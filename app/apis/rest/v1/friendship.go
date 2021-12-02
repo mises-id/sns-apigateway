@@ -36,6 +36,9 @@ func ListFriendship(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return err
 	}
+	if len(params.RelationType) == 0 {
+		params.RelationType = "fan"
+	}
 
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {

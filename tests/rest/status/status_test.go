@@ -116,7 +116,7 @@ func (suite *StatusServerSuite) TestCreateStatus() {
 		resp := suite.Expect.POST("/api/v1/status").WithJSON(map[string]interface{}{
 			"status_type": "link",
 			"content":     "post a link status",
-			"meta":        linkMeta,
+			"link_meta":   linkMeta,
 		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(codes.SuccessCode)
 		status := &models.Status{}

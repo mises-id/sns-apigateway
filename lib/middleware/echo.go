@@ -4,7 +4,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mises-id/apigateway/lib/codes"
 	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/mongo"
+	grpccodes "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var ErrorResponseMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -14,10 +15,20 @@ var ErrorResponseMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 			if _, ok := err.(*echo.HTTPError); ok {
 				return err
 			}
-			switch err {
-			case mongo.ErrNoDocuments:
-				err = codes.ErrNotFound
+			statusErr, ok := status.FromError(err)
+			if ok {
+				switch statusErr.Code() {
+				case grpccodes.NotFound:
+					err = codes.ErrNotFound
+				case grpccodes.PermissionDenied:
+					err = codes.ErrForbidden
+				case grpccodes.Unauthenticated:
+					err = codes.ErrUnauthorized
+				case grpccodes.AlreadyExists:
+					err = codes.ErrUsernameExisted
+				}
 			}
+
 			code, ok := err.(codes.Code)
 			if !ok {
 				log.WithFields(map[string]interface{}{

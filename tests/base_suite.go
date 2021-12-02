@@ -6,6 +6,7 @@ import (
 
 	"github.com/khaiql/dbcleaner"
 	"github.com/mises-id/socialsvc/app/models"
+	"github.com/mises-id/socialsvc/config/env"
 	"github.com/mises-id/socialsvc/lib/db"
 	"github.com/stretchr/testify/suite"
 )
@@ -17,7 +18,15 @@ type BaseTestSuite struct {
 
 func (suite *BaseTestSuite) SetupSuite() {
 	suite.DbCleaner = dbcleaner.New()
+	// TODO the env should read through api
+	env.Envs = &env.Env{
+		DBName:   "mises_dev",
+		DBUser:   "root",
+		DBPass:   "example",
+		MongoURI: "mongodb://localhost:27017",
+	}
 	db.SetupMongo(context.Background())
+	models.EnsureIndex()
 }
 
 func (suite *BaseTestSuite) TearDownSuite() {

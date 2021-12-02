@@ -34,7 +34,7 @@ var SetCurrentUserMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 			if err != nil {
 				return err
 			}
-			userSession := UserSession{
+			userSession := &UserSession{
 				UID:      user.UID,
 				Username: user.Username,
 				Misesid:  user.Misesid,

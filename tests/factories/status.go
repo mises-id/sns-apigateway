@@ -36,6 +36,7 @@ var StatusFactory = factory.NewFactory(
 	return uint64(0), nil
 }).OnCreate(func(args factory.Args) error {
 	_, err := db.DB().Collection("statuses").InsertOne(context.Background(), args.Instance())
+
 	return err
 })
 

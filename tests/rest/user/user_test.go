@@ -129,7 +129,7 @@ func (suite *UserServerSuite) TestUpdateUser() {
 		AvatarID: 0,
 		Misesid:  "123",
 	})
-	token := suite.MockLoginUser("123:123")
+	token := suite.MockLoginUser("1001:123")
 	suite.T().Run("update username success", func(t *testing.T) {
 		resp := suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
 			"by": "username",
@@ -148,7 +148,7 @@ func (suite *UserServerSuite) TestUpdateUser() {
 			"username": map[string]interface{}{
 				"username": "Hello",
 			},
-		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusForbidden).JSON().Object()
+		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusUnprocessableEntity).JSON().Object()
 		resp.Value("code").Equal(codes.UsernameExistedCode)
 	})
 	suite.T().Run("update user avatar success", func(t *testing.T) {

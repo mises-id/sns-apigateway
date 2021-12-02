@@ -71,7 +71,7 @@ func (suite *FollowServerSuite) TestListFriendship() {
 	})
 
 	suite.T().Run("list fans", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fans").
+		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fan").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(8)
@@ -82,7 +82,7 @@ func (suite *FollowServerSuite) TestListFriendship() {
 		resp.Value("pagination").Object().Value("last_id").Equal("")
 	})
 
-	suite.T().Run("list folloing", func(t *testing.T) {
+	suite.T().Run("list following", func(t *testing.T) {
 		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "following").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
@@ -102,7 +102,7 @@ func (suite *FollowServerSuite) TestListFriendship() {
 	})
 
 	suite.T().Run("list page", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fans").
+		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fan").
 			WithQuery("limit", "3").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
@@ -111,15 +111,16 @@ func (suite *FollowServerSuite) TestListFriendship() {
 		resp.Value("pagination").Object().Value("last_id").NotEqual("")
 	})
 
-	token := suite.MockLoginUser(user1.Misesid + ":123")
+	token := suite.MockLoginUser("1001:" + user1.Misesid)
+	println("token", token)
 	suite.T().Run("follow stranger", func(t *testing.T) {
 		resp := suite.Expect.POST("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": user2.UID}).
 			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		f, err := models.GetFollow(context.Background(), 1, user2.UID)
+		f, err := models.GetFollow(context.Background(), user1.UID, user2.UID)
 		suite.Nil(err)
 		suite.False(f.IsFriend)
-		_, err = models.GetFollow(context.Background(), user2.UID, 1)
+		_, err = models.GetFollow(context.Background(), user2.UID, user1.UID)
 		suite.Equal(err, mongo.ErrNoDocuments)
 
 		u1, u2 := &models.User{}, &models.User{}

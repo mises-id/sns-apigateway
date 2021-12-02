@@ -26,11 +26,14 @@ func BuildSuccessResp(c echo.Context, data interface{}) error {
 }
 
 // BuildSuccessResp return a success response with payload
-func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination interface{}) error {
+func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination *pb.PageQuick) error {
 	return c.JSON(http.StatusOK, echo.Map{
-		"code":       0,
-		"data":       data,
-		"pagination": pagination,
+		"code": 0,
+		"data": data,
+		"pagination": PageQuickParams{
+			Limit:  int64(pagination.Limit),
+			NextID: pagination.NextId,
+		},
 	})
 }
 

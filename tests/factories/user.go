@@ -8,6 +8,8 @@ import (
 	"github.com/mises-id/socialsvc/app/models"
 	"github.com/mises-id/socialsvc/app/models/enum"
 	"github.com/mises-id/socialsvc/lib/db"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var UserFactory = factory.NewFactory(
@@ -29,7 +31,13 @@ var UserFactory = factory.NewFactory(
 }).Attr("AvatarID", func(args factory.Args) (interface{}, error) {
 	return uint64(0), nil
 }).OnCreate(func(args factory.Args) error {
-	_, err := db.DB().Collection("users").InsertOne(context.Background(), args.Instance())
+	user := args.Instance().(*models.User)
+	_, err := db.DB().Collection("users").InsertOne(context.Background(), user)
+	db.DB().Collection("counters").FindOneAndUpdate(context.Background(), bson.M{"_id": "userid"},
+		bson.M{"$set": bson.M{"seq": user.UID}},
+		options.FindOneAndUpdate().SetUpsert(true),
+	)
+	println("create user ", user.UID, user.Misesid)
 	return err
 })
 

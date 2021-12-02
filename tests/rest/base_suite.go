@@ -63,6 +63,7 @@ func (suite *RestBaseTestSuite) LoginUser(auth string) string {
 }
 
 func (suite *RestBaseTestSuite) MockLoginUser(auth string) string {
+	println("MockLoginUser", auth)
 	resp := suite.Expect.POST("/api/v1/signin").WithJSON(map[string]interface{}{
 		"provider": "mises",
 		"user_authz": map[string]interface{}{
