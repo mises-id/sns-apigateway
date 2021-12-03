@@ -10,9 +10,12 @@ require (
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gavv/httpexpect v2.0.0+incompatible
+	github.com/go-kit/kit v0.12.0 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/mock v1.4.4
 	github.com/google/go-github/v33 v33.0.0
 	github.com/google/uuid v1.1.2
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
@@ -37,3 +40,5 @@ require (
 )
 
 replace github.com/mises-id/socialsvc => ../socialsvc
+
+replace github.com/go-kit/kit => ../kit

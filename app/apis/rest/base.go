@@ -6,10 +6,15 @@ import (
 	"net/http"
 	"time"
 
+	grpcpool "github.com/go-kit/kit/util/grpcpool"
 	"github.com/labstack/echo"
 	pb "github.com/mises-id/socialsvc/proto"
 	grpcclient "github.com/mises-id/socialsvc/svc/client/grpc"
 	"google.golang.org/grpc"
+)
+
+var (
+	socialSvcPool *grpcpool.Pool
 )
 
 type PageQuickParams struct {
@@ -44,14 +49,28 @@ func Probe(c echo.Context) error {
 
 // build a service client, we are currently not using service discover
 func GrpcSocialService() (pb.SocialServer, context.Context, error) {
-	conn, err := grpc.Dial(":5040", grpc.WithInsecure(), grpc.WithTimeout(time.Second))
+	conn, err := socialSvcPool.Get(context.Background())
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create grpcclient: %q", err)
 	}
+	defer conn.Close()
 
 	// Create a context with the header key and value
 	ctx := context.WithValue(context.Background(), "key", "value")
 
-	svcclient, err := grpcclient.New(conn)
+	svcclient, err := grpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
+}
+
+func init() {
+	var err error
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	socialSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		println("grpcpool", "new connection created")
+		return grpc.DialContext(ctx, ":5040", grpc.WithInsecure())
+	}, 0, 1, 60*time.Second)
+	if err != nil {
+		panic(err)
+	}
 }
