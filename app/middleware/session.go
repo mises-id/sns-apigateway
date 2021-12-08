@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
-	"github.com/mises-id/apigateway/lib/codes"
-	"github.com/mises-id/socialsvc/app/services/session"
+	"github.com/mises-id/sns-apigateway/lib/codes"
+	"github.com/mises-id/sns-socialsvc/app/services/session"
 )
 
 var (

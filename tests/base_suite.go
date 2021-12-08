@@ -5,9 +5,9 @@ import (
 	"sort"
 
 	"github.com/khaiql/dbcleaner"
-	"github.com/mises-id/socialsvc/app/models"
-	"github.com/mises-id/socialsvc/config/env"
-	"github.com/mises-id/socialsvc/lib/db"
+	"github.com/mises-id/sns-socialsvc/app/models"
+	"github.com/mises-id/sns-socialsvc/config/env"
+	"github.com/mises-id/sns-socialsvc/lib/db"
 	"github.com/stretchr/testify/suite"
 )
 

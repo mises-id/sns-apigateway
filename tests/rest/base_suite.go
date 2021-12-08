@@ -7,9 +7,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/mises-id/apigateway/config/route"
-	"github.com/mises-id/apigateway/tests"
-	misesMock "github.com/mises-id/apigateway/tests/mocks/lib/mises"
+	"github.com/mises-id/sns-apigateway/config/route"
+	"github.com/mises-id/sns-apigateway/tests"
+	misesMock "github.com/mises-id/sns-apigateway/tests/mocks/lib/mises"
 )
 
 type RestBaseTestSuite struct {

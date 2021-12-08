@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mises-id/apigateway/config/env"
-	"github.com/mises-id/apigateway/tests/rest"
+	"github.com/mises-id/sns-apigateway/config/env"
+	"github.com/mises-id/sns-apigateway/tests/rest"
 	"github.com/stretchr/testify/suite"
 )
 

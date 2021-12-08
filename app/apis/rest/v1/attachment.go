@@ -4,7 +4,7 @@ import (
 	"mime/multipart"
 
 	"github.com/labstack/echo"
-	"github.com/mises-id/apigateway/lib/codes"
+	"github.com/mises-id/sns-apigateway/lib/codes"
 	"github.com/sirupsen/logrus"
 )
 

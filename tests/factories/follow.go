@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/bluele/factory-go/factory"
-	"github.com/mises-id/socialsvc/app/models"
-	"github.com/mises-id/socialsvc/lib/db"
+	"github.com/mises-id/sns-socialsvc/app/models"
+	"github.com/mises-id/sns-socialsvc/lib/db"
 )
 
 var FollowFactory = factory.NewFactory(

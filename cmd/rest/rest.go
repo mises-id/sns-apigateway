@@ -12,8 +12,8 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/mises-id/apigateway/config/env"
-	"github.com/mises-id/apigateway/config/route"
+	"github.com/mises-id/sns-apigateway/config/env"
+	"github.com/mises-id/sns-apigateway/config/route"
 )
 
 func Start(ctx context.Context) error {

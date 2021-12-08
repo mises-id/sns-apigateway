@@ -8,8 +8,8 @@ import (
 
 	grpcpool "github.com/go-kit/kit/util/grpcpool"
 	"github.com/labstack/echo"
-	pb "github.com/mises-id/socialsvc/proto"
-	grpcclient "github.com/mises-id/socialsvc/svc/client/grpc"
+	pb "github.com/mises-id/sns-socialsvc/proto"
+	grpcclient "github.com/mises-id/sns-socialsvc/svc/client/grpc"
 	"google.golang.org/grpc"
 )
 

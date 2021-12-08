@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/mises-id/apigateway/app/apis/rest"
-	"github.com/mises-id/apigateway/lib/codes"
-	pb "github.com/mises-id/socialsvc/proto"
+	"github.com/mises-id/sns-apigateway/app/apis/rest"
+	"github.com/mises-id/sns-apigateway/lib/codes"
+	pb "github.com/mises-id/sns-socialsvc/proto"
 )
 
 type ListUserStatusParams struct {

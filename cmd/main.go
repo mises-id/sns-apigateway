@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/mises-id/apigateway/cmd/rest"
+	"github.com/mises-id/sns-apigateway/cmd/rest"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )

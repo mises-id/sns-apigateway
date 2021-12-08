@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	"github.com/bluele/factory-go/factory"
-	"github.com/mises-id/socialsvc/app/models"
-	"github.com/mises-id/socialsvc/app/models/enum"
-	"github.com/mises-id/socialsvc/app/models/meta"
-	"github.com/mises-id/socialsvc/lib/db"
+	"github.com/mises-id/sns-socialsvc/app/models"
+	"github.com/mises-id/sns-socialsvc/app/models/enum"
+	"github.com/mises-id/sns-socialsvc/app/models/meta"
+	"github.com/mises-id/sns-socialsvc/lib/db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

@@ -2,10 +2,10 @@ package route
 
 import (
 	"github.com/labstack/echo"
-	"github.com/mises-id/apigateway/app/apis/rest"
-	v1 "github.com/mises-id/apigateway/app/apis/rest/v1"
-	appmw "github.com/mises-id/apigateway/app/middleware"
-	mw "github.com/mises-id/apigateway/lib/middleware"
+	"github.com/mises-id/sns-apigateway/app/apis/rest"
+	v1 "github.com/mises-id/sns-apigateway/app/apis/rest/v1"
+	appmw "github.com/mises-id/sns-apigateway/app/middleware"
+	mw "github.com/mises-id/sns-apigateway/lib/middleware"
 )
 
 // SetRoutes sets the routes of echo http server

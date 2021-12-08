@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/labstack/echo"
-	"github.com/mises-id/apigateway/lib/codes"
+	"github.com/mises-id/sns-apigateway/lib/codes"
 	log "github.com/sirupsen/logrus"
 	grpccodes "google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mises-id/apigateway/lib/codes"
-	"github.com/mises-id/apigateway/tests/factories"
-	"github.com/mises-id/apigateway/tests/rest"
-	"github.com/mises-id/socialsvc/app/models"
-	"github.com/mises-id/socialsvc/app/models/enum"
-	"github.com/mises-id/socialsvc/lib/db"
+	"github.com/mises-id/sns-apigateway/lib/codes"
+	"github.com/mises-id/sns-apigateway/tests/factories"
+	"github.com/mises-id/sns-apigateway/tests/rest"
+	"github.com/mises-id/sns-socialsvc/app/models"
+	"github.com/mises-id/sns-socialsvc/app/models/enum"
+	"github.com/mises-id/sns-socialsvc/lib/db"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson"
 )

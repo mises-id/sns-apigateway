@@ -1,4 +1,4 @@
-module github.com/mises-id/apigateway
+module github.com/mises-id/sns-apigateway
 
 go 1.16
 
@@ -10,7 +10,7 @@ require (
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gavv/httpexpect v2.0.0+incompatible
-	github.com/go-kit/kit v0.12.0 // indirect
+	github.com/go-kit/kit v0.12.0
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/mock v1.4.4
 	github.com/google/go-github/v33 v33.0.0
@@ -23,7 +23,7 @@ require (
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
-	github.com/mises-id/socialsvc v0.0.0-00010101000000-000000000000
+	github.com/mises-id/sns-socialsvc v0.0.0-20211208063925-3b844bc52949
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -39,6 +39,6 @@ require (
 	google.golang.org/grpc v1.42.0
 )
 
-replace github.com/mises-id/socialsvc => ../socialsvc
+replace github.com/go-kit/kit => github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165
 
-replace github.com/go-kit/kit => ../kit
+replace github.com/mises-id/sns-socialsvc => ../socialsvc
