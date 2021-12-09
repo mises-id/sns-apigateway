@@ -1,7 +1,10 @@
+// +build cgo,tests
+
 package tests
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/khaiql/dbcleaner"
@@ -10,6 +13,10 @@ import (
 	"github.com/mises-id/sns-socialsvc/lib/db"
 	"github.com/stretchr/testify/suite"
 )
+
+func init() {
+	fmt.Println("this is test build...")
+}
 
 type BaseTestSuite struct {
 	suite.Suite
