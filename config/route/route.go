@@ -12,8 +12,8 @@ import (
 func SetRoutes(e *echo.Echo) {
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
-
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
+	groupV1.POST("/upload", v1.UploadFile)
 	groupV1.POST("/attachment", v1.Upload)
 	groupV1.GET("/user/:uid", v1.FindUser)
 	groupV1.POST("/signin", v1.SignIn)
