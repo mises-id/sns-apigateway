@@ -22,6 +22,7 @@ type Env struct {
 	JWTSecret       string        `env:"JWT_SECRET,required"`
 	TokenDuration   time.Duration `env:"TOKEN_DURATION" envDefault:"24h"`
 	AllowOrigins    string        `env:"ALLOW_ORIGINS" envDefault:""`
+	LocalFilePath   string        `env:"LocalFilePath" envDefault:"/tmp/sns-apigateway/"`
 	RootPath        string
 }
 

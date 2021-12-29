@@ -3,20 +3,17 @@ package v1
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
+	"github.com/mises-id/sns-apigateway/config/env"
 	"github.com/mises-id/sns-apigateway/lib/codes"
-
-	//"github.com/mises-id/sns-apigateway/app/apis/rest"
 	storagepb "github.com/mises-id/sns-storagesvc/proto"
-)
-
-var (
-	localFilePath = "/Users/cg/Documents/image/temp/"
 )
 
 type (
@@ -42,7 +39,8 @@ func UploadFile(c echo.Context) error {
 		return err
 	}
 	defer src.Close()
-	localFile, err := saveLocal(fileFolder(), file.Filename, src)
+
+	localFile, err := saveLocal(fileFolder(), fileName(file.Filename), src)
 	if err != nil {
 		return err
 	}
@@ -50,22 +48,24 @@ func UploadFile(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(grpcsvc)
-	key := path.Join(time.Now().Format("2006/01/02/"), file.Filename)
+	key := path.Join(time.Now().Format("2006/01/02/"), fileName(file.Filename))
 	svcresp, err := grpcsvc.FUpload(ctx, &storagepb.FUploadRequest{File: localFile, Key: key, Bucket: ""})
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}
-	fmt.Println(svcresp)
 	return rest.BuildSuccessResp(c, svcresp)
-
-	return nil
 }
 
 func fileFolder() string {
 
-	return path.Join(localFilePath, time.Now().Format("2006/01/02/"))
+	return path.Join(env.Envs.LocalFilePath, time.Now().Format("2006/01/02/"))
+}
+
+func fileName(filename string) string {
+
+	return strconv.FormatInt(time.Now().Unix(), 10) + strconv.Itoa(rand.Intn(999999-100000)+100000) + path.Ext(filename)
+
 }
 
 func saveLocal(filePath, filename string, file File) (string, error) {
