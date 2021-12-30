@@ -20,6 +20,12 @@ var (
 	storageSvcPool *grpcpool.Pool
 )
 
+type PoolCfg struct {
+	SocialSvcURI  string
+	StorageSvcURI string
+	Capacity      int
+	IdleTimeout   time.Duration
+}
 type PageQuickParams struct {
 	Limit  int64  `json:"limit" query:"limit"`
 	NextID string `json:"last_id" query:"last_id"`
@@ -79,19 +85,23 @@ func GrpcStorageService() (storagepb.StoragesvcServer, context.Context, error) {
 	return svcclient, ctx, err
 }
 
-func init() {
+func ResetSvrPool(cfg PoolCfg) {
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	socialSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
-		return grpc.DialContext(ctx, ":5040", grpc.WithInsecure())
-	}, 0, 1, 60*time.Second)
+		return grpc.DialContext(ctx, cfg.SocialSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 	storageSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
-		return grpc.DialContext(ctx, ":6040", grpc.WithInsecure())
-	}, 0, 1, 60*time.Second)
+		return grpc.DialContext(ctx, cfg.StorageSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func init() {
+	ResetSvrPool(PoolCfg{":5040", ":6040", 1, 60})
 }

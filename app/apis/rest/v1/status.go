@@ -16,10 +16,10 @@ type ListUserStatusParams struct {
 }
 
 type LinkMeta struct {
-	Title        string `json:"title"`
-	Host         string `json:"host"`
-	Link         string `json:"link"`
-	AttachmentID uint64 `json:"attachment_id"`
+	Title          string `json:"title"`
+	Host           string `json:"host"`
+	Link           string `json:"link"`
+	AttachmentPath string `json:"attachment_path"`
 }
 
 type CreateStatusParams struct {
@@ -30,11 +30,11 @@ type CreateStatusParams struct {
 }
 
 type LinkMetaResp struct {
-	Title         string `json:"title"`
-	Host          string `json:"host"`
-	Link          string `json:"link"`
-	AttachmentID  uint64 `json:"attachment_id"`
-	AttachmentURL string `json:"attachment_url"`
+	Title          string `json:"title"`
+	Host           string `json:"host"`
+	Link           string `json:"link"`
+	AttachmentPath uint64 `json:"attachment_path"`
+	AttachmentURL  string `json:"attachment_url"`
 }
 
 type StatusResp struct {

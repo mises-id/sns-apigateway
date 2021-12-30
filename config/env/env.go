@@ -19,7 +19,7 @@ type Env struct {
 	LogLevel        string        `env:"LOG_LEVEL" envDefault:"INFO"`
 	AssetHost       string        `env:"ASSET_HOST" envDefault:"http://localhost/"`
 	StorageProvider string        `env:"STORAGE_PROVIDER" envDefault:"local"`
-	JWTSecret       string        `env:"JWT_SECRET,required"`
+	JWTSecret       string        `env:"JWT_SECRET" envDefault:"jwt secret"`
 	TokenDuration   time.Duration `env:"TOKEN_DURATION" envDefault:"24h"`
 	AllowOrigins    string        `env:"ALLOW_ORIGINS" envDefault:""`
 	LocalFilePath   string        `env:"LocalFilePath" envDefault:"/tmp/sns-apigateway/"`

@@ -1,4 +1,4 @@
-// +build cgo,tests
+// +build tests
 
 package factories
 
@@ -30,8 +30,8 @@ var UserFactory = factory.NewFactory(
 	return "", nil
 }).Attr("Address", func(args factory.Args) (interface{}, error) {
 	return "", nil
-}).Attr("AvatarID", func(args factory.Args) (interface{}, error) {
-	return uint64(0), nil
+}).Attr("AvatarPath", func(args factory.Args) (interface{}, error) {
+	return "", nil
 }).OnCreate(func(args factory.Args) error {
 	user := args.Instance().(*models.User)
 	_, err := db.DB().Collection("users").InsertOne(context.Background(), user)
@@ -46,14 +46,14 @@ var UserFactory = factory.NewFactory(
 func InitUsers(args ...*models.User) {
 	for _, arg := range args {
 		UserFactory.MustCreateWithOption(map[string]interface{}{
-			"UID":      arg.UID,
-			"Username": arg.Username,
-			"Misesid":  arg.Misesid,
-			"Gender":   arg.Gender,
-			"Mobile":   arg.Mobile,
-			"Email":    arg.Email,
-			"Address":  arg.Address,
-			"AvatarID": arg.AvatarID,
+			"UID":        arg.UID,
+			"Username":   arg.Username,
+			"Misesid":    arg.Misesid,
+			"Gender":     arg.Gender,
+			"Mobile":     arg.Mobile,
+			"Email":      arg.Email,
+			"Address":    arg.Address,
+			"AvatarPath": arg.AvatarPath,
 		})
 	}
 }

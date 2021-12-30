@@ -1,4 +1,4 @@
-// +build cgo,tests
+// +build tests
 
 package follow
 

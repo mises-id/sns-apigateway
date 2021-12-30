@@ -1,12 +1,11 @@
+// +build tests
+
 package attachment
 
 import (
-	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"testing"
-	"time"
 
 	"github.com/mises-id/sns-apigateway/config/env"
 	"github.com/mises-id/sns-apigateway/tests/rest"
@@ -50,21 +49,21 @@ func TestAttachmentServer(t *testing.T) {
 }
 
 func (suite *AttachmentServerSuite) TestUpload() {
-	suite.T().Run("upload image success", func(t *testing.T) {
-		resp := suite.Expect.POST("/api/v1/attachment").WithMultipart().
-			WithFile("file", "../../test.jpg").WithFormField("file_type", "image").
-			Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("code").Equal(0)
-		resp.Value("data").Object().Value("id").Equal(1)
-	})
+	// suite.T().Run("upload image success", func(t *testing.T) {
+	// 	resp := suite.Expect.POST("/api/v1/attachment").WithMultipart().
+	// 		WithFile("file", "../../test.jpg").WithFormField("file_type", "image").
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	resp.Value("code").Equal(0)
+	// 	resp.Value("data").Object().Value("id").Equal(1)
+	// })
 
-	suite.T().Run("upload video success", func(t *testing.T) {
-		resp := suite.Expect.POST("/api/v1/attachment").WithMultipart().
-			WithFile("file", "../../test.mp4").WithFormField("file_type", "video").
-			Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("code").Equal(0)
-		resp.Value("data").Object().Value("id").Equal(2)
-		url := fmt.Sprintf("http://localhost/upload/attachment/%s/2/test.mp4", time.Now().Format("2006/01/02"))
-		resp.Value("data").Object().Value("url").Equal(url)
-	})
+	// suite.T().Run("upload video success", func(t *testing.T) {
+	// 	resp := suite.Expect.POST("/api/v1/attachment").WithMultipart().
+	// 		WithFile("file", "../../test.mp4").WithFormField("file_type", "video").
+	// 		Expect().Status(http.StatusOK).JSON().Object()
+	// 	resp.Value("code").Equal(0)
+	// 	resp.Value("data").Object().Value("id").Equal(2)
+	// 	url := fmt.Sprintf("http://localhost/upload/attachment/%s/2/test.mp4", time.Now().Format("2006/01/02"))
+	// 	resp.Value("data").Object().Value("url").Equal(url)
+	// })
 }

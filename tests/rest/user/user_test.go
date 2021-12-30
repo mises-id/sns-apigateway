@@ -1,4 +1,4 @@
-// +build cgo,tests
+// +build tests
 
 package user
 
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/mises-id/sns-apigateway/lib/codes"
 	"github.com/mises-id/sns-apigateway/tests/factories"
@@ -47,23 +46,17 @@ func TestUserServer(t *testing.T) {
 }
 
 func (suite *UserServerSuite) TestFindUser() {
-	factories.InitAttachments(&models.Attachment{
-		ID:        1,
-		Filename:  "test.jpg",
-		FileType:  enum.ImageFile,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	})
+
 	factories.InitUsers(&models.User{
-		UID:      1,
-		AvatarID: 1,
-		Misesid:  "123",
-		Gender:   enum.GenderMale,
+		UID:        1,
+		AvatarPath: "DummyAvatarPath",
+		Misesid:    "123",
+		Gender:     enum.GenderMale,
 	}, &models.User{
-		UID:      2,
-		Misesid:  "456",
-		Gender:   enum.GenderMale,
-		AvatarID: 0,
+		UID:        2,
+		Misesid:    "456",
+		Gender:     enum.GenderMale,
+		AvatarPath: "",
 	})
 	suite.T().Run("not found user", func(t *testing.T) {
 		resp := suite.Expect.GET("/api/v1/user/999").
@@ -76,7 +69,7 @@ func (suite *UserServerSuite) TestFindUser() {
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Object().Value("uid").Equal(1)
-		url := fmt.Sprintf("http://localhost/upload/attachment/%s/1/test.jpg", time.Now().Format("2006/01/02"))
+		url := fmt.Sprintf("http://localhost/DummyAvatarPath?")
 		resp.Value("data").Object().Value("avatar").Object().Value("small").Equal(url)
 	})
 
@@ -91,24 +84,17 @@ func (suite *UserServerSuite) TestFindUser() {
 
 func (suite *UserServerSuite) TestSignin() {
 	factories.InitUsers(&models.User{
-		UID:      1001,
-		AvatarID: 0,
-		Misesid:  "123",
-		Gender:   enum.GenderMale,
-	})
-	factories.InitAttachments(&models.Attachment{
-		ID:        1,
-		Filename:  "test.jpg",
-		FileType:  enum.ImageFile,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UID:        1001,
+		AvatarPath: "0",
+		Misesid:    "1001",
+		Gender:     enum.GenderMale,
 	})
 
 	suite.T().Run("user signin success", func(t *testing.T) {
 		resp := suite.Expect.POST("/api/v1/signin").WithJSON(map[string]interface{}{
 			"provider": "mises",
 			"user_authz": map[string]interface{}{
-				"auth": "123:123",
+				"auth": "1001:1001",
 			},
 		}).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
@@ -117,7 +103,7 @@ func (suite *UserServerSuite) TestSignin() {
 		resp := suite.Expect.POST("/api/v1/signin").WithJSON(map[string]interface{}{
 			"provider": "mises",
 			"user_authz": map[string]interface{}{
-				"auth": "234:234",
+				"auth": "1002:1002",
 			},
 		}).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
@@ -126,12 +112,12 @@ func (suite *UserServerSuite) TestSignin() {
 
 func (suite *UserServerSuite) TestUpdateUser() {
 	factories.InitUsers(&models.User{
-		UID:      1001,
-		Gender:   enum.GenderFemale,
-		AvatarID: 0,
-		Misesid:  "123",
+		UID:        1001,
+		Gender:     enum.GenderFemale,
+		AvatarPath: "0",
+		Misesid:    "1001",
 	})
-	token := suite.MockLoginUser("1001:123")
+	token := suite.MockLoginUser("1001:1001")
 	suite.T().Run("update username success", func(t *testing.T) {
 		resp := suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
 			"by": "username",
@@ -157,16 +143,18 @@ func (suite *UserServerSuite) TestUpdateUser() {
 		resp := suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
 			"by": "avatar",
 			"avatar": map[string]interface{}{
-				"attachment_id": 1,
+				"attachment_path": "1",
 			},
 		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		u := &models.User{}
 		err := db.ODM(context.Background()).First(u, bson.M{"_id": 1001}).Error
 		suite.Nil(err)
-		suite.Equal(uint64(1), u.AvatarID)
+		suite.Equal("1", u.AvatarPath)
 	})
 	suite.T().Run("update user profile success", func(t *testing.T) {
+		suite.Expect.GET("/api/v1/user/me").WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK)
+
 		resp := suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
 			"by": "profile",
 			"profile": map[string]interface{}{

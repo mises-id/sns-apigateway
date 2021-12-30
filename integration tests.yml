@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: run tests
-        run: APP_ENV=test go test -coverprofile coverage.out -v ./...
+        run: APP_ENV=test go test -coverprofile coverage.out -v  --tags tests -parallel 1 ./...
         env:
           APP_ENV: test
 

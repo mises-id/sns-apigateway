@@ -18,7 +18,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
-	github.com/mises-id/sns-socialsvc v0.0.0-20211229071341-a3b899011e42
+	github.com/mises-id/sns-socialsvc v0.0.0-20211230035130-2aa7f95cd451
 	github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -31,3 +31,7 @@ require (
 replace github.com/go-kit/kit => github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20211207033151-1f29b59c0edf
+
+replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20211209094558-a7c9c77cfc17
