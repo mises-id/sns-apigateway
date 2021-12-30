@@ -11,6 +11,7 @@ import (
 	"github.com/khaiql/dbcleaner"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-socialsvc/app/models"
+	"github.com/mises-id/sns-socialsvc/app/services/session"
 	_ "github.com/mises-id/sns-socialsvc/config"
 	"github.com/mises-id/sns-socialsvc/config/env"
 	"github.com/mises-id/sns-socialsvc/handlers"
@@ -40,6 +41,7 @@ func (suite *BaseTestSuite) SetupSuite() {
 	}
 	db.SetupMongo(context.Background())
 	models.EnsureIndex()
+	session.SetupMisesClient()
 
 	port := 15040
 	cfg := server.DefaultConfig
