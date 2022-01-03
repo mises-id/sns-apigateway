@@ -7,7 +7,7 @@ require (
 	github.com/alexflint/go-filemutex v1.1.0 // indirect
 	github.com/bluele/factory-go v0.0.1
 	github.com/caarlos0/env v3.5.0+incompatible
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/gavv/httpexpect v2.0.0+incompatible
@@ -15,7 +15,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/mock v1.4.4
 	github.com/google/go-github/v33 v33.0.0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/joho/godotenv v1.4.0
@@ -25,6 +25,7 @@ require (
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/mises-id/sns-socialsvc v0.0.0-20211208063925-3b844bc52949
+	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -35,8 +36,8 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
-	go.mongodb.org/mongo-driver v1.8.0
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
+	go.mongodb.org/mongo-driver v1.8.1
+	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914
 	google.golang.org/grpc v1.42.0
 )
 

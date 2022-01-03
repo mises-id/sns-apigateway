@@ -97,7 +97,7 @@ type UserNameParams struct {
 }
 
 type UserAvatarParams struct {
-	AttachmentID uint64 `json:"attachment_id"`
+	AttachmentPath string `json:"attachment_path"`
 }
 
 type UserUpdateParams struct {
@@ -134,8 +134,8 @@ func UpdateUser(c echo.Context) error {
 		})
 	case "avatar":
 		serverresp, err = grpcsvc.UpdateUserAvatar(ctx, &pb.UpdateUserAvatarRequest{
-			Uid:          uid,
-			AttachmentId: params.Avatar.AttachmentID,
+			Uid:            uid,
+			AttachmentPath: params.Avatar.AttachmentPath,
 		})
 	case "username":
 		serverresp, err = grpcsvc.UpdateUserName(ctx, &pb.UpdateUserNameRequest{

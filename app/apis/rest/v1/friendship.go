@@ -26,6 +26,25 @@ type FriendshipResp struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+func LatestFollowing(c echo.Context) error {
+	uidParam := c.Param("uid")
+	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	if err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.LatestFollowing(ctx, &pb.LatestFollowingRequest{
+		CurrentUid: uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, svcresp.Followings)
+}
+
 func ListFriendship(c echo.Context) error {
 	uidParam := c.Param("uid")
 	uid, err := strconv.ParseUint(uidParam, 10, 64)
