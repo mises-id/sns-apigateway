@@ -1,5 +1,3 @@
-// +build cgo,tests
-
 package tests
 
 import (
