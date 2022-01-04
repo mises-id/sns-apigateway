@@ -14,7 +14,6 @@ func SetRoutes(e *echo.Echo) {
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	groupV1.POST("/upload", v1.UploadFile)
-	groupV1.POST("/attachment", v1.Upload)
 	groupV1.GET("/user/:uid", v1.FindUser)
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
@@ -24,6 +23,8 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.PATCH("/user/me", v1.UpdateUser)
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)
+	userGroup.GET("/user/following/latest", v1.LatestFollowing)
+
 	groupV1.GET("/user/:uid/status", v1.ListUserStatus)
 	groupV1.GET("/status/recommend", v1.RecommendStatus)
 	userGroup.GET("/timeline/me", v1.Timeline)
@@ -35,4 +36,7 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)
+
+	userGroup.GET("/message", v1.ListMessage)
+	userGroup.PATCH("/message/read", v1.ReadMessage)
 }

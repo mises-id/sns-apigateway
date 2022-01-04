@@ -12,13 +12,13 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v33 v33.0.0
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
-	github.com/mises-id/sns-socialsvc v0.0.0-20211230063117-75473fcba06e
+	github.com/mises-id/sns-socialsvc v0.0.0-20220104055004-c53df48ab86a
 	github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
