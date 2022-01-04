@@ -65,7 +65,7 @@ func MyProfile(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, buildUserResp(svcresp.User, false))
+	return rest.BuildSuccessResp(c, BuildUserResp(svcresp.User, false))
 }
 
 func FindUser(c echo.Context) error {
@@ -82,7 +82,7 @@ func FindUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, buildUserResp(svcresp.User, svcresp.IsFollowed))
+	return rest.BuildSuccessResp(c, BuildUserResp(svcresp.User, svcresp.IsFollowed))
 }
 
 type UserProfileParams struct {
@@ -146,10 +146,10 @@ func UpdateUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, buildUserResp(serverresp.User, false))
+	return rest.BuildSuccessResp(c, BuildUserResp(serverresp.User, false))
 }
 
-func buildUserResp(user *pb.UserInfo, followed bool) *UserResp {
+func BuildUserResp(user *pb.UserInfo, followed bool) *UserResp {
 	if user == nil {
 		return nil
 	}

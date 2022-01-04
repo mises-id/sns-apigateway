@@ -33,7 +33,7 @@ type LinkMetaResp struct {
 	Title          string `json:"title"`
 	Host           string `json:"host"`
 	Link           string `json:"link"`
-	AttachmentPath uint64 `json:"attachment_path"`
+	AttachmentPath string `json:"attachment_path"`
 	AttachmentURL  string `json:"attachment_url"`
 }
 
@@ -53,6 +53,48 @@ type StatusResp struct {
 	CreatedAt     time.Time     `json:"created_at"`
 }
 
+func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
+	if info == nil {
+		return nil
+	}
+	resp := &StatusResp{
+		ID:            info.Id,
+		User:          BuildUserResp(info.User, false),
+		Content:       info.Content,
+		FromType:      info.FromType,
+		StatusType:    info.StatusType,
+		CommentsCount: info.CommentCount,
+		LikesCount:    info.LikeCount,
+		ForwardsCount: info.ForwardCount,
+		IsLiked:       info.IsLiked,
+	}
+
+	if info.LinkMeta != nil {
+		resp.LinkMeta = &LinkMetaResp{
+			Title:          info.LinkMeta.Title,
+			Host:           info.LinkMeta.Host,
+			Link:           info.LinkMeta.Link,
+			AttachmentPath: info.LinkMeta.ImagePath,
+			AttachmentURL:  info.LinkMeta.ImageUrl,
+		}
+	}
+	if info.Parent != nil {
+		resp.ParentStatus = BuildStatusResp(info.Parent)
+	}
+	if info.Origin != nil {
+		resp.OriginStatus = BuildStatusResp(info.Origin)
+	}
+
+	return resp
+}
+func BuildStatusRespSlice(infos []*pb.StatusInfo) []*StatusResp {
+	resp := []*StatusResp{}
+	for _, info := range infos {
+		resp = append(resp, BuildStatusResp(info))
+	}
+
+	return resp
+}
 func GetStatus(c echo.Context) error {
 	var currentUID uint64
 	if c.Get("CurrentUID") != nil {
@@ -71,7 +113,7 @@ func GetStatus(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessResp(c, svcresp.Status)
+	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
 
 // list user status
@@ -107,7 +149,7 @@ func ListUserStatus(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Statuses, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 }
 
 func Timeline(c echo.Context) error {
@@ -138,7 +180,7 @@ func Timeline(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Statuses, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 }
 
 func RecommendStatus(c echo.Context) error {
@@ -167,7 +209,7 @@ func RecommendStatus(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Statuses, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 
 }
 
@@ -211,7 +253,7 @@ func CreateStatus(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessResp(c, svcresp.Status)
+	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
 
 func DeleteStatus(c echo.Context) error {

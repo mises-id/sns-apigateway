@@ -46,7 +46,7 @@ func ListComment(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Statuses, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 }
 
 func CreateComment(c echo.Context) error {

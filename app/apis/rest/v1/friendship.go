@@ -26,6 +26,23 @@ type FriendshipResp struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+func BuildFriendshipResp(info *pb.RelationInfo) *FriendshipResp {
+	return &FriendshipResp{
+		User:         BuildUserResp(info.User, true),
+		RelationType: info.RelationType,
+		CreatedAt:    time.UnixMilli(int64(info.CreatedAt)),
+	}
+}
+
+func BuildFriendshipRespSlice(infos []*pb.RelationInfo) []*FriendshipResp {
+	resp := []*FriendshipResp{}
+	for _, info := range infos {
+		resp = append(resp, BuildFriendshipResp(info))
+	}
+
+	return resp
+}
+
 func ListFriendship(c echo.Context) error {
 	uidParam := c.Param("uid")
 	uid, err := strconv.ParseUint(uidParam, 10, 64)
@@ -56,7 +73,7 @@ func ListFriendship(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Relations, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildFriendshipRespSlice(svcresp.Relations), svcresp.Paginator)
 }
 
 func Follow(c echo.Context) error {
