@@ -23,10 +23,12 @@ type LinkMeta struct {
 }
 
 type CreateStatusParams struct {
+	FromType   string    `json:"from_type"`
 	StatusType string    `json:"status_type"`
 	ParentID   string    `json:"parent_id"`
 	Content    string    `json:"content"`
 	LinkMeta   *LinkMeta `json:"link_meta"`
+	Images     []string  `json:"images"`
 }
 
 type LinkMetaResp struct {
@@ -51,6 +53,8 @@ type StatusResp struct {
 	IsLiked       bool          `json:"is_liked"`
 	LinkMeta      *LinkMetaResp `json:"link_meta"`
 	CreatedAt     time.Time     `json:"created_at"`
+	ThumbImages   []string      `json:"thumb_images"`
+	Images        []string      `json:"images"`
 }
 
 func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
@@ -67,6 +71,7 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 		LikesCount:    info.LikeCount,
 		ForwardsCount: info.ForwardCount,
 		IsLiked:       info.IsLiked,
+		CreatedAt:     time.Unix(int64(info.CreatedAt), 0),
 	}
 
 	if info.LinkMeta != nil {
@@ -83,6 +88,13 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 	}
 	if info.Origin != nil {
 		resp.OriginStatus = BuildStatusResp(info.Origin)
+	}
+	if info.ImageMeta != nil {
+		resp.Images = info.ImageMeta.Images
+		resp.ThumbImages = info.ImageMeta.Images
+	} else {
+		resp.Images = []string{}
+		resp.ThumbImages = []string{}
 	}
 
 	return resp
@@ -248,6 +260,7 @@ func CreateStatus(c echo.Context) error {
 		ParentId:   params.ParentID,
 		Meta:       string(meta),
 		FromType:   fromType,
+		Images:     params.Images,
 	})
 	if err != nil {
 		return err

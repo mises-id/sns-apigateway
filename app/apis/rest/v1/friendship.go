@@ -30,7 +30,7 @@ func BuildFriendshipResp(info *pb.RelationInfo) *FriendshipResp {
 	return &FriendshipResp{
 		User:         BuildUserResp(info.User, true),
 		RelationType: info.RelationType,
-		CreatedAt:    time.UnixMilli(int64(info.CreatedAt)),
+		CreatedAt:    time.Unix(int64(info.CreatedAt), 0),
 	}
 }
 

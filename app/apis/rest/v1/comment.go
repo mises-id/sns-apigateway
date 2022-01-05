@@ -20,6 +20,14 @@ type ListCommentParams struct {
 	TopicID       string `query:"topic_id"`
 }
 
+func BuildCommentRespSlice(in []*pb.Comment) []*pb.Comment {
+	if in == nil {
+		return []*pb.Comment{}
+	} else {
+		return in
+	}
+}
+
 func ListComment(c echo.Context) error {
 	params := &ListCommentParams{}
 	if err := c.Bind(params); err != nil {
@@ -47,7 +55,7 @@ func ListComment(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Comments, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildCommentRespSlice(svcresp.Comments), svcresp.Paginator)
 }
 
 func CreateComment(c echo.Context) error {

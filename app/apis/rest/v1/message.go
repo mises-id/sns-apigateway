@@ -17,6 +17,14 @@ type ReadMessageParams struct {
 	LatestID string   `body:"latest_id"`
 }
 
+func BuildMessageRespSlice(in []*pb.Message) []*pb.Message {
+	if in == nil {
+		return []*pb.Message{}
+	} else {
+		return in
+	}
+}
+
 func ListMessage(c echo.Context) error {
 	params := &ListMessageParams{}
 	if err := c.Bind(params); err != nil {
@@ -41,7 +49,7 @@ func ListMessage(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Messages, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildMessageRespSlice(svcresp.Messages), svcresp.Paginator)
 }
 
 func ReadMessage(c echo.Context) error {
