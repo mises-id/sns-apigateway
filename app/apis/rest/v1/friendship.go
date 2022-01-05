@@ -21,14 +21,19 @@ type FollowParams struct {
 }
 
 type FriendshipResp struct {
-	User         *UserResp `json:"user"`
-	RelationType string    `json:"relation_type"`
-	CreatedAt    time.Time `json:"created_at"`
+	User         *UserSummaryResp `json:"user"`
+	RelationType string           `json:"relation_type"`
+	CreatedAt    time.Time        `json:"created_at"`
+}
+
+type FollowingResp struct {
+	User   *UserSummaryResp `json:"user"`
+	Unread bool             `json:"unread"`
 }
 
 func BuildFriendshipResp(info *pb.RelationInfo) *FriendshipResp {
 	return &FriendshipResp{
-		User:         BuildUserResp(info.User, true),
+		User:         BuildUserSummaryResp(info.User),
 		RelationType: info.RelationType,
 		CreatedAt:    time.Unix(int64(info.CreatedAt), 0),
 	}
@@ -42,24 +47,48 @@ func BuildFriendshipRespSlice(infos []*pb.RelationInfo) []*FriendshipResp {
 
 	return resp
 }
+func BuildFollowingsRespSlice(infos []*pb.Following) []*FollowingResp {
+	resp := []*FollowingResp{}
+	if infos == nil {
+		return []*FollowingResp{}
+	} else {
+		for _, info := range infos {
+			resp = append(resp, &FollowingResp{BuildUserSummaryResp(info.User), info.Unread})
+		}
+	}
+	return resp
+}
+
+func BuildRecommendUserRespSlice(infos []*pb.UserInfo) []*UserSummaryResp {
+	resp := []*UserSummaryResp{}
+	if infos == nil {
+		return []*UserSummaryResp{}
+	} else {
+		for _, info := range infos {
+			resp = append(resp, BuildUserSummaryResp(info))
+		}
+	}
+	return resp
+}
 
 func LatestFollowing(c echo.Context) error {
-	uidParam := c.Param("uid")
-	uid, err := strconv.ParseUint(uidParam, 10, 64)
-	if err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+	var currentUID uint64
+	if c.Get("CurrentUID") != nil {
+		currentUID = c.Get("CurrentUID").(uint64)
+	} else {
+		return codes.ErrUnauthorized
 	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.LatestFollowing(ctx, &pb.LatestFollowingRequest{
-		CurrentUid: uid,
+		CurrentUid: currentUID,
 	})
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, svcresp.Followings)
+	return rest.BuildSuccessResp(c, BuildFollowingsRespSlice(svcresp.Followings))
 }
 
 func ListFriendship(c echo.Context) error {
@@ -67,6 +96,10 @@ func ListFriendship(c echo.Context) error {
 	uid, err := strconv.ParseUint(uidParam, 10, 64)
 	if err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+	}
+	var currentUID uint64
+	if c.Get("CurrentUID") != nil {
+		currentUID = c.Get("CurrentUID").(uint64)
 	}
 	params := &ListFriendshipParams{}
 	if err := c.Bind(params); err != nil {
@@ -81,7 +114,8 @@ func ListFriendship(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListRelationship(ctx, &pb.ListRelationshipRequest{
-		CurrentUid:   uid,
+		CurrentUid:   currentUID,
+		Uid:          uid,
 		RelationType: params.RelationType,
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
@@ -147,4 +181,15 @@ func Unfollow(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, nil)
+}
+
+func RecommendUser(c echo.Context) error {
+
+	// var currentUID uint64
+	// if c.Get("CurrentUID") != nil {
+	// 	currentUID = c.Get("CurrentUID").(uint64)
+	// }
+
+	return rest.BuildSuccessResp(c, BuildFollowingsRespSlice(nil))
+
 }

@@ -13,12 +13,12 @@ func SetRoutes(e *echo.Echo) {
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
-	groupV1.POST("/upload", v1.UploadFile)
 	groupV1.GET("/user/:uid", v1.FindUser)
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
+	userGroup.POST("/upload", v1.UploadFile)
 	userGroup.GET("/user/me", v1.MyProfile)
 	userGroup.PATCH("/user/me", v1.UpdateUser)
 	userGroup.POST("/user/follow", v1.Follow)
@@ -38,5 +38,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/comment", v1.CreateComment)
 
 	userGroup.GET("/message", v1.ListMessage)
-	userGroup.PATCH("/message/read", v1.ReadMessage)
+	userGroup.PUT("/message/read", v1.ReadMessage)
+
+	groupV1.GET("/user/recommend", v1.RecommendUser)
 }

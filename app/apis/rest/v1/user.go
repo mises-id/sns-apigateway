@@ -25,7 +25,7 @@ type AvatarResp struct {
 	Large  string `json:"large"`
 }
 
-type UserResp struct {
+type UserFullResp struct {
 	UID        uint64      `json:"uid"`
 	Username   string      `json:"username"`
 	Misesid    string      `json:"misesid"`
@@ -33,6 +33,14 @@ type UserResp struct {
 	Mobile     string      `json:"mobile"`
 	Email      string      `json:"email"`
 	Address    string      `json:"address"`
+	Avatar     *AvatarResp `json:"avatar"`
+	IsFollowed bool        `json:"is_followed"`
+}
+
+type UserSummaryResp struct {
+	UID        uint64      `json:"uid"`
+	Username   string      `json:"username"`
+	Misesid    string      `json:"misesid"`
 	Avatar     *AvatarResp `json:"avatar"`
 	IsFollowed bool        `json:"is_followed"`
 }
@@ -65,7 +73,7 @@ func MyProfile(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, BuildUserResp(svcresp.User, false))
+	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, false))
 }
 
 func FindUser(c echo.Context) error {
@@ -82,7 +90,7 @@ func FindUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, BuildUserResp(svcresp.User, svcresp.IsFollowed))
+	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, svcresp.IsFollowed))
 }
 
 type UserProfileParams struct {
@@ -146,14 +154,14 @@ func UpdateUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, BuildUserResp(serverresp.User, false))
+	return rest.BuildSuccessResp(c, BuildUserFullResp(serverresp.User, false))
 }
 
-func BuildUserResp(user *pb.UserInfo, followed bool) *UserResp {
+func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 	if user == nil {
 		return nil
 	}
-	resp := &UserResp{
+	resp := &UserFullResp{
 		UID:        user.Uid,
 		Username:   user.Username,
 		Misesid:    user.Misesid,
@@ -162,6 +170,27 @@ func BuildUserResp(user *pb.UserInfo, followed bool) *UserResp {
 		Email:      user.Email,
 		Address:    user.Address,
 		IsFollowed: followed,
+	}
+	if len(user.Avatar) > 0 {
+		resp.Avatar = &AvatarResp{
+			// TODO support multiple sizes avatar
+			Small:  user.Avatar,
+			Medium: user.Avatar,
+			Large:  user.Avatar,
+		}
+	}
+	return resp
+}
+
+func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
+	if user == nil {
+		return nil
+	}
+	resp := &UserSummaryResp{
+		UID:        user.Uid,
+		Username:   user.Username,
+		Misesid:    user.Misesid,
+		IsFollowed: user.IsFollowed,
 	}
 	if len(user.Avatar) > 0 {
 		resp.Avatar = &AvatarResp{

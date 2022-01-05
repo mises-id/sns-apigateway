@@ -208,8 +208,8 @@ func (suite *StatusServerSuite) TestLikeStatus() {
 		resp.Value("code").Equal(codes.SuccessCode)
 
 		resp = suite.Expect.POST(fmt.Sprintf("/api/v1/status/%s/like", suite.statuses[1].ID.Hex())).
-			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("code").Equal(codes.SuccessCode)
+			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusInternalServerError).JSON().Object()
+		resp.Value("code").Equal(codes.InternalCode)
 
 		likes := make([]*models.Like, 0)
 		err := db.ODM(context.TODO()).Find(&likes).Error

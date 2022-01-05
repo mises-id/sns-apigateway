@@ -40,21 +40,21 @@ type LinkMetaResp struct {
 }
 
 type StatusResp struct {
-	ID            string        `json:"id"`
-	User          *UserResp     `json:"user"`
-	Content       string        `json:"content"`
-	FromType      string        `json:"from_type"`
-	StatusType    string        `json:"status_type"`
-	ParentStatus  *StatusResp   `json:"parent_status"`
-	OriginStatus  *StatusResp   `json:"origin_status"`
-	CommentsCount uint64        `json:"comments_count"`
-	LikesCount    uint64        `json:"likes_count"`
-	ForwardsCount uint64        `json:"forwards_count"`
-	IsLiked       bool          `json:"is_liked"`
-	LinkMeta      *LinkMetaResp `json:"link_meta"`
-	CreatedAt     time.Time     `json:"created_at"`
-	ThumbImages   []string      `json:"thumb_images"`
-	Images        []string      `json:"images"`
+	ID            string           `json:"id"`
+	User          *UserSummaryResp `json:"user"`
+	Content       string           `json:"content"`
+	FromType      string           `json:"from_type"`
+	StatusType    string           `json:"status_type"`
+	ParentStatus  *StatusResp      `json:"parent_status"`
+	OriginStatus  *StatusResp      `json:"origin_status"`
+	CommentsCount uint64           `json:"comments_count"`
+	LikesCount    uint64           `json:"likes_count"`
+	ForwardsCount uint64           `json:"forwards_count"`
+	IsLiked       bool             `json:"is_liked"`
+	LinkMeta      *LinkMetaResp    `json:"link_meta"`
+	CreatedAt     time.Time        `json:"created_at"`
+	ThumbImages   []string         `json:"thumb_images"`
+	Images        []string         `json:"images"`
 }
 
 func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
@@ -63,7 +63,7 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 	}
 	resp := &StatusResp{
 		ID:            info.Id,
-		User:          BuildUserResp(info.User, false),
+		User:          BuildUserSummaryResp(info.User),
 		Content:       info.Content,
 		FromType:      info.FromType,
 		StatusType:    info.StatusType,
