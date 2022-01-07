@@ -20,12 +20,42 @@ type ListCommentParams struct {
 	TopicID       string `query:"topic_id"`
 }
 
-func BuildCommentRespSlice(in []*pb.Comment) []*pb.Comment {
+type CommentResp struct {
+	ID            string         `json:"id"`
+	TopicID       string         `json:"topic_id"`
+	Content       string         `json:"content"`
+	Comments      []*CommentResp `json:"comments"`
+	CommentsCount uint64         `json:"comments_count"`
+	LikesCount    uint64         `json:"likes_count"`
+}
+
+func BuildCommentResp(in *pb.Comment) *CommentResp {
 	if in == nil {
-		return []*pb.Comment{}
+		return &CommentResp{}
 	} else {
-		return in
+		return &CommentResp{
+			ID:            in.Id,
+			TopicID:       in.GroupId,
+			Content:       in.Content,
+			Comments:      BuildCommentRespSlice(in.Comments),
+			CommentsCount: 0,
+			LikesCount:    0,
+		}
 	}
+}
+
+func BuildCommentRespSlice(in []*pb.Comment) []*CommentResp {
+	if in == nil {
+		return []*CommentResp{}
+	}
+
+	resp := []*CommentResp{}
+	for _, i := range in {
+		resp = append(resp, BuildCommentResp(i))
+	}
+
+	return resp
+
 }
 
 func ListComment(c echo.Context) error {
@@ -33,17 +63,13 @@ func ListComment(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid query params")
 	}
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	}
 
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.ListComment(ctx, &pb.ListCommentRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		StatusId:   params.CommentableID,
 		TopicId:    params.TopicID,
 		Paginator: &pb.PageQuick{
@@ -63,19 +89,12 @@ func CreateComment(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid comment params")
 	}
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
-
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.CreateComment(ctx, &pb.CreateCommentRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		StatusId:   params.CommentableID,
 		Content:    params.Content,
 		ParentId:   params.ParentID,
@@ -84,4 +103,36 @@ func CreateComment(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, svcresp.Comment)
+}
+
+func LikeComment(c echo.Context) error {
+	// grpcsvc, ctx, err := rest.GrpcSocialService()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// _, err = grpcsvc.LikeComment(ctx, &pb.LikeStatusRequest{
+	// 	CurrentUid: GetCurrentUID(c),
+	// 	Statusid:   c.Param("id"),
+	// })
+	// if err != nil {
+	// 	return err
+	// }
+	return rest.BuildSuccessResp(c, nil)
+}
+
+func UnlikeComment(c echo.Context) error {
+	// grpcsvc, ctx, err := rest.GrpcSocialService()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// _, err = grpcsvc.UnLikeComment(ctx, &pb.UnLikeStatusRequest{
+	// 	CurrentUid: GetCurrentUID(c),
+	// 	Statusid:   c.Param("id"),
+	// })
+	// if err != nil {
+	// 	return err
+	// }
+	return rest.BuildSuccessResp(c, nil)
 }

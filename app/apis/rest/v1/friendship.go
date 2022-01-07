@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -72,18 +71,12 @@ func BuildRecommendUserRespSlice(infos []*pb.UserInfo) []*UserSummaryResp {
 }
 
 func LatestFollowing(c echo.Context) error {
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrUnauthorized
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.LatestFollowing(ctx, &pb.LatestFollowingRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 	})
 	if err != nil {
 		return err
@@ -92,15 +85,11 @@ func LatestFollowing(c echo.Context) error {
 }
 
 func ListFriendship(c echo.Context) error {
-	uidParam := c.Param("uid")
-	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	uid, err := GetUIDParam(c)
 	if err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+		return err
 	}
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	}
+
 	params := &ListFriendshipParams{}
 	if err := c.Bind(params); err != nil {
 		return err
@@ -114,7 +103,7 @@ func ListFriendship(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListRelationship(ctx, &pb.ListRelationshipRequest{
-		CurrentUid:   currentUID,
+		CurrentUid:   GetCurrentUID(c),
 		Uid:          uid,
 		RelationType: params.RelationType,
 		Paginator: &pb.PageQuick{
@@ -135,19 +124,13 @@ func Follow(c echo.Context) error {
 		return codes.ErrInvalidArgument
 	}
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.Follow(ctx, &pb.FollowRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		TargetUid:  params.ToUserID,
 	})
 	if err != nil {
@@ -162,19 +145,13 @@ func Unfollow(c echo.Context) error {
 		return codes.ErrInvalidArgument
 	}
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.UnFollow(ctx, &pb.UnFollowRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		TargetUid:  params.ToUserID,
 	})
 	if err != nil {
@@ -184,11 +161,6 @@ func Unfollow(c echo.Context) error {
 }
 
 func RecommendUser(c echo.Context) error {
-
-	// var currentUID uint64
-	// if c.Get("CurrentUID") != nil {
-	// 	currentUID = c.Get("CurrentUID").(uint64)
-	// }
 
 	return rest.BuildSuccessResp(c, BuildFollowingsRespSlice(nil))
 

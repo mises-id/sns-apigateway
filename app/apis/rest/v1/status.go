@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -23,12 +22,14 @@ type LinkMeta struct {
 }
 
 type CreateStatusParams struct {
-	FromType   string    `json:"from_type"`
-	StatusType string    `json:"status_type"`
-	ParentID   string    `json:"parent_id"`
-	Content    string    `json:"content"`
-	LinkMeta   *LinkMeta `json:"link_meta"`
-	Images     []string  `json:"images"`
+	FromType     string        `json:"from_type"`
+	StatusType   string        `json:"status_type"`
+	ParentID     string        `json:"parent_id"`
+	Content      string        `json:"content"`
+	LinkMeta     *LinkMeta     `json:"link_meta"`
+	Images       []string      `json:"images"`
+	IsPrivate    bool          `json:"is_private"`
+	ShowDuration time.Duration `json:"show_duration"`
 }
 
 type LinkMetaResp struct {
@@ -108,17 +109,13 @@ func BuildStatusRespSlice(infos []*pb.StatusInfo) []*StatusResp {
 	return resp
 }
 func GetStatus(c echo.Context) error {
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	}
 
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.GetStatus(ctx, &pb.GetStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
 	})
 	if err != nil {
@@ -130,15 +127,11 @@ func GetStatus(c echo.Context) error {
 
 // list user status
 func ListUserStatus(c echo.Context) error {
-	uidParam := c.Param("uid")
-	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	uid, err := GetUIDParam(c)
 	if err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+		return err
 	}
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	}
+
 	params := &ListUserStatusParams{}
 	if err = c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
@@ -149,7 +142,7 @@ func ListUserStatus(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListStatus(ctx, &pb.ListStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		TargetUid:  uid,
 		FromTypes:  []string{"post", "forward"},
 		Paginator: &pb.PageQuick{
@@ -170,19 +163,12 @@ func Timeline(c echo.Context) error {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
-
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.ListUserTimeline(ctx, &pb.ListStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
 			Limit:  uint64(params.PageQuickParams.Limit),
@@ -197,10 +183,6 @@ func Timeline(c echo.Context) error {
 
 func RecommendStatus(c echo.Context) error {
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	}
 	params := &ListUserStatusParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
@@ -211,7 +193,7 @@ func RecommendStatus(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListRecommended(ctx, &pb.ListStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
 			Limit:  uint64(params.PageQuickParams.Limit),
@@ -225,18 +207,20 @@ func RecommendStatus(c echo.Context) error {
 
 }
 
+func UpdateStatus(c echo.Context) error {
+	params := &CreateStatusParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid status params")
+	}
+
+	return rest.BuildSuccessResp(c, nil)
+}
+
 func CreateStatus(c echo.Context) error {
 	params := &CreateStatusParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid status params")
 	}
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
-	// uid := c.Get("CurrentUser").(*models.User).UID
 	fromType := "post"
 	if len(params.ParentID) > 0 {
 		fromType = "forward"
@@ -254,7 +238,7 @@ func CreateStatus(c echo.Context) error {
 	}
 
 	svcresp, err := grpcsvc.CreateStatus(ctx, &pb.CreateStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		StatusType: params.StatusType,
 		Content:    params.Content,
 		ParentId:   params.ParentID,
@@ -270,19 +254,13 @@ func CreateStatus(c echo.Context) error {
 }
 
 func DeleteStatus(c echo.Context) error {
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.DeleteStatus(ctx, &pb.DeleteStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
 	})
 	if err != nil {
@@ -292,19 +270,13 @@ func DeleteStatus(c echo.Context) error {
 }
 
 func LikeStatus(c echo.Context) error {
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.LikeStatus(ctx, &pb.LikeStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
 	})
 	if err != nil {
@@ -314,19 +286,13 @@ func LikeStatus(c echo.Context) error {
 }
 
 func UnlikeStatus(c echo.Context) error {
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.UnLikeStatus(ctx, &pb.UnLikeStatusRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
 	})
 	if err != nil {

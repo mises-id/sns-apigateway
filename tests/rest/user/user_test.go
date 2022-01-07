@@ -178,4 +178,58 @@ func (suite *UserServerSuite) TestUpdateUser() {
 		resp.Value("data").Object().Value("mobile").Equal("123456")
 		resp.Value("data").Object().Value("address").Equal("xxxx")
 	})
+
+}
+
+func (suite *UserServerSuite) TestBlackUser() {
+
+	factories.InitUsers(&models.User{
+		UID:        1001,
+		Gender:     enum.GenderFemale,
+		AvatarPath: "0",
+		Misesid:    "1001",
+	}, &models.User{
+		UID:        1002,
+		Gender:     enum.GenderFemale,
+		AvatarPath: "0",
+		Misesid:    "1002",
+	})
+	token := suite.MockLoginUser("1001:1001")
+
+	suite.T().Run("empty blacklist", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/blacklist").WithHeader("Authorization", "Bearer "+token).
+			Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(0)
+	})
+
+	suite.T().Run("add to black list", func(t *testing.T) {
+		resp := suite.Expect.POST("/api/v1/user/blacklist").WithJSON(map[string]interface{}{
+			"uid": 1002,
+		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+
+	})
+
+	suite.T().Run("one blacklist", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/blacklist").WithHeader("Authorization", "Bearer "+token).
+			Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(1)
+		resp.Value("data").Array().First().Object().Value("user").Object().Value("uid").Equal(1002)
+	})
+
+	suite.T().Run("remove from black list", func(t *testing.T) {
+		resp := suite.Expect.DELETE("/api/v1/user/blacklist/1002").
+			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+
+	})
+
+	suite.T().Run("cleared blacklist", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/blacklist").WithHeader("Authorization", "Bearer "+token).
+			Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(0)
+	})
 }

@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
@@ -26,15 +27,19 @@ type AvatarResp struct {
 }
 
 type UserFullResp struct {
-	UID        uint64      `json:"uid"`
-	Username   string      `json:"username"`
-	Misesid    string      `json:"misesid"`
-	Gender     string      `json:"gender"`
-	Mobile     string      `json:"mobile"`
-	Email      string      `json:"email"`
-	Address    string      `json:"address"`
-	Avatar     *AvatarResp `json:"avatar"`
-	IsFollowed bool        `json:"is_followed"`
+	UID            uint64      `json:"uid"`
+	Username       string      `json:"username"`
+	Misesid        string      `json:"misesid"`
+	Gender         string      `json:"gender"`
+	Mobile         string      `json:"mobile"`
+	Email          string      `json:"email"`
+	Address        string      `json:"address"`
+	Avatar         *AvatarResp `json:"avatar"`
+	IsFollowed     bool        `json:"is_followed"`
+	FollowingCount uint64      `json:"followings_count"`
+	FansCount      uint64      `json:"fans_count"`
+	LikedCount     uint64      `json:"liked_count"`
+	NewFansCount   uint64      `json:"new_fans_count"`
 }
 
 type UserSummaryResp struct {
@@ -43,6 +48,22 @@ type UserSummaryResp struct {
 	Misesid    string      `json:"misesid"`
 	Avatar     *AvatarResp `json:"avatar"`
 	IsFollowed bool        `json:"is_followed"`
+}
+
+func GetCurrentUID(c echo.Context) uint64 {
+	var currentUID uint64
+	if c.Get("CurrentUID") != nil {
+		currentUID = c.Get("CurrentUID").(uint64)
+	}
+	return currentUID
+}
+func GetUIDParam(c echo.Context) (uint64, error) {
+	uidParam := c.Param("uid")
+	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	if err != nil {
+		return 0, codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+	}
+	return uid, nil
 }
 
 func SignIn(c echo.Context) error {
@@ -77,10 +98,9 @@ func MyProfile(c echo.Context) error {
 }
 
 func FindUser(c echo.Context) error {
-	uidParam := c.Param("uid")
-	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	uid, err := GetUIDParam(c)
 	if err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+		return err
 	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
@@ -201,4 +221,98 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 		}
 	}
 	return resp
+}
+
+type BlackParams struct {
+	UID string `json:"uid"`
+}
+
+type ListBlackParams struct {
+	rest.PageQuickParams
+}
+
+type BlackResp struct {
+	User      *UserSummaryResp `json:"user"`
+	CreatedAt time.Time        `json:"created_at"`
+}
+
+func BuildBlackRespSlice() []*BlackResp {
+	return []*BlackResp{
+		{
+			User:      BuildUserSummaryResp(&pb.UserInfo{}),
+			CreatedAt: time.Now(),
+		},
+	}
+}
+
+func ListBlack(c echo.Context) error {
+	params := &ListBlackParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+	// grpcsvc, ctx, err := rest.GrpcSocialService()
+	// if err != nil {
+	// 	return err
+	// }
+	paginator := &pb.PageQuick{
+		NextId: params.PageQuickParams.NextID,
+		Limit:  uint64(params.PageQuickParams.Limit),
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildBlackRespSlice(), paginator)
+}
+
+func Black(c echo.Context) error {
+	params := &BlackParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+	// GetCurrentUID(c)
+
+	return rest.BuildSuccessResp(c, nil)
+}
+
+func UnBlack(c echo.Context) error {
+	// uid, err := GetUIDParam(c)
+	// if err != nil {
+	// 	return err
+	// }
+	// GetCurrentUID(c)
+
+	return rest.BuildSuccessResp(c, nil)
+}
+
+type ListUserLikeParams struct {
+	rest.PageQuickParams
+}
+
+type UserLikeResp struct {
+	Status    *StatusResp `json:"status"`
+	CreatedAt time.Time   `json:"created_at"`
+}
+
+func BuildUserLikeResplice() []*UserLikeResp {
+	return []*UserLikeResp{
+		{
+			Status:    BuildStatusResp(&pb.StatusInfo{}),
+			CreatedAt: time.Now(),
+		},
+	}
+}
+
+func ListUserLike(c echo.Context) error {
+	params := &ListUserLikeParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+	// grpcsvc, ctx, err := rest.GrpcSocialService()
+	// if err != nil {
+	// 	return err
+	// }
+	paginator := &pb.PageQuick{
+		NextId: params.PageQuickParams.NextID,
+		Limit:  uint64(params.PageQuickParams.Limit),
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildUserLikeResplice(), paginator)
 }

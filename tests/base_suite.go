@@ -33,7 +33,7 @@ func (suite *BaseTestSuite) SetupSuite() {
 	suite.DbCleaner = dbcleaner.New()
 	// TODO the env should read through api
 	env.Envs = &env.Env{
-		DBName:           "mises_dev",
+		DBName:           "mises_unit_test",
 		DBUser:           "root",
 		DBPass:           "example",
 		MongoURI:         "mongodb://localhost:27017",

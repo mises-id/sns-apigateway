@@ -24,11 +24,16 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)
 	userGroup.GET("/user/following/latest", v1.LatestFollowing)
+	userGroup.GET("/user/blacklist", v1.ListBlack)
+	userGroup.POST("/user/blacklist", v1.Black)
+	userGroup.DELETE("/user/blacklist/:id", v1.UnBlack)
 
+	groupV1.GET("/user/:uid/like", v1.ListUserLike)
 	groupV1.GET("/user/:uid/status", v1.ListUserStatus)
 	groupV1.GET("/status/recommend", v1.RecommendStatus)
 	userGroup.GET("/timeline/me", v1.Timeline)
 	userGroup.POST("/status", v1.CreateStatus)
+	userGroup.PATCH("/status/:id", v1.UpdateStatus)
 	groupV1.GET("/status/:id", v1.GetStatus)
 	userGroup.DELETE("/status/:id", v1.DeleteStatus)
 	userGroup.POST("/status/:id/like", v1.LikeStatus)
@@ -36,8 +41,11 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)
+	userGroup.POST("/comment/:id/like", v1.LikeComment)
+	userGroup.DELETE("/comment/:id/like", v1.UnlikeComment)
 
-	userGroup.GET("/message", v1.ListMessage)
+	userGroup.GET("/user/message", v1.ListMessage)
+	userGroup.GET("/user/message/summary", v1.MessageSummary)
 	userGroup.PUT("/message/read", v1.ReadMessage)
 
 	groupV1.GET("/user/recommend", v1.RecommendUser)
