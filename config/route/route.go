@@ -24,6 +24,9 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)
 	userGroup.GET("/user/following/latest", v1.LatestFollowing)
+	userGroup.GET("/user/blacklist", v1.ListBlacklist)
+	userGroup.POST("/user/blacklist", v1.CreateBlacklist)
+	userGroup.DELETE("/user/blacklist", v1.DeleteBlacklist)
 
 	groupV1.GET("/user/:uid/status", v1.ListUserStatus)
 	groupV1.GET("/status/recommend", v1.RecommendStatus)
@@ -38,6 +41,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/comment", v1.CreateComment)
 
 	userGroup.GET("/message", v1.ListMessage)
+	userGroup.GET("/message/summary", v1.MessageSummary)
 	userGroup.PUT("/message/read", v1.ReadMessage)
 
 	groupV1.GET("/user/recommend", v1.RecommendUser)
