@@ -24,6 +24,24 @@ func BuildMessageRespSlice(in []*pb.Message) []*pb.Message {
 		return in
 	}
 }
+func MessageSummary(c echo.Context) error {
+	var currentUID uint64
+	if c.Get("CurrentUID") != nil {
+		currentUID = c.Get("CurrentUID").(uint64)
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.MessageSummary(ctx, &pb.MessageSummaryRequest{
+		CurrentUid: currentUID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, svcresp.Summary)
+}
 
 func ListMessage(c echo.Context) error {
 	params := &ListMessageParams{}
