@@ -41,6 +41,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/comment", v1.CreateComment)
 
 	userGroup.GET("/message", v1.ListMessage)
+	userGroup.GET("/message/summary", v1.MessageSummary)
 	userGroup.PUT("/message/read", v1.ReadMessage)
 
 	groupV1.GET("/user/recommend", v1.RecommendUser)
