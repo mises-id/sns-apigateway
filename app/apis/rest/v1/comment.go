@@ -27,6 +27,9 @@ type CommentResp struct {
 	Comments      []*CommentResp `json:"comments"`
 	CommentsCount uint64         `json:"comments_count"`
 	LikesCount    uint64         `json:"likes_count"`
+
+	User     *UserSummaryResp `json:"user,omitempty"`
+	Opponent *UserSummaryResp `json:"opponent,omitempty"`
 }
 
 func BuildCommentResp(in *pb.Comment) *CommentResp {
@@ -38,8 +41,10 @@ func BuildCommentResp(in *pb.Comment) *CommentResp {
 			TopicID:       in.GroupId,
 			Content:       in.Content,
 			Comments:      BuildCommentRespSlice(in.Comments),
-			CommentsCount: 0,
-			LikesCount:    0,
+			CommentsCount: in.CommentCount,
+			LikesCount:    in.LikeCount,
+			User:          BuildUserSummaryResp(in.User),
+			Opponent:      BuildUserSummaryResp(in.Opponent),
 		}
 	}
 }
