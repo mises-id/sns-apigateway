@@ -107,37 +107,37 @@ func CreateComment(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, svcresp.Comment)
+	return rest.BuildSuccessResp(c, BuildCommentResp(svcresp.Comment))
 }
 
 func LikeComment(c echo.Context) error {
-	// grpcsvc, ctx, err := rest.GrpcSocialService()
-	// if err != nil {
-	// 	return err
-	// }
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
 
-	// _, err = grpcsvc.LikeComment(ctx, &pb.LikeStatusRequest{
-	// 	CurrentUid: GetCurrentUID(c),
-	// 	Statusid:   c.Param("id"),
-	// })
-	// if err != nil {
-	// 	return err
-	// }
+	_, err = grpcsvc.LikeComment(ctx, &pb.LikeCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		CommentId:  c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
 	return rest.BuildSuccessResp(c, nil)
 }
 
 func UnlikeComment(c echo.Context) error {
-	// grpcsvc, ctx, err := rest.GrpcSocialService()
-	// if err != nil {
-	// 	return err
-	// }
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
 
-	// _, err = grpcsvc.UnLikeComment(ctx, &pb.UnLikeStatusRequest{
-	// 	CurrentUid: GetCurrentUID(c),
-	// 	Statusid:   c.Param("id"),
-	// })
-	// if err != nil {
-	// 	return err
-	// }
+	_, err = grpcsvc.UnlikeComment(ctx, &pb.UnlikeCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		CommentId:  c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
 	return rest.BuildSuccessResp(c, nil)
 }
