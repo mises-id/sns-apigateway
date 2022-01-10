@@ -44,9 +44,27 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 			State:       in.State,
 			CreatedAt:   time.Now(),
 		}
-		if meta, err := json.Marshal(in.MetaData); err == nil {
-			ret.MetaData = string(meta)
+		if in.NewCommentMeta != nil {
+			if meta, err := json.Marshal(in.NewCommentMeta); err == nil {
+				ret.MetaData = string(meta)
+			}
 		}
+		if in.NewLikeMeta != nil {
+			if meta, err := json.Marshal(in.NewLikeMeta); err == nil {
+				ret.MetaData = string(meta)
+			}
+		}
+		if in.NewFansMeta != nil {
+			if meta, err := json.Marshal(in.NewFansMeta); err == nil {
+				ret.MetaData = string(meta)
+			}
+		}
+		if in.NewForwardMeta != nil {
+			if meta, err := json.Marshal(in.NewForwardMeta); err == nil {
+				ret.MetaData = string(meta)
+			}
+		}
+
 		return ret
 	}
 }
@@ -61,6 +79,20 @@ func BuildMessageRespSlice(ins []*pb.Message) []*MessageResp {
 		}
 	}
 	return resp
+}
+func MessageSummary(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetMessageSummary(ctx, &pb.GetMessageSummaryRequest{
+		CurrentUid: GetCurrentUID(c),
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, svcresp.Summary)
 }
 
 func ListMessage(c echo.Context) error {
@@ -104,13 +136,4 @@ func ReadMessage(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, nil)
-}
-
-func MessageSummary(c echo.Context) error {
-
-	return rest.BuildSuccessResp(c, &MessageSummaryResp{
-		Total:              1,
-		NotificationsCount: 2,
-		UsersCount:         3,
-	})
 }
