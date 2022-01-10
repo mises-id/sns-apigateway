@@ -33,7 +33,7 @@ func MessageSummary(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.MessageSummary(ctx, &pb.MessageSummaryRequest{
+	svcresp, err := grpcsvc.GetMessageSummary(ctx, &pb.GetMessageSummaryRequest{
 		CurrentUid: currentUID,
 	})
 	if err != nil {
