@@ -224,7 +224,7 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 }
 
 type BlackParams struct {
-	UID string `json:"uid"`
+	UID uint64 `json:"uid"`
 }
 
 type ListBlackParams struct {
@@ -236,13 +236,22 @@ type BlackResp struct {
 	CreatedAt time.Time        `json:"created_at"`
 }
 
-func BuildBlackRespSlice() []*BlackResp {
-	return []*BlackResp{
-		{
-			User:      BuildUserSummaryResp(&pb.UserInfo{}),
-			CreatedAt: time.Now(),
-		},
+func BuildBlackResp(in *pb.Blacklist) *BlackResp {
+	return &BlackResp{
+		User:      BuildUserSummaryResp(in.User),
+		CreatedAt: time.Unix(int64(in.CreatedAt), 0),
 	}
+}
+
+func BuildBlackRespSlice(infos []*pb.Blacklist) []*BlackResp {
+	resp := []*BlackResp{}
+	if infos != nil {
+		for _, info := range infos {
+			resp = append(resp, BuildBlackResp(info))
+		}
+	}
+
+	return resp
 }
 
 func ListBlack(c echo.Context) error {
@@ -250,16 +259,24 @@ func ListBlack(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid query params")
 	}
-	// grpcsvc, ctx, err := rest.GrpcSocialService()
-	// if err != nil {
-	// 	return err
-	// }
+
 	paginator := &pb.PageQuick{
 		NextId: params.PageQuickParams.NextID,
 		Limit:  uint64(params.PageQuickParams.Limit),
 	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.ListBlacklist(ctx, &pb.ListBlacklistRequest{
+		Uid:       GetCurrentUID(c),
+		Paginator: paginator,
+	})
+	if err != nil {
+		return err
+	}
 
-	return rest.BuildSuccessRespWithPagination(c, BuildBlackRespSlice(), paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildBlackRespSlice(svcresp.Blacklists), paginator)
 }
 
 func Black(c echo.Context) error {
@@ -267,17 +284,38 @@ func Black(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid query params")
 	}
-	// GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
 
+	_, err = grpcsvc.CreateBlacklist(ctx, &pb.CreateBlacklistRequest{
+		Uid:       GetCurrentUID(c),
+		TargetUid: params.UID,
+	})
+	if err != nil {
+		return err
+	}
 	return rest.BuildSuccessResp(c, nil)
 }
 
 func UnBlack(c echo.Context) error {
-	// uid, err := GetUIDParam(c)
-	// if err != nil {
-	// 	return err
-	// }
-	// GetCurrentUID(c)
+	uid, err := GetUIDParam(c)
+	if err != nil {
+		return err
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+
+	_, err = grpcsvc.DeleteBlacklist(ctx, &pb.DeleteBlacklistRequest{
+		Uid:       GetCurrentUID(c),
+		TargetUid: uid,
+	})
+	if err != nil {
+		return err
+	}
 
 	return rest.BuildSuccessResp(c, nil)
 }
