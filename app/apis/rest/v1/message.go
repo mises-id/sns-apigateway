@@ -20,19 +20,33 @@ type ReadMessageParams struct {
 	LatestID string   `body:"latest_id"`
 }
 type MessageSummaryResp struct {
-	LatestMessage      MessageResp `json:"latest_message"`
-	Total              uint64      `json:"total"`
-	NotificationsCount uint64      `json:"notifications_count"`
-	UsersCount         uint64      `json:"users_count"`
+	LatestMessage      *MessageResp `json:"latest_message"`
+	Total              uint64       `json:"total"`
+	NotificationsCount uint64       `json:"notifications_count"`
+	UsersCount         uint64       `json:"users_count"`
 }
 type MessageResp struct {
-	ID          string    `json:"id"`
-	MessageType string    `json:"message_type"`
-	MetaData    string    `json:"meta_data"`
-	State       string    `json:"state"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          string           `json:"id"`
+	User        *UserSummaryResp `json:"user"`
+	MessageType string           `json:"message_type"`
+	MetaData    string           `json:"meta_data"`
+	State       string           `json:"state"`
+	CreatedAt   time.Time        `json:"created_at"`
 }
 
+func BuildMessageSummaryResp(in *pb.MessageSummary) *MessageSummaryResp {
+
+	if in == nil {
+		return &MessageSummaryResp{}
+	} else {
+		return &MessageSummaryResp{
+			LatestMessage:      BuildMessageResp(in.LatestMessage),
+			Total:              uint64(in.Total),
+			NotificationsCount: uint64(in.NotificationsCount),
+			UsersCount:         uint64(in.UsersCount),
+		}
+	}
+}
 func BuildMessageResp(in *pb.Message) *MessageResp {
 	if in == nil {
 		return &MessageResp{}
@@ -40,6 +54,7 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 
 		ret := &MessageResp{
 			ID:          in.Id,
+			User:        BuildUserSummaryResp(in.FromUser),
 			MessageType: in.MessageType,
 			State:       in.State,
 			CreatedAt:   time.Now(),
@@ -92,7 +107,7 @@ func MessageSummary(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessResp(c, svcresp.Summary)
+	return rest.BuildSuccessResp(c, BuildMessageSummaryResp(svcresp.Summary))
 }
 
 func ListMessage(c echo.Context) error {

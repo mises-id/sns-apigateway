@@ -20,7 +20,7 @@ type MessageServerSuite struct {
 
 func (suite *MessageServerSuite) SetupSuite() {
 	suite.RestBaseTestSuite.SetupSuite()
-	suite.collections = []string{"counters", "users", "follows"}
+	suite.collections = []string{"counters", "users", "follows", "messages"}
 }
 
 func (suite *MessageServerSuite) TearDownSuite() {
@@ -91,7 +91,7 @@ func (suite *MessageServerSuite) TestNewCommentMessage() {
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(1)
 		resp.Value("data").Array().First().Object().Value("message_type").Equal("new_comment")
-		resp.Value("data").Array().First().Object().Value("state").Equal("pending")
+		resp.Value("data").Array().First().Object().Value("state").Equal("unread")
 		pending_message_id = resp.Value("data").Array().First().Object().Value("id").String().Raw()
 		resp.Value("pagination").Object().Value("last_id").Equal("")
 

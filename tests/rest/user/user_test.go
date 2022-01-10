@@ -25,7 +25,7 @@ type UserServerSuite struct {
 
 func (suite *UserServerSuite) SetupSuite() {
 	suite.RestBaseTestSuite.SetupSuite()
-	suite.collections = []string{"counters", "attachments", "users"}
+	suite.collections = []string{"counters", "attachments", "users", "blacklists"}
 }
 
 func (suite *UserServerSuite) TearDownSuite() {

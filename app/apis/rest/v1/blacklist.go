@@ -32,10 +32,8 @@ func BuildBlackResp(in *pb.Blacklist) *BlackResp {
 
 func BuildBlacklistRespSlice(infos []*pb.Blacklist) []*BlackResp {
 	resp := []*BlackResp{}
-	if infos != nil {
-		for _, info := range infos {
-			resp = append(resp, BuildBlackResp(info))
-		}
+	for _, info := range infos {
+		resp = append(resp, BuildBlackResp(info))
 	}
 
 	return resp

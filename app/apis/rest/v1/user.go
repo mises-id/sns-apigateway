@@ -232,13 +232,16 @@ type UserLikeResp struct {
 	CreatedAt time.Time   `json:"created_at"`
 }
 
-func BuildUserLikeResplice() []*UserLikeResp {
-	return []*UserLikeResp{
-		{
-			Status:    BuildStatusResp(&pb.StatusInfo{}),
-			CreatedAt: time.Now(),
-		},
+func BuildUserLikeResplice(in []*pb.StatusLike) []*UserLikeResp {
+	resp := []*UserLikeResp{}
+	for _, i := range in {
+		resp = append(resp, &UserLikeResp{
+			Status:    BuildStatusResp(i.Status),
+			CreatedAt: time.Unix(int64(i.CreatedAt), 0),
+		})
 	}
+
+	return resp
 }
 
 func ListUserLike(c echo.Context) error {
@@ -246,14 +249,21 @@ func ListUserLike(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid query params")
 	}
-	// grpcsvc, ctx, err := rest.GrpcSocialService()
-	// if err != nil {
-	// 	return err
-	// }
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
 	paginator := &pb.PageQuick{
 		NextId: params.PageQuickParams.NextID,
 		Limit:  uint64(params.PageQuickParams.Limit),
 	}
+	svcresp, err := grpcsvc.ListLikeStatus(ctx, &pb.ListLikeRequest{
+		Uid:       GetCurrentUID(c),
+		Paginator: paginator,
+	})
+	if err != nil {
+		return err
+	}
 
-	return rest.BuildSuccessRespWithPagination(c, BuildUserLikeResplice(), paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildUserLikeResplice(svcresp.Statuses), svcresp.Paginator)
 }
