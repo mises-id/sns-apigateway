@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"time"
+
 	"github.com/labstack/echo"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
@@ -30,6 +32,9 @@ type CommentResp struct {
 
 	User     *UserSummaryResp `json:"user,omitempty"`
 	Opponent *UserSummaryResp `json:"opponent,omitempty"`
+
+	IsLiked   bool      `json:"is_liked"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func BuildCommentResp(in *pb.Comment) *CommentResp {
@@ -43,6 +48,8 @@ func BuildCommentResp(in *pb.Comment) *CommentResp {
 			Comments:      BuildCommentRespSlice(in.Comments),
 			CommentsCount: in.CommentCount,
 			LikesCount:    in.LikeCount,
+			IsLiked:       in.IsLiked,
+			CreatedAt:     time.Unix(int64(in.CreatedAt), 0),
 			User:          BuildUserSummaryResp(in.User),
 			Opponent:      BuildUserSummaryResp(in.Opponent),
 		}

@@ -56,6 +56,8 @@ type StatusResp struct {
 	CreatedAt     time.Time        `json:"created_at"`
 	ThumbImages   []string         `json:"thumb_images"`
 	Images        []string         `json:"images"`
+	IsPublic      bool             `json:"is_public"`
+	HideTime      time.Time        `json:"hide_time"`
 }
 
 func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
@@ -73,6 +75,8 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 		ForwardsCount: info.ForwardCount,
 		IsLiked:       info.IsLiked,
 		CreatedAt:     time.Unix(int64(info.CreatedAt), 0),
+		IsPublic:      info.IsPublic,
+		HideTime:      time.Unix(int64(info.HideTime), 0),
 	}
 
 	if info.LinkMeta != nil {

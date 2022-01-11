@@ -36,6 +36,7 @@ type UserFullResp struct {
 	Address        string      `json:"address"`
 	Avatar         *AvatarResp `json:"avatar"`
 	IsFollowed     bool        `json:"is_followed"`
+	IsBlocked      bool        `json:"is_blocked"`
 	FollowingCount uint64      `json:"followings_count"`
 	FansCount      uint64      `json:"fans_count"`
 	LikedCount     uint64      `json:"liked_count"`
@@ -182,14 +183,19 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		return nil
 	}
 	resp := &UserFullResp{
-		UID:        user.Uid,
-		Username:   user.Username,
-		Misesid:    user.Misesid,
-		Gender:     user.Gender,
-		Mobile:     user.Mobile,
-		Email:      user.Email,
-		Address:    user.Address,
-		IsFollowed: followed,
+		UID:            user.Uid,
+		Username:       user.Username,
+		Misesid:        user.Misesid,
+		Gender:         user.Gender,
+		Mobile:         user.Mobile,
+		Email:          user.Email,
+		Address:        user.Address,
+		IsFollowed:     followed,
+		IsBlocked:      user.IsBlocked,
+		FollowingCount: uint64(user.FollowingsCount),
+		FansCount:      uint64(user.FansCount),
+		LikedCount:     uint64(user.LikedCount),
+		NewFansCount:   uint64(user.NewFansCount),
 	}
 	if len(user.Avatar) > 0 {
 		resp.Avatar = &AvatarResp{
