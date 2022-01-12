@@ -24,6 +24,7 @@ type ListCommentParams struct {
 
 type CommentResp struct {
 	ID            string         `json:"id"`
+	ParentID      string         `json:"parent_id"`
 	TopicID       string         `json:"topic_id"`
 	Content       string         `json:"content"`
 	Comments      []*CommentResp `json:"comments"`
@@ -43,6 +44,7 @@ func BuildCommentResp(in *pb.Comment) *CommentResp {
 	} else {
 		return &CommentResp{
 			ID:            in.Id,
+			ParentID:      in.ParentId,
 			TopicID:       in.GroupId,
 			Content:       in.Content,
 			Comments:      BuildCommentRespSlice(in.Comments),
