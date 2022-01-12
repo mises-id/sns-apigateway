@@ -255,6 +255,10 @@ func ListUserLike(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.Newf("invalid query params")
 	}
+	uid, err := GetUIDParam(c)
+	if err != nil {
+		return err
+	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
@@ -264,8 +268,9 @@ func ListUserLike(c echo.Context) error {
 		Limit:  uint64(params.PageQuickParams.Limit),
 	}
 	svcresp, err := grpcsvc.ListLikeStatus(ctx, &pb.ListLikeRequest{
-		Uid:       GetCurrentUID(c),
-		Paginator: paginator,
+		Uid:        uid,
+		CurrentUid: GetCurrentUID(c),
+		Paginator:  paginator,
 	})
 	if err != nil {
 		return err

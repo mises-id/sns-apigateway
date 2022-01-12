@@ -98,7 +98,7 @@ func (suite *MessageServerSuite) TestNewCommentMessage() {
 	})
 
 	suite.T().Run("read message", func(t *testing.T) {
-		resp := suite.Expect.PUT("/api/v1/user/message/read").WithJSON(map[string]interface{}{
+		resp := suite.Expect.PUT("/api/v1/message/read").WithJSON(map[string]interface{}{
 			"ids": []string{pending_message_id},
 		}).WithHeader("Authorization", "Bearer "+token1001).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
