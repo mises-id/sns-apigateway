@@ -16,6 +16,52 @@ type CreateCommentParams struct {
 type ListCommentParams struct {
 	rest.PageQuickParams
 	CommentableID string `query:"status_id"`
+	TopicID       string `query:"topic_id"`
+}
+
+type CommentResp struct {
+	ID            string         `json:"id"`
+	TopicID       string         `json:"topic_id"`
+	ParentID      string         `json:"parent_id"`
+	Content       string         `json:"content"`
+	Comments      []*CommentResp `json:"comments"`
+	CommentsCount uint64         `json:"comments_count"`
+	LikesCount    uint64         `json:"likes_count"`
+
+	User     *UserSummaryResp `json:"user,omitempty"`
+	Opponent *UserSummaryResp `json:"opponent,omitempty"`
+}
+
+func BuildCommentResp(in *pb.Comment) *CommentResp {
+	if in == nil {
+		return &CommentResp{}
+	} else {
+		return &CommentResp{
+			ID:            in.Id,
+			TopicID:       in.GroupId,
+			ParentID:      in.GetParentId(),
+			Content:       in.Content,
+			Comments:      BuildCommentRespSlice(in.Comments),
+			CommentsCount: in.CommentCount,
+			LikesCount:    in.LikeCount,
+			User:          BuildUserSummaryResp(in.User),
+			Opponent:      BuildUserSummaryResp(in.Opponent),
+		}
+	}
+}
+
+func BuildCommentRespSlice(in []*pb.Comment) []*CommentResp {
+	if in == nil {
+		return []*CommentResp{}
+	}
+
+	resp := []*CommentResp{}
+	for _, i := range in {
+		resp = append(resp, BuildCommentResp(i))
+	}
+
+	return resp
+
 }
 
 func ListComment(c echo.Context) error {

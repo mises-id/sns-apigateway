@@ -173,3 +173,74 @@ func buildUserResp(user *pb.UserInfo, followed bool) *UserResp {
 	}
 	return resp
 }
+
+func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
+	if user == nil {
+		return nil
+	}
+	resp := &UserSummaryResp{
+		UID:        user.Uid,
+		Username:   user.Username,
+		Misesid:    user.Misesid,
+		IsFollowed: user.IsFollowed,
+	}
+	if len(user.Avatar) > 0 {
+		resp.Avatar = &AvatarResp{
+			// TODO support multiple sizes avatar
+			Small:  user.Avatar,
+			Medium: user.Avatar,
+			Large:  user.Avatar,
+		}
+	}
+	return resp
+}
+
+type ListUserLikeParams struct {
+	rest.PageQuickParams
+}
+
+type UserLikeResp struct {
+	Status    *StatusResp `json:"status"`
+	CreatedAt time.Time   `json:"created_at"`
+}
+
+func BuildUserLikeResplice(in []*pb.StatusLike) []*UserLikeResp {
+	resp := []*UserLikeResp{}
+	for _, i := range in {
+		resp = append(resp, &UserLikeResp{
+			Status:    BuildStatusResp(i.Status),
+			CreatedAt: time.Unix(int64(i.CreatedAt), 0),
+		})
+	}
+
+	return resp
+}
+
+func ListUserLike(c echo.Context) error {
+	uid, err := GetUIDParam(c)
+	if err != nil {
+		return err
+	}
+	params := &ListUserLikeParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	paginator := &pb.PageQuick{
+		NextId: params.PageQuickParams.NextID,
+		Limit:  uint64(params.PageQuickParams.Limit),
+	}
+	svcresp, err := grpcsvc.ListLikeStatus(ctx, &pb.ListLikeRequest{
+		Uid:        uid,
+		CurrentUID: GetCurrentUID(),
+		Paginator:  paginator,
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildUserLikeResplice(svcresp.Statuses), svcresp.Paginator)
+}
