@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -21,17 +20,76 @@ type FollowParams struct {
 }
 
 type FriendshipResp struct {
-	User         *UserResp `json:"user"`
-	RelationType string    `json:"relation_type"`
-	CreatedAt    time.Time `json:"created_at"`
+	User         *UserSummaryResp `json:"user"`
+	RelationType string           `json:"relation_type"`
+	CreatedAt    time.Time        `json:"created_at"`
+}
+
+type FollowingResp struct {
+	User   *UserSummaryResp `json:"user"`
+	Unread bool             `json:"unread"`
+}
+
+func BuildFriendshipResp(info *pb.RelationInfo) *FriendshipResp {
+	return &FriendshipResp{
+		User:         BuildUserSummaryResp(info.User),
+		RelationType: info.RelationType,
+		CreatedAt:    time.Unix(int64(info.CreatedAt), 0),
+	}
+}
+
+func BuildFriendshipRespSlice(infos []*pb.RelationInfo) []*FriendshipResp {
+	resp := []*FriendshipResp{}
+	for _, info := range infos {
+		resp = append(resp, BuildFriendshipResp(info))
+	}
+
+	return resp
+}
+func BuildFollowingsRespSlice(infos []*pb.Following) []*FollowingResp {
+	resp := []*FollowingResp{}
+	if infos == nil {
+		return []*FollowingResp{}
+	} else {
+		for _, info := range infos {
+			resp = append(resp, &FollowingResp{BuildUserSummaryResp(info.User), info.Unread})
+		}
+	}
+	return resp
+}
+
+func BuildRecommendUserRespSlice(infos []*pb.UserInfo) []*UserSummaryResp {
+	resp := []*UserSummaryResp{}
+	if infos == nil {
+		return []*UserSummaryResp{}
+	} else {
+		for _, info := range infos {
+			resp = append(resp, BuildUserSummaryResp(info))
+		}
+	}
+	return resp
+}
+
+func LatestFollowing(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.LatestFollowing(ctx, &pb.LatestFollowingRequest{
+		CurrentUid: GetCurrentUID(c),
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildFollowingsRespSlice(svcresp.Followings))
 }
 
 func ListFriendship(c echo.Context) error {
-	uidParam := c.Param("uid")
-	uid, err := strconv.ParseUint(uidParam, 10, 64)
+	uid, err := GetUIDParam(c)
 	if err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid uid %s", uidParam)
+		return err
 	}
+
 	params := &ListFriendshipParams{}
 	if err := c.Bind(params); err != nil {
 		return err
@@ -45,7 +103,8 @@ func ListFriendship(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListRelationship(ctx, &pb.ListRelationshipRequest{
-		CurrentUid:   uid,
+		CurrentUid:   GetCurrentUID(c),
+		Uid:          uid,
 		RelationType: params.RelationType,
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
@@ -56,7 +115,7 @@ func ListFriendship(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, svcresp.Relations, svcresp.Paginator)
+	return rest.BuildSuccessRespWithPagination(c, BuildFriendshipRespSlice(svcresp.Relations), svcresp.Paginator)
 }
 
 func Follow(c echo.Context) error {
@@ -65,19 +124,13 @@ func Follow(c echo.Context) error {
 		return codes.ErrInvalidArgument
 	}
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.Follow(ctx, &pb.FollowRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		TargetUid:  params.ToUserID,
 	})
 	if err != nil {
@@ -92,23 +145,23 @@ func Unfollow(c echo.Context) error {
 		return codes.ErrInvalidArgument
 	}
 
-	var currentUID uint64
-	if c.Get("CurrentUID") != nil {
-		currentUID = c.Get("CurrentUID").(uint64)
-	} else {
-		return codes.ErrInvalidArgument
-	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
 	}
 
 	_, err = grpcsvc.UnFollow(ctx, &pb.UnFollowRequest{
-		CurrentUid: currentUID,
+		CurrentUid: GetCurrentUID(c),
 		TargetUid:  params.ToUserID,
 	})
 	if err != nil {
 		return err
 	}
 	return rest.BuildSuccessResp(c, nil)
+}
+
+func RecommendUser(c echo.Context) error {
+
+	return rest.BuildSuccessResp(c, BuildFollowingsRespSlice(nil))
+
 }

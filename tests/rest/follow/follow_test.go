@@ -1,9 +1,10 @@
-// +build cgo,tests
+// +build tests
 
 package follow
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -33,6 +34,7 @@ func (suite *FollowServerSuite) TearDownSuite() {
 func (suite *FollowServerSuite) SetupTest() {
 	suite.Clean(suite.collections...)
 	suite.Acquire(suite.collections...)
+
 }
 
 func (suite *FollowServerSuite) TearDownTest() {
@@ -64,7 +66,6 @@ func (suite *FollowServerSuite) TestListFriendship() {
 			})
 		}
 	}
-	user2 := factories.UserFactory.MustCreate().(*models.User)
 
 	suite.T().Run("not found user", func(t *testing.T) {
 		resp := suite.Expect.GET("/api/v1/user/999/friendship").
@@ -73,38 +74,38 @@ func (suite *FollowServerSuite) TestListFriendship() {
 	})
 
 	suite.T().Run("list fans", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fan").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "fan").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(8)
 		resp.Value("data").Array().First().Object().Value("relation_type").Equal("friend")
-		resp.Value("data").Array().First().Object().Value("user").Object().Value("uid").Equal(13)
-		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(6)
+		resp.Value("data").Array().First().Object().Value("user").Object().Value("uid").Equal(users[11].UID)
+		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(users[4].UID)
 		resp.Value("data").Array().Last().Object().Value("relation_type").Equal("fan")
 		resp.Value("pagination").Object().Value("last_id").Equal("")
 	})
 
 	suite.T().Run("list following", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "following").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "following").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(8)
 		resp.Value("data").Array().First().Object().Value("relation_type").Equal("friend")
-		resp.Value("data").Array().First().Object().Value("user").Object().Value("uid").Equal(13)
-		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(2)
+		resp.Value("data").Array().First().Object().Value("user").Object().Value("uid").Equal(users[11].UID)
+		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(users[0].UID)
 		resp.Value("data").Array().Last().Object().Value("relation_type").Equal("following")
 	})
 
 	suite.T().Run("list friend", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "friend").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "friend").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(4)
-		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(10)
+		resp.Value("data").Array().Last().Object().Value("user").Object().Value("uid").Equal(users[8].UID)
 	})
 
 	suite.T().Run("list page", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/friendship").WithQuery("relation_type", "fan").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "fan").
 			WithQuery("limit", "3").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
@@ -113,6 +114,18 @@ func (suite *FollowServerSuite) TestListFriendship() {
 		resp.Value("pagination").Object().Value("last_id").NotEqual("")
 	})
 
+}
+
+func (suite *FollowServerSuite) TestFollowUnfollow() {
+
+	user1 := factories.UserFactory.MustCreate().(*models.User)
+	user2 := factories.UserFactory.MustCreate().(*models.User)
+	user3 := factories.UserFactory.MustCreate().(*models.User)
+	factories.FollowFactory.MustCreateWithOption(map[string]interface{}{
+		"FromUID":  user3.UID,
+		"ToUID":    user1.UID,
+		"IsFriend": false,
+	})
 	token := suite.MockLoginUser("1001:" + user1.Misesid)
 	println("token", token)
 	suite.T().Run("follow stranger", func(t *testing.T) {
@@ -130,20 +143,20 @@ func (suite *FollowServerSuite) TestListFriendship() {
 		suite.Nil(err)
 		db.ODM(context.Background()).First(u2, bson.M{"_id": user2.UID})
 		suite.Nil(err)
-		suite.Equal(int64(0), u1.FansCount)
-		suite.Equal(int64(1), u1.FollowingCount)
-		suite.Equal(int64(1), u2.FansCount)
-		suite.Equal(int64(0), u2.FollowingCount)
+		suite.Equal(uint32(0), u1.FansCount)
+		suite.Equal(uint32(1), u1.FollowingCount)
+		suite.Equal(uint32(1), u2.FansCount)
+		suite.Equal(uint32(0), u2.FollowingCount)
 	})
 
 	suite.T().Run("follow fans", func(t *testing.T) {
-		resp := suite.Expect.POST("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": 6}).
+		resp := suite.Expect.POST("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": user3.UID}).
 			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		f, err := models.GetFollow(context.Background(), 1, 6)
+		f, err := models.GetFollow(context.Background(), user1.UID, user3.UID)
 		suite.Nil(err)
 		suite.True(f.IsFriend)
-		f, err = models.GetFollow(context.Background(), 6, 1)
+		f, err = models.GetFollow(context.Background(), user3.UID, user1.UID)
 		suite.Nil(err)
 		suite.True(f.IsFriend)
 	})
@@ -152,18 +165,74 @@ func (suite *FollowServerSuite) TestListFriendship() {
 		resp := suite.Expect.DELETE("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": user2.UID}).
 			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		_, err := models.GetFollow(context.Background(), 1, user2.UID)
+		_, err := models.GetFollow(context.Background(), user1.UID, user2.UID)
 		suite.Equal(err, mongo.ErrNoDocuments)
 	})
 
 	suite.T().Run("unfollow friend", func(t *testing.T) {
-		resp := suite.Expect.DELETE("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": 6}).
+		resp := suite.Expect.DELETE("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": user3.UID}).
 			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		_, err := models.GetFollow(context.Background(), 1, 6)
+		_, err := models.GetFollow(context.Background(), user1.UID, user3.UID)
 		suite.Equal(err, mongo.ErrNoDocuments)
-		f, err := models.GetFollow(context.Background(), 6, 1)
+		f, err := models.GetFollow(context.Background(), user3.UID, user1.UID)
 		suite.Nil(err)
 		suite.False(f.IsFriend)
+	})
+}
+func (suite *FollowServerSuite) TestLatestFollowing() {
+
+	user1 := factories.UserFactory.MustCreate().(*models.User)
+	user2 := factories.UserFactory.MustCreate().(*models.User)
+	token1 := suite.MockLoginUser("1:" + user1.Misesid)
+	token2 := suite.MockLoginUser("2:" + user2.Misesid)
+	suite.T().Run("list latest following", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/following/latest").
+			WithHeader("Authorization", "Bearer "+token1).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(0)
+	})
+	suite.T().Run("new fans", func(t *testing.T) {
+		resp := suite.Expect.POST("/api/v1/user/follow").WithJSON(map[string]interface{}{"to_user_id": user1.UID}).
+			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp = suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "fan").
+			Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(1)
+	})
+
+	suite.T().Run("list latest following empty", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/following/latest").
+			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(1)
+		resp.Value("data").Array().First().Object().Value("unread").Equal(false)
+	})
+
+	suite.T().Run("list latest following unread", func(t *testing.T) {
+		resp := suite.Expect.POST("/api/v1/status").WithJSON(map[string]interface{}{
+			"status_type": "text",
+			"content":     "post a text status",
+		}).WithHeader("Authorization", "Bearer "+token1).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+
+		resp = suite.Expect.GET("/api/v1/user/following/latest").
+			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(1)
+		resp.Value("data").Array().First().Object().Value("unread").Equal(true)
+	})
+
+	suite.T().Run("list latest following unread", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/user/1/status").
+			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("data").Array()
+
+		resp = suite.Expect.GET("/api/v1/user/following/latest").
+			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(1)
+		resp.Value("data").Array().First().Object().Value("unread").Equal(false)
 	})
 }
