@@ -216,8 +216,20 @@ func UpdateStatus(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid status params")
 	}
-
-	return rest.BuildSuccessResp(c, nil)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.UpdateStatus(ctx, &pb.UpdateStatusRequest{
+		CurrentUid:   GetCurrentUID(c),
+		StatusId:     c.Param("id"),
+		IsPrivate:    params.IsPrivate,
+		ShowDuration: uint64(params.ShowDuration),
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
 
 func CreateStatus(c echo.Context) error {
@@ -242,13 +254,15 @@ func CreateStatus(c echo.Context) error {
 	}
 
 	svcresp, err := grpcsvc.CreateStatus(ctx, &pb.CreateStatusRequest{
-		CurrentUid: GetCurrentUID(c),
-		StatusType: params.StatusType,
-		Content:    params.Content,
-		ParentId:   params.ParentID,
-		Meta:       string(meta),
-		FromType:   fromType,
-		Images:     params.Images,
+		CurrentUid:   GetCurrentUID(c),
+		StatusType:   params.StatusType,
+		Content:      params.Content,
+		ParentId:     params.ParentID,
+		Meta:         string(meta),
+		FromType:     fromType,
+		Images:       params.Images,
+		IsPrivate:    params.IsPrivate,
+		ShowDuration: uint64(params.ShowDuration),
 	})
 	if err != nil {
 		return err

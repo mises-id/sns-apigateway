@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/labstack/echo"
@@ -25,11 +24,59 @@ type MessageSummaryResp struct {
 	NotificationsCount uint64       `json:"notifications_count"`
 	UsersCount         uint64       `json:"users_count"`
 }
+
+type MessageMeta interface {
+	isMessageMeta()
+}
+
+type NewLikeStatusMeta struct {
+	MessageMeta
+	UID             uint64 `json:"uid"`
+	StatusID        string `json:"status_id"`
+	StatusContent   string `json:"status_content"`
+	StatusImagePath string `json:"status_image_path"`
+}
+
+type NewLikeCommentMeta struct {
+	MessageMeta
+	UID             uint64 `json:"uid"`
+	CommentID       string `json:"comment_id"`
+	CommentUsername string `json:"comment_username"`
+	CommentContent  string `json:"comment_content"`
+}
+
+type NewCommentMeta struct {
+	MessageMeta
+	UID                  uint64 `json:"uid"`
+	GroupID              string `json:"group_id"`
+	CommentID            string `json:"comment_id"`
+	Content              string `json:"content"`
+	ParentContent        string `json:"parent_content"`
+	ParentUsername       string `json:"parent_username"`
+	StatusContentSummary string `json:"status_content_summary"`
+	StatusImagePath      string `json:"status_image_path"`
+}
+
+type NewFanMeta struct {
+	MessageMeta
+	UID         uint64 `json:"uid"`
+	FanUsername string `json:"fan_username"`
+}
+
+type NewForwardMeta struct {
+	MessageMeta
+	UID            uint64 `json:"uid"`
+	StatusID       string `json:"status_id"`
+	ForwardContent string `json:"forward_content"`
+	ContentSummary string `json:"content_summary"`
+	ImagePath      string `json:"image_path"`
+}
+
 type MessageResp struct {
 	ID          string           `json:"id"`
 	User        *UserSummaryResp `json:"user"`
 	MessageType string           `json:"message_type"`
-	MetaData    string           `json:"meta_data"`
+	MetaData    MessageMeta      `json:"meta_data"`
 	State       string           `json:"state"`
 	CreatedAt   time.Time        `json:"created_at"`
 }
@@ -51,7 +98,6 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 	if in == nil {
 		return &MessageResp{}
 	} else {
-
 		ret := &MessageResp{
 			ID:          in.Id,
 			User:        BuildUserSummaryResp(in.FromUser),
@@ -59,27 +105,46 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 			State:       in.State,
 			CreatedAt:   time.Now(),
 		}
-		if in.NewCommentMeta != nil {
-			if meta, err := json.Marshal(in.NewCommentMeta); err == nil {
-				ret.MetaData = string(meta)
+		switch in.MessageType {
+		case "new_like_status":
+			ret.MetaData = &NewLikeStatusMeta{
+				UID:             in.NewLikeStatusMeta.Uid,
+				StatusID:        in.NewLikeStatusMeta.StatusId,
+				StatusContent:   in.NewLikeStatusMeta.StatusContent,
+				StatusImagePath: in.NewLikeStatusMeta.StatusImagePath,
+			}
+		case "new_like_comment":
+			ret.MetaData = &NewLikeCommentMeta{
+				UID:             in.NewLikeCommentMeta.Uid,
+				CommentID:       in.NewLikeCommentMeta.CommentId,
+				CommentUsername: in.NewLikeCommentMeta.CommentUsername,
+				CommentContent:  in.NewLikeCommentMeta.CommentContent,
+			}
+		case "new_comment":
+			ret.MetaData = &NewCommentMeta{
+				UID:                  in.NewCommentMeta.Uid,
+				GroupID:              in.NewCommentMeta.GroupId,
+				CommentID:            in.NewCommentMeta.CommentId,
+				Content:              in.NewCommentMeta.Content,
+				ParentContent:        in.NewCommentMeta.ParentContent,
+				ParentUsername:       in.NewCommentMeta.ParentUserName,
+				StatusContentSummary: in.NewCommentMeta.StatusContentSummary,
+				StatusImagePath:      in.NewCommentMeta.StatusImagePath,
+			}
+		case "new_fans":
+			ret.MetaData = &NewFanMeta{
+				UID:         in.NewFansMeta.Uid,
+				FanUsername: in.NewFansMeta.FanUsername,
+			}
+		case "new_fowards":
+			ret.MetaData = &NewForwardMeta{
+				UID:            in.NewForwardMeta.Uid,
+				StatusID:       in.NewForwardMeta.StatusId,
+				ForwardContent: in.NewForwardMeta.ForwardContent,
+				ContentSummary: in.NewForwardMeta.ContentSummary,
+				ImagePath:      in.NewForwardMeta.ImagePath,
 			}
 		}
-		if in.NewLikeMeta != nil {
-			if meta, err := json.Marshal(in.NewLikeMeta); err == nil {
-				ret.MetaData = string(meta)
-			}
-		}
-		if in.NewFansMeta != nil {
-			if meta, err := json.Marshal(in.NewFansMeta); err == nil {
-				ret.MetaData = string(meta)
-			}
-		}
-		if in.NewForwardMeta != nil {
-			if meta, err := json.Marshal(in.NewForwardMeta); err == nil {
-				ret.MetaData = string(meta)
-			}
-		}
-
 		return ret
 	}
 }
