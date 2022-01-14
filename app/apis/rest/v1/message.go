@@ -110,7 +110,7 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 			MessageType: in.MessageType,
 			State:       in.State,
 			Status:      BuildStatusResp(in.Status),
-			CreatedAt:   time.Now(),
+			CreatedAt:   time.Unix(int64(in.CreatedAt), 0),
 		}
 		switch in.MessageType {
 		case "new_like_status":
