@@ -86,7 +86,7 @@ func SignIn(c echo.Context) error {
 }
 
 func MyProfile(c echo.Context) error {
-	uid := c.Get("CurrentUser").(*middleware.UserSession).UID
+	uid := GetCurrentUID(c)
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func MyProfile(c echo.Context) error {
 }
 
 func FindUser(c echo.Context) error {
-	currentUID := c.Get("CurrentUser").(*middleware.UserSession).UID
+	currentUID := GetCurrentUID(c)
 	uid, err := GetUIDParam(c)
 	if err != nil {
 		return err
