@@ -14,6 +14,10 @@ type ListUserStatusParams struct {
 	rest.PageQuickParams
 }
 
+type RecommendStatusParams struct {
+	rest.PageQuickParams
+}
+
 type LinkMeta struct {
 	Title          string `json:"title"`
 	Host           string `json:"host"`
@@ -187,7 +191,7 @@ func Timeline(c echo.Context) error {
 
 func RecommendStatus(c echo.Context) error {
 
-	params := &ListUserStatusParams{}
+	params := &RecommendStatusParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
@@ -196,18 +200,34 @@ func RecommendStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.ListRecommended(ctx, &pb.ListStatusRequest{
-		CurrentUid: GetCurrentUID(c),
-		Paginator: &pb.PageQuick{
-			NextId: params.PageQuickParams.NextID,
-			Limit:  uint64(params.PageQuickParams.Limit),
-		},
+
+	next := pb.NewRecommendNext{}
+	next.LastCommonTime = int64(0)
+	next.LastRecommendTime = int64(0)
+	if params.NextID != "" {
+		err = json.Unmarshal([]byte(params.NextID), &next)
+		if err != nil {
+			return err
+		}
+
+	}
+	svcresp, err := grpcsvc.NewRecommendStatus(ctx, &pb.NewRecommendStatusRequest{
+		CurrentUid:        GetCurrentUID(c),
+		LastRecommendTime: next.LastRecommendTime,
+		LastCommonTime:    next.LastCommonTime,
 	})
 	if err != nil {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
+	var nextID []byte
+	if nextID, err = json.Marshal(svcresp.Next); err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), &pb.PageQuick{
+		NextId: string(nextID),
+	})
 
 }
 

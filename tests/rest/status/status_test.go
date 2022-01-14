@@ -57,29 +57,6 @@ func TestStatusServer(t *testing.T) {
 
 func (suite *StatusServerSuite) TestListStatus() {
 	token := suite.MockLoginUser("1001:1001")
-	suite.T().Run("recommend status for guest", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/status/recommend").Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("data").Array()
-	})
-
-	suite.T().Run("recommend status pagination", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/status/recommend").WithQuery("limit", 3).Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("data").Array()
-		resp.Value("pagination").Object().Value("limit").Equal(3)
-		resp.Value("pagination").Object().Value("last_id").Equal(suite.statuses[4].ID.Hex())
-
-		resp = suite.Expect.GET("/api/v1/status/recommend").
-			WithQuery("limit", 1).WithQuery("last_id", suite.statuses[3].ID.Hex()).Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("data").Array()
-		resp.Value("pagination").Object().Value("limit").Equal(1)
-		//resp.Value("pagination").Object().Value("last_id").Equal(suite.statuses[4].ID.Hex())
-	})
-
-	suite.T().Run("recommend status for user", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/status/recommend").
-			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
-		resp.Value("data").Array()
-	})
 
 	suite.T().Run("list user status", func(t *testing.T) {
 		resp := suite.Expect.GET("/api/v1/user/1001/status").Expect().Status(http.StatusOK).JSON().Object()
@@ -293,4 +270,28 @@ func (suite *StatusServerSuite) TestGetUpdateStatus() {
 		resp.Value("data").Object().Value("is_public").Equal(false)
 	})
 
+}
+
+func (suite *StatusServerSuite) TestRecommendStatus() {
+	token := suite.MockLoginUser("1001:1001")
+	suite.T().Run("recommend status for guest", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/status/recommend").Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("data").Array()
+	})
+
+	suite.T().Run("recommend status pagination", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/status/recommend").WithQuery("limit", 3).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("data").Array()
+		nextid := resp.Value("pagination").Object().Value("last_id").String().Raw()
+
+		resp = suite.Expect.GET("/api/v1/status/recommend").
+			WithQuery("limit", 1).WithQuery("last_id", nextid).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("data").Array()
+	})
+
+	suite.T().Run("recommend status for user", func(t *testing.T) {
+		resp := suite.Expect.GET("/api/v1/status/recommend").
+			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("data").Array()
+	})
 }
