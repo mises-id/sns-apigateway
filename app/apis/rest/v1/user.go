@@ -91,7 +91,10 @@ func MyProfile(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.FindUser(ctx, &pb.FindUserRequest{Uid: uid})
+	svcresp, err := grpcsvc.FindUser(ctx, &pb.FindUserRequest{
+		Uid:        uid,
+		CurrentUid: uid,
+	})
 	if err != nil {
 		return err
 	}
@@ -99,6 +102,7 @@ func MyProfile(c echo.Context) error {
 }
 
 func FindUser(c echo.Context) error {
+	currentUID := c.Get("CurrentUser").(*middleware.UserSession).UID
 	uid, err := GetUIDParam(c)
 	if err != nil {
 		return err
@@ -107,7 +111,10 @@ func FindUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.FindUser(ctx, &pb.FindUserRequest{Uid: uid})
+	svcresp, err := grpcsvc.FindUser(ctx, &pb.FindUserRequest{
+		Uid:        uid,
+		CurrentUid: currentUID,
+	})
 	if err != nil {
 		return err
 	}
