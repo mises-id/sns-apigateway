@@ -18,7 +18,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
-	github.com/mises-id/sns-socialsvc v0.0.0-20220114022015-2e443995aa73
+	github.com/mises-id/sns-socialsvc v0.0.0-20220114034505-11c4eb8a46bb
 	github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0

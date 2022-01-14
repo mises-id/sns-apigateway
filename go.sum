@@ -675,6 +675,8 @@ github.com/mises-id/sns-socialsvc v0.0.0-20220114021925-f7e227c978f5 h1:xL0I6MG7
 github.com/mises-id/sns-socialsvc v0.0.0-20220114021925-f7e227c978f5/go.mod h1:OC8DgG4h0gW9opS26PQvcRYetd07XGQ9YjfHB4rt3F8=
 github.com/mises-id/sns-socialsvc v0.0.0-20220114022015-2e443995aa73 h1:xXSbd9j2jZmg3WYW+0vNmUU+4HS0mAy3Ybc1t+Pi52Y=
 github.com/mises-id/sns-socialsvc v0.0.0-20220114022015-2e443995aa73/go.mod h1:OC8DgG4h0gW9opS26PQvcRYetd07XGQ9YjfHB4rt3F8=
+github.com/mises-id/sns-socialsvc v0.0.0-20220114034505-11c4eb8a46bb h1:Q+3F8w+D5NTW9sqUncKNSWGpi7bx2aKcLpp3AjnKS7s=
+github.com/mises-id/sns-socialsvc v0.0.0-20220114034505-11c4eb8a46bb/go.mod h1:OC8DgG4h0gW9opS26PQvcRYetd07XGQ9YjfHB4rt3F8=
 github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb h1:pXwrBv38qS04jcAH1Y710pcgYNCtKa6jln6u8z5eCpU=
 github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb/go.mod h1:tWRdIvCMG4slyVVTdfG6NiOYXW0Hayecr7dkSn1csHw=
 github.com/mises-id/sns-storagesvc/sdk v0.0.0-20211221064425-26bd51fd6a98 h1:YyD6tOjWBarXN6eyxed2rGcpTD42IBCD1XIhyXNwKMM=

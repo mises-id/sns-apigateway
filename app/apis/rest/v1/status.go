@@ -244,7 +244,13 @@ func CreateStatus(c echo.Context) error {
 	var meta json.RawMessage
 	var err error
 	if params.LinkMeta != nil {
-		if meta, err = json.Marshal(params.LinkMeta); err != nil {
+		metaInfo := &pb.LinkMetaInfo{
+			Title:     params.LinkMeta.Title,
+			Host:      params.LinkMeta.Host,
+			Link:      params.LinkMeta.Link,
+			ImagePath: params.LinkMeta.AttachmentPath,
+		}
+		if meta, err = json.Marshal(metaInfo); err != nil {
 			return err
 		}
 	}

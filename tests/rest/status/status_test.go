@@ -129,6 +129,7 @@ func (suite *StatusServerSuite) TestCreateStatus() {
 		suite.Nil(err)
 		suite.Equal("post a link status", status.Content)
 		suite.Equal(enum.LinkStatus, status.StatusType)
+		suite.Equal("1", status.LinkMeta.ImagePath)
 		suite.Equal(uint64(1001), status.UID)
 	})
 	suite.T().Run("forward a text status", func(t *testing.T) {
@@ -253,6 +254,11 @@ func (suite *StatusServerSuite) TestUnlikeStatus() {
 		suite.Nil(err)
 		suite.Equal(1, len(likes))
 		suite.NotNil(likes[0].DeletedAt)
+
+		resp = suite.Expect.GET("/api/v1/user/1001/like").
+			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusOK).JSON().Object()
+		resp.Value("code").Equal(0)
+		resp.Value("data").Array().Length().Equal(0)
 	})
 }
 

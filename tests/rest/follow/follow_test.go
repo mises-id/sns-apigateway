@@ -225,7 +225,7 @@ func (suite *FollowServerSuite) TestLatestFollowing() {
 	})
 
 	suite.T().Run("list latest following unread", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1/status").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/status").
 			WithHeader("Authorization", "Bearer "+token2).Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("data").Array()
 
