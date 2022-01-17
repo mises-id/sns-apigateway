@@ -221,8 +221,13 @@ func RecommendStatus(c echo.Context) error {
 	}
 
 	var nextID []byte
-	if nextID, err = json.Marshal(svcresp.Next); err != nil {
-		return err
+
+	if len(svcresp.Statuses) == 0 {
+		nextID = []byte{}
+	} else {
+		if nextID, err = json.Marshal(svcresp.Next); err != nil {
+			return err
+		}
 	}
 
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), &pb.PageQuick{
