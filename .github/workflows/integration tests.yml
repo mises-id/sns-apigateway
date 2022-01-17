@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: run tests
-        run: APP_ENV=test go test -coverprofile coverage.out -v  --tags tests -parallel 1 ./...
+        run: APP_ENV=test go test -coverprofile coverage.out   --tags tests -parallel 1 -coverpkg=./app/... ./tests/...
         env:
           APP_ENV: test
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
