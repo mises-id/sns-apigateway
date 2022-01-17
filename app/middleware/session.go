@@ -4,8 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
-
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo"
 	"github.com/mises-id/sns-apigateway/config/env"
 	"github.com/mises-id/sns-apigateway/lib/codes"

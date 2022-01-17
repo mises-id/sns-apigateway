@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"sort"
+	"time"
 
 	"github.com/khaiql/dbcleaner"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
@@ -32,12 +33,14 @@ type BaseTestSuite struct {
 func (suite *BaseTestSuite) SetupSuite() {
 	suite.DbCleaner = dbcleaner.New()
 	// TODO the env should read through api
+	duration, _ := time.ParseDuration("24h")
 	env.Envs = &env.Env{
 		DBName:           "mises_unit_test",
 		DBUser:           "",
 		DBPass:           "",
 		MongoURI:         "mongodb://localhost:27017",
 		DebugMisesPrefix: "1001",
+		TokenDuration:    duration,
 	}
 	db.SetupMongo(context.Background())
 	models.EnsureIndex()

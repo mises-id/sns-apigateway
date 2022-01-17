@@ -5,16 +5,16 @@ go 1.17
 require (
 	github.com/bluele/factory-go v0.0.1
 	github.com/caarlos0/env v3.5.0+incompatible
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gavv/httpexpect v2.0.0+incompatible
 	github.com/go-kit/kit v0.12.0
+	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v33 v33.0.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/mises-id/sns-socialsvc v0.0.0-20220114105436-b1e3cce7bbb8
+	github.com/mises-id/sns-socialsvc v0.0.0-20220117040302-edded9e2e829
 	github.com/mises-id/sns-storagesvc v0.0.0-20211229064402-41052e86ccfb
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -50,6 +50,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.2 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/dvsekhvalnov/jose2go v0.0.0-20200901110807-248326c1351b // indirect
