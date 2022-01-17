@@ -34,8 +34,8 @@ func (suite *BaseTestSuite) SetupSuite() {
 	// TODO the env should read through api
 	env.Envs = &env.Env{
 		DBName:           "mises_unit_test",
-		DBUser:           "root",
-		DBPass:           "example",
+		DBUser:           "",
+		DBPass:           "",
 		MongoURI:         "mongodb://localhost:27017",
 		DebugMisesPrefix: "1001",
 	}

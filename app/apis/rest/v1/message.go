@@ -30,23 +30,24 @@ type MessageMeta interface {
 }
 
 type NewLikeStatusMeta struct {
-	MessageMeta
-	UID             uint64 `json:"uid"`
-	StatusID        string `json:"status_id"`
-	StatusContent   string `json:"status_content"`
-	StatusImagePath string `json:"status_image_path"`
+	UID            uint64 `json:"uid"`
+	StatusID       string `json:"status_id"`
+	StatusContent  string `json:"status_content"`
+	StatusImageURL string `json:"status_image_url"`
 }
 
+func (NewLikeStatusMeta) isMessageMeta() {}
+
 type NewLikeCommentMeta struct {
-	MessageMeta
 	UID             uint64 `json:"uid"`
 	CommentID       string `json:"comment_id"`
 	CommentUsername string `json:"comment_username"`
 	CommentContent  string `json:"comment_content"`
 }
 
+func (NewLikeCommentMeta) isMessageMeta() {}
+
 type NewCommentMeta struct {
-	MessageMeta
 	UID                  uint64 `json:"uid"`
 	GroupID              string `json:"group_id"`
 	CommentID            string `json:"comment_id"`
@@ -54,23 +55,27 @@ type NewCommentMeta struct {
 	ParentContent        string `json:"parent_content"`
 	ParentUsername       string `json:"parent_username"`
 	StatusContentSummary string `json:"status_content_summary"`
-	StatusImagePath      string `json:"status_image_path"`
+	StatusImageURL       string `json:"status_image_url"`
 }
 
+func (NewCommentMeta) isMessageMeta() {}
+
 type NewFanMeta struct {
-	MessageMeta
 	UID         uint64 `json:"uid"`
 	FanUsername string `json:"fan_username"`
 }
 
+func (NewFanMeta) isMessageMeta() {}
+
 type NewForwardMeta struct {
-	MessageMeta
 	UID            uint64 `json:"uid"`
 	StatusID       string `json:"status_id"`
 	ForwardContent string `json:"forward_content"`
 	ContentSummary string `json:"content_summary"`
-	ImagePath      string `json:"image_path"`
+	ImageURL       string `json:"image_url"`
 }
+
+func (NewForwardMeta) isMessageMeta() {}
 
 type MessageResp struct {
 	ID          string           `json:"id"`
@@ -78,6 +83,7 @@ type MessageResp struct {
 	MessageType string           `json:"message_type"`
 	MetaData    MessageMeta      `json:"meta_data"`
 	State       string           `json:"state"`
+	Status      *StatusResp      `json:"status"`
 	CreatedAt   time.Time        `json:"created_at"`
 }
 
@@ -103,15 +109,16 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 			User:        BuildUserSummaryResp(in.FromUser),
 			MessageType: in.MessageType,
 			State:       in.State,
-			CreatedAt:   time.Now(),
+			Status:      BuildStatusResp(in.Status),
+			CreatedAt:   time.Unix(int64(in.CreatedAt), 0),
 		}
 		switch in.MessageType {
 		case "new_like_status":
 			ret.MetaData = &NewLikeStatusMeta{
-				UID:             in.NewLikeStatusMeta.Uid,
-				StatusID:        in.NewLikeStatusMeta.StatusId,
-				StatusContent:   in.NewLikeStatusMeta.StatusContent,
-				StatusImagePath: in.NewLikeStatusMeta.StatusImagePath,
+				UID:            in.NewLikeStatusMeta.Uid,
+				StatusID:       in.NewLikeStatusMeta.StatusId,
+				StatusContent:  in.NewLikeStatusMeta.StatusContent,
+				StatusImageURL: in.NewLikeStatusMeta.StatusImageUrl,
 			}
 		case "new_like_comment":
 			ret.MetaData = &NewLikeCommentMeta{
@@ -129,7 +136,7 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 				ParentContent:        in.NewCommentMeta.ParentContent,
 				ParentUsername:       in.NewCommentMeta.ParentUserName,
 				StatusContentSummary: in.NewCommentMeta.StatusContentSummary,
-				StatusImagePath:      in.NewCommentMeta.StatusImagePath,
+				StatusImageURL:       in.NewCommentMeta.StatusImageUrl,
 			}
 		case "new_fans":
 			ret.MetaData = &NewFanMeta{
@@ -142,7 +149,7 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 				StatusID:       in.NewForwardMeta.StatusId,
 				ForwardContent: in.NewForwardMeta.ForwardContent,
 				ContentSummary: in.NewForwardMeta.ContentSummary,
-				ImagePath:      in.NewForwardMeta.ImagePath,
+				ImageURL:       in.NewForwardMeta.ImageUrl,
 			}
 		}
 		return ret

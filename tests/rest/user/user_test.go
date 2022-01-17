@@ -26,6 +26,7 @@ type UserServerSuite struct {
 func (suite *UserServerSuite) SetupSuite() {
 	suite.RestBaseTestSuite.SetupSuite()
 	suite.collections = []string{"counters", "attachments", "users", "blacklists"}
+
 }
 
 func (suite *UserServerSuite) TearDownSuite() {
@@ -35,6 +36,18 @@ func (suite *UserServerSuite) TearDownSuite() {
 func (suite *UserServerSuite) SetupTest() {
 	suite.Clean(suite.collections...)
 	suite.Acquire(suite.collections...)
+
+	factories.InitUsers(&models.User{
+		UID:        1001,
+		Gender:     enum.GenderFemale,
+		AvatarPath: "DummyAvatarPath",
+		Misesid:    "1001",
+	}, &models.User{
+		UID:     1002,
+		Gender:  enum.GenderFemale,
+		Misesid: "1002",
+	})
+
 }
 
 func (suite *UserServerSuite) TearDownTest() {
@@ -47,17 +60,6 @@ func TestUserServer(t *testing.T) {
 
 func (suite *UserServerSuite) TestFindUser() {
 
-	factories.InitUsers(&models.User{
-		UID:        1,
-		AvatarPath: "DummyAvatarPath",
-		Misesid:    "123",
-		Gender:     enum.GenderMale,
-	}, &models.User{
-		UID:        2,
-		Misesid:    "456",
-		Gender:     enum.GenderMale,
-		AvatarPath: "",
-	})
 	suite.T().Run("not found user", func(t *testing.T) {
 		resp := suite.Expect.GET("/api/v1/user/999").
 			Expect().Status(http.StatusNotFound).JSON().Object()
@@ -65,30 +67,24 @@ func (suite *UserServerSuite) TestFindUser() {
 	})
 
 	suite.T().Run("find user with avatar", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/1").
+		resp := suite.Expect.GET("/api/v1/user/1001").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		resp.Value("data").Object().Value("uid").Equal(1)
+		resp.Value("data").Object().Value("uid").Equal(1001)
 		url := fmt.Sprintf("http://localhost/DummyAvatarPath?")
 		resp.Value("data").Object().Value("avatar").Object().Value("small").Equal(url)
 	})
 
 	suite.T().Run("find user without avatar", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/2").
+		resp := suite.Expect.GET("/api/v1/user/1002").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
-		resp.Value("data").Object().Value("uid").Equal(2)
+		resp.Value("data").Object().Value("uid").Equal(1002)
 		resp.Value("data").Object().Value("avatar").Null()
 	})
 }
 
 func (suite *UserServerSuite) TestSignin() {
-	factories.InitUsers(&models.User{
-		UID:        1001,
-		AvatarPath: "0",
-		Misesid:    "1001",
-		Gender:     enum.GenderMale,
-	})
 
 	suite.T().Run("user signin success", func(t *testing.T) {
 		resp := suite.Expect.POST("/api/v1/signin").WithJSON(map[string]interface{}{
@@ -111,12 +107,6 @@ func (suite *UserServerSuite) TestSignin() {
 }
 
 func (suite *UserServerSuite) TestUpdateUser() {
-	factories.InitUsers(&models.User{
-		UID:        1001,
-		Gender:     enum.GenderFemale,
-		AvatarPath: "0",
-		Misesid:    "1001",
-	})
 	token := suite.MockLoginUser("1001:1001")
 	suite.T().Run("update username success", func(t *testing.T) {
 		resp := suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
@@ -183,17 +173,6 @@ func (suite *UserServerSuite) TestUpdateUser() {
 
 func (suite *UserServerSuite) TestBlackUser() {
 
-	factories.InitUsers(&models.User{
-		UID:        1001,
-		Gender:     enum.GenderFemale,
-		AvatarPath: "0",
-		Misesid:    "1001",
-	}, &models.User{
-		UID:        1002,
-		Gender:     enum.GenderFemale,
-		AvatarPath: "0",
-		Misesid:    "1002",
-	})
 	token := suite.MockLoginUser("1001:1001")
 
 	suite.T().Run("empty blacklist", func(t *testing.T) {
