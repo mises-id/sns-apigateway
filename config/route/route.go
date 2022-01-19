@@ -41,6 +41,7 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)
+	userGroup.DELETE("/comment/:id", v1.DeleteComment)
 	userGroup.POST("/comment/:id/like", v1.LikeComment)
 	userGroup.DELETE("/comment/:id/like", v1.UnlikeComment)
 
