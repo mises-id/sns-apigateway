@@ -119,6 +119,21 @@ func CreateComment(c echo.Context) error {
 	return rest.BuildSuccessResp(c, BuildCommentResp(svcresp.Comment))
 }
 
+func DeleteComment(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	_, err = grpcsvc.DeleteComment(ctx, &pb.DeleteCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		Id:         c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, nil)
+}
+
 func LikeComment(c echo.Context) error {
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
