@@ -71,6 +71,22 @@ func BuildCommentRespSlice(in []*pb.Comment) []*CommentResp {
 	return resp
 
 }
+func GetComment(c echo.Context) error {
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetComment(ctx, &pb.GetCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		CommentId:  c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, BuildCommentResp(svcresp.Comment))
+}
 
 func ListComment(c echo.Context) error {
 	params := &ListCommentParams{}
