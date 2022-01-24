@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	v1 "github.com/mises-id/sns-apigateway/app/apis/rest/v1"
 	appmw "github.com/mises-id/sns-apigateway/app/middleware"
@@ -18,7 +19,11 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
-	userGroup.POST("/upload", v1.UploadFile)
+
+	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
+		Skipper: middleware.DefaultSkipper,
+		Limit:   "8M",
+	}))
 	userGroup.GET("/user/me", v1.MyProfile)
 	userGroup.PATCH("/user/me", v1.UpdateUser)
 	userGroup.POST("/user/follow", v1.Follow)
@@ -41,6 +46,8 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)
+	groupV1.GET("/comment/:id", v1.GetComment)
+	userGroup.DELETE("/comment/:id", v1.DeleteComment)
 	userGroup.POST("/comment/:id/like", v1.LikeComment)
 	userGroup.DELETE("/comment/:id/like", v1.UnlikeComment)
 

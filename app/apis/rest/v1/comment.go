@@ -71,6 +71,22 @@ func BuildCommentRespSlice(in []*pb.Comment) []*CommentResp {
 	return resp
 
 }
+func GetComment(c echo.Context) error {
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetComment(ctx, &pb.GetCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		CommentId:  c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, BuildCommentResp(svcresp.Comment))
+}
 
 func ListComment(c echo.Context) error {
 	params := &ListCommentParams{}
@@ -117,6 +133,21 @@ func CreateComment(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, BuildCommentResp(svcresp.Comment))
+}
+
+func DeleteComment(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	_, err = grpcsvc.DeleteComment(ctx, &pb.DeleteCommentRequest{
+		CurrentUid: GetCurrentUID(c),
+		Id:         c.Param("id"),
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, nil)
 }
 
 func LikeComment(c echo.Context) error {

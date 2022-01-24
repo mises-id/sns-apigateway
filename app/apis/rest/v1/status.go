@@ -45,23 +45,25 @@ type LinkMetaResp struct {
 }
 
 type StatusResp struct {
-	ID            string           `json:"id"`
-	User          *UserSummaryResp `json:"user"`
-	Content       string           `json:"content"`
-	FromType      string           `json:"from_type"`
-	StatusType    string           `json:"status_type"`
-	ParentStatus  *StatusResp      `json:"parent_status"`
-	OriginStatus  *StatusResp      `json:"origin_status"`
-	CommentsCount uint64           `json:"comments_count"`
-	LikesCount    uint64           `json:"likes_count"`
-	ForwardsCount uint64           `json:"forwards_count"`
-	IsLiked       bool             `json:"is_liked"`
-	LinkMeta      *LinkMetaResp    `json:"link_meta"`
-	CreatedAt     time.Time        `json:"created_at"`
-	ThumbImages   []string         `json:"thumb_images"`
-	Images        []string         `json:"images"`
-	IsPublic      bool             `json:"is_public"`
-	HideTime      time.Time        `json:"hide_time"`
+	ID                    string           `json:"id"`
+	User                  *UserSummaryResp `json:"user"`
+	Content               string           `json:"content"`
+	FromType              string           `json:"from_type"`
+	StatusType            string           `json:"status_type"`
+	ParentStatus          *StatusResp      `json:"parent_status"`
+	OriginStatus          *StatusResp      `json:"origin_status"`
+	CommentsCount         uint64           `json:"comments_count"`
+	LikesCount            uint64           `json:"likes_count"`
+	ForwardsCount         uint64           `json:"forwards_count"`
+	IsLiked               bool             `json:"is_liked"`
+	LinkMeta              *LinkMetaResp    `json:"link_meta"`
+	CreatedAt             time.Time        `json:"created_at"`
+	ThumbImages           []string         `json:"thumb_images"`
+	Images                []string         `json:"images"`
+	IsPublic              bool             `json:"is_public"`
+	ParentStatusIsDeleted bool             `json:"parent_ststus_is_deleted"`
+	ParentStatusIsBlacked bool             `json:"parent_ststus_is_black"`
+	HideTime              time.Time        `json:"hide_time"`
 }
 
 func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
@@ -69,18 +71,20 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 		return nil
 	}
 	resp := &StatusResp{
-		ID:            info.Id,
-		User:          BuildUserSummaryResp(info.User),
-		Content:       info.Content,
-		FromType:      info.FromType,
-		StatusType:    info.StatusType,
-		CommentsCount: info.CommentCount,
-		LikesCount:    info.LikeCount,
-		ForwardsCount: info.ForwardCount,
-		IsLiked:       info.IsLiked,
-		CreatedAt:     time.Unix(int64(info.CreatedAt), 0),
-		IsPublic:      info.IsPublic,
-		HideTime:      time.Unix(int64(info.HideTime), 0),
+		ID:                    info.Id,
+		User:                  BuildUserSummaryResp(info.User),
+		Content:               info.Content,
+		FromType:              info.FromType,
+		StatusType:            info.StatusType,
+		CommentsCount:         info.CommentCount,
+		LikesCount:            info.LikeCount,
+		ForwardsCount:         info.ForwardCount,
+		IsLiked:               info.IsLiked,
+		ParentStatusIsDeleted: info.ParentStatusIsDeleted,
+		ParentStatusIsBlacked: info.ParentStatusIsBlacked,
+		CreatedAt:             time.Unix(int64(info.CreatedAt), 0),
+		IsPublic:              info.IsPublic,
+		HideTime:              time.Unix(int64(info.HideTime), 0),
 	}
 
 	if info.LinkMeta != nil {
@@ -221,8 +225,13 @@ func RecommendStatus(c echo.Context) error {
 	}
 
 	var nextID []byte
-	if nextID, err = json.Marshal(svcresp.Next); err != nil {
-		return err
+
+	if len(svcresp.Statuses) == 0 {
+		nextID = []byte{}
+	} else {
+		if nextID, err = json.Marshal(svcresp.Next); err != nil {
+			return err
+		}
 	}
 
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), &pb.PageQuick{
