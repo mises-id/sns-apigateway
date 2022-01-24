@@ -15,7 +15,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/mises-id/sns-socialsvc v0.0.0-20220124094126-370020fe0218
-	github.com/mises-id/sns-storagesvc v0.0.0-20211231103331-1632dba7a03c
+	github.com/mises-id/sns-storagesvc v0.0.0-20220124102532-82e7c17f5d65
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli v1.22.5
