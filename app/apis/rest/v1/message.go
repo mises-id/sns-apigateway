@@ -78,13 +78,15 @@ type NewForwardMeta struct {
 func (NewForwardMeta) isMessageMeta() {}
 
 type MessageResp struct {
-	ID          string           `json:"id"`
-	User        *UserSummaryResp `json:"user"`
-	MessageType string           `json:"message_type"`
-	MetaData    MessageMeta      `json:"meta_data"`
-	State       string           `json:"state"`
-	Status      *StatusResp      `json:"status"`
-	CreatedAt   time.Time        `json:"created_at"`
+	ID               string           `json:"id"`
+	User             *UserSummaryResp `json:"user"`
+	MessageType      string           `json:"message_type"`
+	MetaData         MessageMeta      `json:"meta_data"`
+	State            string           `json:"state"`
+	Status           *StatusResp      `json:"status"`
+	StatusIsDeleted  bool             `json:"ststus_is_deleted"`
+	CommentIsDeleted bool             `json:"comment_is_deleted"`
+	CreatedAt        time.Time        `json:"created_at"`
 }
 
 func BuildMessageSummaryResp(in *pb.MessageSummary) *MessageSummaryResp {
@@ -105,12 +107,14 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 		return &MessageResp{}
 	} else {
 		ret := &MessageResp{
-			ID:          in.Id,
-			User:        BuildUserSummaryResp(in.FromUser),
-			MessageType: in.MessageType,
-			State:       in.State,
-			Status:      BuildStatusResp(in.Status),
-			CreatedAt:   time.Unix(int64(in.CreatedAt), 0),
+			ID:               in.Id,
+			User:             BuildUserSummaryResp(in.FromUser),
+			MessageType:      in.MessageType,
+			State:            in.State,
+			StatusIsDeleted:  in.StatusIsDeleted,
+			CommentIsDeleted: in.CommentIsDeleted,
+			Status:           BuildStatusResp(in.Status),
+			CreatedAt:        time.Unix(int64(in.CreatedAt), 0),
 		}
 		switch in.MessageType {
 		case "new_like_status":
