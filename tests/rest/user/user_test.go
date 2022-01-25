@@ -1,3 +1,4 @@
+//go:build tests
 // +build tests
 
 package user
@@ -42,6 +43,7 @@ func (suite *UserServerSuite) SetupTest() {
 		Gender:     enum.GenderFemale,
 		AvatarPath: "DummyAvatarPath",
 		Misesid:    "1001",
+		Username: ""
 	}, &models.User{
 		UID:     1002,
 		Gender:  enum.GenderFemale,
