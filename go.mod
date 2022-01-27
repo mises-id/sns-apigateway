@@ -14,14 +14,14 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/mises-id/sns-socialsvc v0.0.0-20220125092810-1aa66b4d1fce
+	github.com/mises-id/sns-socialsvc v0.0.0-20220127071726-a07e90fcb61d
 	github.com/mises-id/sns-storagesvc v0.0.0-20220124102532-82e7c17f5d65
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli v1.22.5
 	go.mongodb.org/mongo-driver v1.8.1
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	google.golang.org/grpc v1.43.0
+	google.golang.org/grpc v1.44.0
 )
 
 require (

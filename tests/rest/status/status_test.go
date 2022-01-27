@@ -1,3 +1,4 @@
+//go:build tests
 // +build tests
 
 package status
@@ -157,8 +158,8 @@ func (suite *StatusServerSuite) TestDeleteStatus() {
 	token := suite.MockLoginUser("1001:1001")
 	suite.T().Run("delete status not found", func(t *testing.T) {
 		resp := suite.Expect.DELETE("/api/v1/status/xxxxxxx").
-			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusInternalServerError).JSON().Object()
-		resp.Value("code").Equal(codes.InternalCode)
+			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusBadRequest).JSON().Object()
+		resp.Value("code").Equal(codes.InvalidArgumentCode)
 
 		resp = suite.Expect.DELETE("/api/v1/status/"+primitive.NewObjectID().Hex()).
 			WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusNotFound).JSON().Object()
