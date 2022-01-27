@@ -48,6 +48,7 @@ func TestFollowServer(t *testing.T) {
 
 func (suite *FollowServerSuite) TestListFriendship() {
 	user1 := factories.UserFactory.MustCreate().(*models.User)
+	token := suite.MockLoginUser("1001:" + user1.Misesid)
 	users := make([]*models.User, 12)
 	for i := range users {
 		users[i] = factories.UserFactory.MustCreate().(*models.User)
@@ -75,7 +76,9 @@ func (suite *FollowServerSuite) TestListFriendship() {
 	})
 
 	suite.T().Run("list fans", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "fan").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").
+			WithHeader("Authorization", "Bearer "+token).
+			WithQuery("relation_type", "fan").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(8)
@@ -87,7 +90,9 @@ func (suite *FollowServerSuite) TestListFriendship() {
 	})
 
 	suite.T().Run("list following", func(t *testing.T) {
-		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").WithQuery("relation_type", "following").
+		resp := suite.Expect.GET("/api/v1/user/"+fmt.Sprintf("%d", user1.UID)+"/friendship").
+			WithHeader("Authorization", "Bearer "+token).
+			WithQuery("relation_type", "following").
 			Expect().Status(http.StatusOK).JSON().Object()
 		resp.Value("code").Equal(0)
 		resp.Value("data").Array().Length().Equal(8)
