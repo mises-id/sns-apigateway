@@ -28,6 +28,7 @@ type PoolCfg struct {
 }
 type PageQuickParams struct {
 	Limit  int64  `json:"limit" query:"limit"`
+	Total  int64  `json:"total" query:"total"`
 	NextID string `json:"last_id" query:"last_id"`
 }
 
@@ -46,6 +47,7 @@ func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination
 		"data": data,
 		"pagination": PageQuickParams{
 			Limit:  int64(pagination.Limit),
+			Total:  int64(pagination.Total),
 			NextID: pagination.NextId,
 		},
 	})
