@@ -14,8 +14,8 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/mises-id/sns-socialsvc v0.0.0-20220129031107-1e43cd3acdf4
-	github.com/mises-id/sns-storagesvc v0.0.0-20220124102532-82e7c17f5d65
+	github.com/mises-id/sns-socialsvc v0.0.0-20220129092917-a2a065b5ba6c
+	github.com/mises-id/sns-storagesvc v0.0.0-20220129090309-1380706d4aa8
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli v1.22.5
@@ -100,7 +100,7 @@ require (
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/mises-id/mises-tm v0.0.0-20211229053907-7f70cc1f8835 // indirect
 	github.com/mises-id/sdk v0.0.0-20220112092616-f50463033a82 // indirect
-	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220124102532-82e7c17f5d65 // indirect
+	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220129090309-1380706d4aa8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
