@@ -104,7 +104,7 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 	}
 	if info.ImageMeta != nil {
 		resp.Images = info.ImageMeta.Images
-		resp.ThumbImages = info.ImageMeta.Images
+		resp.ThumbImages = info.ImageMeta.ThumbImages
 	} else {
 		resp.Images = []string{}
 		resp.ThumbImages = []string{}
