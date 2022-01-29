@@ -14,7 +14,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/mises-id/sns-socialsvc v0.0.0-20220127071726-a07e90fcb61d
+	github.com/mises-id/sns-socialsvc v0.0.0-20220129031107-1e43cd3acdf4
 	github.com/mises-id/sns-storagesvc v0.0.0-20220124102532-82e7c17f5d65
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
