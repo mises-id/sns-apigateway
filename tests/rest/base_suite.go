@@ -8,8 +8,8 @@ import (
 
 	"github.com/gavv/httpexpect"
 	"github.com/golang/mock/gomock"
-	"github.com/labstack/echo/middleware"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mises-id/sns-apigateway/config/route"
 
 	"github.com/mises-id/sns-apigateway/tests"
