@@ -2,10 +2,11 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
 	pb "github.com/mises-id/sns-socialsvc/proto"
@@ -131,6 +132,7 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(1)
 	svcresp, err := grpcsvc.GetStatus(ctx, &pb.GetStatusRequest{
 		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
@@ -138,6 +140,7 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(svcresp.Status)
 
 	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
