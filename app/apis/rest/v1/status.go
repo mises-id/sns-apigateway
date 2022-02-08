@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -12,6 +13,10 @@ import (
 
 type ListUserStatusParams struct {
 	rest.PageQuickParams
+}
+type ListStatusParams struct {
+	Ids     string `json:"ids" query:"ids"`
+	ListNum uint64 `json:"list_num" query:"list_num"`
 }
 
 type RecommendStatusParams struct {
@@ -167,6 +172,31 @@ func ListUserStatus(c echo.Context) error {
 	}
 
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
+}
+
+//list status
+func ListStatus(c echo.Context) error {
+
+	params := &ListStatusParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	ids := strings.Split(params.Ids, ",")
+	svcresp, err := grpcsvc.NewListStatus(ctx, &pb.NewListStatusRequest{
+		CurrentUid: GetCurrentUID(c),
+		FromTypes:  []string{"post", "forward"},
+		Ids:        ids,
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, BuildStatusRespSlice(svcresp.Statuses))
 }
 
 func Timeline(c echo.Context) error {
