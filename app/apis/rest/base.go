@@ -7,7 +7,7 @@ import (
 	"time"
 
 	grpcpool "github.com/go-kit/kit/util/grpcpool"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	pb "github.com/mises-id/sns-socialsvc/proto"
 	grpcclient "github.com/mises-id/sns-socialsvc/svc/client/grpc"
 	storagepb "github.com/mises-id/sns-storagesvc/proto"

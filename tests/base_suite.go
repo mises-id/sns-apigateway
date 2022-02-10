@@ -1,3 +1,4 @@
+//go:build tests
 // +build tests
 
 package tests
@@ -18,6 +19,11 @@ import (
 	"github.com/mises-id/sns-socialsvc/handlers"
 	"github.com/mises-id/sns-socialsvc/lib/db"
 	"github.com/mises-id/sns-socialsvc/svc/server"
+
+	/* storagesvcenv "github.com/mises-id/sns-storagesvc/config/env"
+	storagehandler "github.com/mises-id/sns-storagesvc/handlers"
+	storagesvcdb "github.com/mises-id/sns-storagesvc/lib/db"
+	storagesvc "github.com/mises-id/sns-storagesvc/svc/server" */
 	"github.com/stretchr/testify/suite"
 )
 
@@ -63,8 +69,43 @@ func (suite *BaseTestSuite) SetupSuite() {
 		}
 
 	}
+	/* storagesvcenv.Envs = &storagesvcenv.Env{
+		DBName:         "mises_unit_test",
+		DBUser:         "",
+		DBPass:         "",
+		MongoURI:       "mongodb://localhost:27017",
+		AWSAccessKeyId: "1",
+		AWSSecretKey:   "2",
+		AWSRegion:      "3",
+	}
+	storagesvcdb.SetupMongo(context.Background())
 
-	rest.ResetSvrPool(rest.PoolCfg{cfg.GRPCAddr, ":6040", 1, 60})
+	sport := 16040
+	scfg := storagesvc.DefaultConfig
+	for {
+
+		scfg.GRPCAddr = fmt.Sprintf(":%d", sport)
+		scfg.HTTPAddr = fmt.Sprintf(":%d", sport+1)
+		//cfg.DebugAddr = fmt.Sprintf(":%d", port+2)
+		ln, err := net.Listen("tcp", scfg.GRPCAddr)
+
+		if err != nil {
+			sport += 10
+		} else {
+			_ = ln.Close()
+			break
+		}
+
+	} */
+	rest.ResetSvrPool(rest.PoolCfg{cfg.GRPCAddr, ":6050", 1, 60})
+	/* go func() {
+
+		scfg = storagehandler.SetConfig(scfg)
+
+		storagesvc.Run(scfg)
+
+	}() */
+
 	go func() {
 
 		cfg = handlers.SetConfig(cfg)

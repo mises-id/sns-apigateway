@@ -3,7 +3,7 @@ package v1
 import (
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
 	pb "github.com/mises-id/sns-socialsvc/proto"
