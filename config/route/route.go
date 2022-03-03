@@ -57,4 +57,6 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.PUT("/message/read", v1.ReadMessage)
 
 	groupV1.GET("/user/recommend", v1.RecommendUser)
+
+	groupV1.GET("/mises/gasprices", v1.GasPrices)
 }
