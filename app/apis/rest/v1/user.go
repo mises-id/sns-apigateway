@@ -37,6 +37,7 @@ type UserFullResp struct {
 	Avatar         *AvatarResp `json:"avatar"`
 	IsFollowed     bool        `json:"is_followed"`
 	IsBlocked      bool        `json:"is_blocked"`
+	IsAirdropped   bool        `json:"is_airdropped"`
 	FollowingCount uint64      `json:"followings_count"`
 	FansCount      uint64      `json:"fans_count"`
 	LikedCount     uint64      `json:"liked_count"`
@@ -81,7 +82,25 @@ func SignIn(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, echo.Map{
-		"token": svcresp.Jwt,
+		"token":      svcresp.Jwt,
+		"is_created": svcresp.IsCreated,
+	})
+}
+
+func ShareTweetUrl(c echo.Context) error {
+	uid := GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.ShareTweetUrl(ctx, &pb.ShareTweetUrlRequest{
+		CurrentUid: uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, echo.Map{
+		"url": svcresp.Url,
 	})
 }
 
@@ -198,6 +217,7 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		Email:          user.Email,
 		Address:        user.Address,
 		IsFollowed:     followed,
+		IsAirdropped:   user.IsAirdropped,
 		IsBlocked:      user.IsBlocked,
 		FollowingCount: uint64(user.FollowingsCount),
 		FansCount:      uint64(user.FansCount),
