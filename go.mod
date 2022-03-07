@@ -102,8 +102,8 @@ require (
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
-	github.com/mises-id/sdk v0.0.0-20220304082136-7b1ccc4f15bb // indirect
-	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220129090309-1380706d4aa8 // indirect
+	github.com/mises-id/sdk v0.0.0-20220307024405-bfcd3b412b77 // indirect
+	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220207063000-8a91039b2f09 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
@@ -179,3 +179,5 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20211207033151-1f29b59c0edf
 
 replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20211209094558-a7c9c77cfc17
+
+replace github.com/mises-id/sns-socialsvc => ../socialsvc
