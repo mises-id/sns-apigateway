@@ -15,7 +15,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/sns-socialsvc v0.0.0-20220304101315-bdab9ae8457e
+	github.com/mises-id/sns-socialsvc v0.0.0-20220307041608-f9fec04d2d05
 	github.com/mises-id/sns-storagesvc v0.0.0-20220207063000-8a91039b2f09
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -179,5 +179,3 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20211207033151-1f29b59c0edf
 
 replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20211209094558-a7c9c77cfc17
-
-replace github.com/mises-id/sns-socialsvc => ../socialsvc
