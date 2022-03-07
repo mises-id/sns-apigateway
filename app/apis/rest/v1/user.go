@@ -37,6 +37,7 @@ type UserFullResp struct {
 	Avatar         *AvatarResp `json:"avatar"`
 	IsFollowed     bool        `json:"is_followed"`
 	IsBlocked      bool        `json:"is_blocked"`
+	IsLogined      bool        `json:"is_logined"`
 	IsAirdropped   bool        `json:"is_airdropped"`
 	AirdropStatus  bool        `json:"airdrop_status"`
 	FollowingCount uint64      `json:"followings_count"`
@@ -221,6 +222,7 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		IsAirdropped:   user.IsAirdropped,
 		AirdropStatus:  user.AirdropStatus,
 		IsBlocked:      user.IsBlocked,
+		IsLogined:      user.IsLogined,
 		FollowingCount: uint64(user.FollowingsCount),
 		FansCount:      uint64(user.FansCount),
 		LikedCount:     uint64(user.LikedCount),
