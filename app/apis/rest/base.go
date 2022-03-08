@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	grpcpool "github.com/go-kit/kit/util/grpcpool"
@@ -18,6 +19,7 @@ import (
 var (
 	socialSvcPool  *grpcpool.Pool
 	storageSvcPool *grpcpool.Pool
+	store          sync.Map
 )
 
 type PoolCfg struct {
@@ -85,6 +87,9 @@ func GrpcStorageService() (storagepb.StoragesvcServer, context.Context, error) {
 
 	svcclient, err := storagesvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
+}
+func InMemoryStore() *sync.Map {
+	return &store
 }
 
 func ResetSvrPool(cfg PoolCfg) {

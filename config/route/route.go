@@ -59,4 +59,5 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/user/recommend", v1.RecommendUser)
 
 	groupV1.GET("/mises/gasprices", v1.GasPrices)
+	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
 }
