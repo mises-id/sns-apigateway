@@ -25,6 +25,7 @@ func SetRoutes(e *echo.Echo) {
 		Limit:   "8M",
 	}))
 	userGroup.GET("/user/me", v1.MyProfile)
+	userGroup.GET("/share/twitter", v1.ShareTweetUrl)
 	userGroup.PATCH("/user/me", v1.UpdateUser)
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)

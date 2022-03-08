@@ -16,7 +16,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/sns-socialsvc v0.0.0-20220208054919-e98505ca6b87
+	github.com/mises-id/sns-socialsvc v0.0.0-20220307100633-92c77b6a875a
 	github.com/mises-id/sns-storagesvc v0.0.0-20220207063000-8a91039b2f09
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -97,10 +97,11 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/metaverse/truss v0.3.1 // indirect
+	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
-	github.com/mises-id/mises-tm v0.0.0-20211229053907-7f70cc1f8835 // indirect
-	github.com/mises-id/sdk v0.0.0-20220112092616-f50463033a82 // indirect
-	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220129090309-1380706d4aa8 // indirect
+	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
+	github.com/mises-id/sdk v0.0.0-20220307024405-bfcd3b412b77 // indirect
+	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220207063000-8a91039b2f09 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
