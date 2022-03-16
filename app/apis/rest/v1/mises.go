@@ -22,6 +22,7 @@ type GasPricesResp struct {
 type ChainInfoResp struct {
 	BlockHeight int64    `json:"block_height"`
 	BlockHash   string   `json:"block_hash"`
+	ChainID     string   `json:"chain_id"`
 	TrustNodes  []string `json:"trust_nodes"`
 }
 
@@ -36,6 +37,7 @@ func GasPrices(c echo.Context) error {
 
 type LastBlockInfo struct {
 	blockTime time.Time
+	chainID   string
 	hash      string
 	height    int64
 }
@@ -75,6 +77,7 @@ func ChainInfo(c echo.Context) error {
 		info = &LastBlockInfo{
 			hash:      resultBlock.BlockID.Hash.String(),
 			height:    resultBlock.Block.Height,
+			chainID:   resultBlock.Block.ChainID,
 			blockTime: time.Now(),
 		}
 		store.Store("LastBlockInfo", info)
@@ -83,6 +86,7 @@ func ChainInfo(c echo.Context) error {
 	return rest.BuildSuccessResp(c, &ChainInfoResp{
 		BlockHeight: info.height,
 		BlockHash:   info.hash,
+		ChainID:     info.chainID,
 		TrustNodes: []string{
 			"http://e1.mises.site:26657",
 			"http://e2.mises.site:26657",
