@@ -16,7 +16,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/sns-socialsvc v0.0.0-20220307100633-92c77b6a875a
+	github.com/mises-id/sns-socialsvc v0.0.0-20220318013513-3c8871343310
 	github.com/mises-id/sns-storagesvc v0.0.0-20220207063000-8a91039b2f09
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -100,7 +100,7 @@ require (
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
-	github.com/mises-id/sdk v0.0.0-20220307024405-bfcd3b412b77 // indirect
+	github.com/mises-id/sdk v0.0.0-20220318011232-cf079a7f5be5 // indirect
 	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220207063000-8a91039b2f09 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
@@ -173,6 +173,6 @@ replace github.com/go-kit/kit => github.com/mises-id/kit v0.12.1-0.2021120308175
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20220303045135-50c576364ddb
+replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20220315093538-763383563639
 
-replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20220303055734-a5c89353c3e2
+replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20220317102522-80f09a270501

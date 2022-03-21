@@ -88,10 +88,10 @@ func ChainInfo(c echo.Context) error {
 		BlockHash:   info.hash,
 		ChainID:     info.chainID,
 		TrustNodes: []string{
-			"http://e1.mises.site:26657",
-			"http://e2.mises.site:26657",
-			"http://w1.mises.site:26657",
-			"http://w2.mises.site:26657",
+			"https://e1.mises.site:443",
+			"https://e2.mises.site:443",
+			"https://w1.mises.site:443",
+			"https://w2.mises.site:443",
 		},
 	})
 }
