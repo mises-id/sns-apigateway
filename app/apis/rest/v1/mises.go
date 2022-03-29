@@ -2,10 +2,12 @@ package v1
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
+	"github.com/mises-id/sns-apigateway/config/env"
 
 	cosmosrest "github.com/cosmos/cosmos-sdk/types/rest"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -83,15 +85,12 @@ func ChainInfo(c echo.Context) error {
 		store.Store("LastBlockInfo", info)
 	}
 
+	nodes := strings.Split(env.Envs.MisesNodes, ",")
+
 	return rest.BuildSuccessResp(c, &ChainInfoResp{
 		BlockHeight: info.height,
 		BlockHash:   info.hash,
 		ChainID:     info.chainID,
-		TrustNodes: []string{
-			"https://e1.mises.site:443",
-			"https://e2.mises.site:443",
-			"https://w1.mises.site:443",
-			"https://w2.mises.site:443",
-		},
+		TrustNodes:  nodes,
 	})
 }
