@@ -10,13 +10,14 @@ import (
 )
 
 type ListMessageParams struct {
+	State string `json:"state"`
 	rest.PageQuickParams
 }
 
 type ReadMessageParams struct {
 	rest.PageQuickParams
 	IDs      []string `body:"ids"`
-	LatestID string   `body:"latest_id"`
+	LatestId string   `body:"latest_id"`
 }
 type MessageSummaryResp struct {
 	LatestMessage      *MessageResp `json:"latest_message"`
@@ -197,6 +198,7 @@ func ListMessage(c echo.Context) error {
 	}
 	svcresp, err := grpcsvc.ListMessage(ctx, &pb.ListMessageRequest{
 		CurrentUid: GetCurrentUID(c),
+		State:      params.State,
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
 			Limit:  uint64(params.PageQuickParams.Limit),
@@ -220,7 +222,7 @@ func ReadMessage(c echo.Context) error {
 	}
 	_, err = grpcsvc.ReadMessage(ctx, &pb.ReadMessageRequest{
 		CurrentUid: GetCurrentUID(c),
-		LatestID:   params.LatestID,
+		LatestId:   params.LatestId,
 		Ids:        params.IDs,
 	})
 	if err != nil {
