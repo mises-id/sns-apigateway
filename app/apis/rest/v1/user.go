@@ -15,6 +15,7 @@ import (
 
 type SignInParams struct {
 	Provider  string `json:"provider"`
+	Referrer  string `json:"referrer"`
 	UserAuthz *struct {
 		Auth string `json:"auth"`
 	} `json:"user_authz"`
@@ -47,11 +48,12 @@ type UserFullResp struct {
 }
 
 type UserSummaryResp struct {
-	UID        uint64      `json:"uid"`
-	Username   string      `json:"username"`
-	Misesid    string      `json:"misesid"`
-	Avatar     *AvatarResp `json:"avatar"`
-	IsFollowed bool        `json:"is_followed"`
+	UID         uint64      `json:"uid"`
+	Username    string      `json:"username"`
+	Misesid     string      `json:"misesid"`
+	Avatar      *AvatarResp `json:"avatar"`
+	HelpMisesid string      `json:"help_misesid"`
+	IsFollowed  bool        `json:"is_followed"`
 }
 
 func GetCurrentUID(c echo.Context) uint64 {
@@ -79,7 +81,10 @@ func SignIn(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.SignIn(ctx, &pb.SignInRequest{Auth: params.UserAuthz.Auth})
+	svcresp, err := grpcsvc.SignIn(ctx, &pb.SignInRequest{
+		Auth:     params.UserAuthz.Auth,
+		Referrer: params.Referrer,
+	})
 	if err != nil {
 		return err
 	}
@@ -244,10 +249,11 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 		return nil
 	}
 	resp := &UserSummaryResp{
-		UID:        user.Uid,
-		Username:   user.Username,
-		Misesid:    user.Misesid,
-		IsFollowed: user.IsFollowed,
+		UID:         user.Uid,
+		Username:    user.Username,
+		Misesid:     user.Misesid,
+		IsFollowed:  user.IsFollowed,
+		HelpMisesid: user.HelpMisesid,
 	}
 	if len(user.Avatar) > 0 {
 		resp.Avatar = &AvatarResp{
