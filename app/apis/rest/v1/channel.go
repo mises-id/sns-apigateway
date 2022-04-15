@@ -29,6 +29,7 @@ type (
 	}
 	ChannelUrlRequest struct {
 		Misesid string `json:"misesid" query:"misesid"`
+		Type    string `json:"type" query:"type"`
 	}
 )
 
@@ -95,6 +96,7 @@ func ChannelInfo(c echo.Context) error {
 	}
 	svcresp, err := grpcsvc.ChannelInfo(ctx, &pb.ChannelInfoRequest{
 		Misesid: params.Misesid,
+		Type:    params.Type,
 	})
 	if err != nil {
 		return err
