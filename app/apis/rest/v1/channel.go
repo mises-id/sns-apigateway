@@ -15,7 +15,18 @@ type (
 		rest.PageQuickParams
 		Misesid string `json:"misesid" query:"misesid"`
 	}
+	GetChannelUserInput struct {
+		Misesid string `json:"misesid" query:"misesid"`
+	}
 
+	GetChannelUserOutput struct {
+		ID             string           `json:"id"`
+		ChannelMisesid string           `json:"channel_misesid"`
+		AirdropState   int32            `json:"airdrop_state"`
+		ValidState     int32            `json:"valid_state"`
+		User           *UserSummaryResp `json:"user"`
+		CreatedAt      time.Time        `json:"created_at"`
+	}
 	PageChannelUserOutput struct {
 		ID           string           `json:"id"`
 		Channel_id   string           `json:"channel_id"`
@@ -30,6 +41,7 @@ type (
 	ChannelUrlRequest struct {
 		Misesid string `json:"misesid" query:"misesid"`
 		Type    string `json:"type" query:"type"`
+		Medium  string `json:"medium" query:"medium"`
 	}
 )
 
@@ -59,6 +71,20 @@ func BuildChannelUserResp(channel_user *pb.ChannelUserInfo) *PageChannelUserOutp
 	}
 	return resp
 }
+func BuildGetChannelUserResp(channel_user *pb.ChannelUserInfo) *GetChannelUserOutput {
+	if channel_user == nil {
+		return nil
+	}
+	resp := &GetChannelUserOutput{
+		ID:             channel_user.Id,
+		ChannelMisesid: channel_user.ChannelMisesid,
+		User:           BuildUserSummaryResp(channel_user.User),
+		AirdropState:   channel_user.AirdropState,
+		ValidState:     channel_user.ValidState,
+		CreatedAt:      time.Unix(int64(channel_user.CreatedAt), 0),
+	}
+	return resp
+}
 
 func PageChannelUser(c echo.Context) error {
 
@@ -85,6 +111,24 @@ func PageChannelUser(c echo.Context) error {
 	return rest.BuildSuccessRespWithPagination(c, BuildChannelUserSliceResp(svcresp.ChannelUsers), svcresp.Paginator)
 }
 
+func GetChannelUser(c echo.Context) error {
+	/* params := &GetChannelUserInput{}
+	if err := c.Bind(params); err != nil {
+		return err
+	} */
+	misesid := c.Param("misesid")
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetChannelUser(ctx, &pb.GetChannelUserRequest{
+		Misesid: misesid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildGetChannelUserResp(svcresp.ChanelUser))
+}
 func ChannelInfo(c echo.Context) error {
 	params := &ChannelUrlRequest{}
 	if err := c.Bind(params); err != nil {
@@ -97,14 +141,15 @@ func ChannelInfo(c echo.Context) error {
 	svcresp, err := grpcsvc.ChannelInfo(ctx, &pb.ChannelInfoRequest{
 		Misesid: params.Misesid,
 		Type:    params.Type,
+		Medium:  params.Medium,
 	})
 	if err != nil {
 		return err
 	}
 	return rest.BuildSuccessResp(c, echo.Map{
 		"url":                svcresp.Url,
-		"poster_url":         svcresp.PosterUrl,
 		"total_channel_user": svcresp.TotalChannelUser,
 		"airdrop_amount":     svcresp.AirdropAmount,
+		"medium_url":         svcresp.MediumUrl,
 	})
 }
