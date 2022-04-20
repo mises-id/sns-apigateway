@@ -23,6 +23,9 @@ type ListStatusParams struct {
 type RecommendStatusParams struct {
 	rest.PageQuickParams
 }
+type RecentStatusParams struct {
+	rest.PageQuickParams
+}
 
 type LinkMeta struct {
 	Title          string `json:"title"`
@@ -270,6 +273,32 @@ func RecommendStatus(c echo.Context) error {
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), &pb.PageQuick{
 		NextId: string(nextID),
 	})
+
+}
+func RecentStatus(c echo.Context) error {
+
+	params := &RecentStatusParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+
+	svcresp, err := grpcsvc.ListRecommended(ctx, &pb.ListStatusRequest{
+		CurrentUid: GetCurrentUID(c),
+		Paginator: &pb.PageQuick{
+			NextId: params.PageQuickParams.NextID,
+			Limit:  uint64(params.PageQuickParams.Limit),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 
 }
 
