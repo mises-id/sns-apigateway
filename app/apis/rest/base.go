@@ -33,6 +33,12 @@ type PageQuickParams struct {
 	Total  int64  `json:"total" query:"total"`
 	NextID string `json:"last_id" query:"last_id"`
 }
+type PageParams struct {
+	PageNum      int64 `json:"page_num" query:"page_num"`
+	PageSize     int64 `json:"page_size" query:"page_size"`
+	TotalPage    int64 `json:"total_page"`
+	TotalRecords int64 `json:"total_records"`
+}
 
 // BuildSuccessResp return a success response with payload
 func BuildSuccessResp(c echo.Context, data interface{}) error {
@@ -51,6 +57,18 @@ func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination
 			Limit:  int64(pagination.Limit),
 			Total:  int64(pagination.Total),
 			NextID: pagination.NextId,
+		},
+	})
+}
+func BuildSuccessRespWithPage(c echo.Context, data interface{}, pagination *pb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"data": data,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
 		},
 	})
 }

@@ -12,7 +12,7 @@ import (
 
 type (
 	PageChannelUserInput struct {
-		rest.PageQuickParams
+		rest.PageParams
 		Misesid string `json:"misesid" query:"misesid"`
 	}
 	GetChannelUserInput struct {
@@ -99,16 +99,16 @@ func PageChannelUser(c echo.Context) error {
 	}
 	svcresp, err := grpcsvc.PageChannelUser(ctx, &pb.PageChannelUserRequest{
 		Misesid: params.Misesid,
-		Paginator: &pb.PageQuick{
-			NextId: params.PageQuickParams.NextID,
-			Limit:  uint64(params.PageQuickParams.Limit),
+		Paginator: &pb.Page{
+			PageNum:  uint64(params.PageParams.PageNum),
+			PageSize: uint64(params.PageParams.PageSize),
 		},
 	})
 	if err != nil {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPagination(c, BuildChannelUserSliceResp(svcresp.ChannelUsers), svcresp.Paginator)
+	return rest.BuildSuccessRespWithPage(c, BuildChannelUserSliceResp(svcresp.ChannelUsers), svcresp.Paginator)
 }
 
 func GetChannelUser(c echo.Context) error {
