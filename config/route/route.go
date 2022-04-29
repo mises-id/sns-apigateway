@@ -18,6 +18,9 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/channel_user/:misesid", v1.GetChannelUser)
 	groupV1.GET("/channel/info", v1.ChannelInfo)
 	groupV1.GET("/channel_user/page", v1.PageChannelUser)
+	groupV1.GET("/opensea/single_asset", v1.GetOpenseaAsset)
+	groupV1.GET("/opensea/assets", v1.ListOpenseaAsset)
+	groupV1.GET("/opensea/assets_contract", v1.GetOpenseaAssetContract)
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 

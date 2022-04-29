@@ -16,7 +16,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/sns-socialsvc v0.0.0-20220420082545-7c1283b9e874
+	github.com/mises-id/sns-socialsvc v0.0.0-20220429090829-37985774702c
 	github.com/mises-id/sns-storagesvc v0.0.0-20220207063000-8a91039b2f09
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -100,7 +100,7 @@ require (
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
-	github.com/mises-id/sdk v0.0.0-20220407092109-d73df08cdc7b // indirect
+	github.com/mises-id/sdk v0.0.0-20220422062246-abc698ec55a2 // indirect
 	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220207063000-8a91039b2f09 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
