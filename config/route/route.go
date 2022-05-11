@@ -32,8 +32,10 @@ func SetRoutes(e *echo.Echo) {
 		Limit:   "8M",
 	}))
 	userGroup.GET("/user/me", v1.MyProfile)
+	userGroup.GET("/user/:uid/config", v1.GetUserConfig)
 	userGroup.GET("/share/twitter", v1.ShareTweetUrl)
 	userGroup.PATCH("/user/me", v1.UpdateUser)
+	userGroup.PATCH("/user/config", v1.UpdateUserConfig)
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)
 	userGroup.GET("/user/following/latest", v1.LatestFollowing)
@@ -53,6 +55,12 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.DELETE("/status/:id", v1.DeleteStatus)
 	userGroup.POST("/status/:id/like", v1.LikeStatus)
 	userGroup.DELETE("/status/:id/like", v1.UnlikeStatus)
+
+	userGroup.GET("/nft_asset/:id/like", v1.ListNftAssetLike)
+	userGroup.POST("/nft_asset/:id/like", v1.LikeNftAsset)
+	userGroup.DELETE("/nft_asset/:id/like", v1.UnlikeNftAsset)
+	groupV1.GET("/user/:uid/nft_asset", v1.PageUserNftAsset)
+	groupV1.GET("/user/nft_asset", v1.MyNftAsset)
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)
