@@ -56,11 +56,13 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/status/:id/like", v1.LikeStatus)
 	userGroup.DELETE("/status/:id/like", v1.UnlikeStatus)
 
-	userGroup.GET("/nft_asset/:id/like", v1.ListNftAssetLike)
+	groupV1.GET("/nft_asset/:id", v1.GetNftAsset)
+	groupV1.GET("/nft_asset/:id/event", v1.PageNftEvent)
+	groupV1.GET("/nft_asset/:id/like", v1.ListNftAssetLike)
 	userGroup.POST("/nft_asset/:id/like", v1.LikeNftAsset)
 	userGroup.DELETE("/nft_asset/:id/like", v1.UnlikeNftAsset)
 	groupV1.GET("/user/:uid/nft_asset", v1.PageUserNftAsset)
-	groupV1.GET("/user/nft_asset", v1.MyNftAsset)
+	userGroup.GET("/user/nft_asset", v1.MyNftAsset)
 
 	groupV1.GET("/comment", v1.ListComment)
 	userGroup.POST("/comment", v1.CreateComment)

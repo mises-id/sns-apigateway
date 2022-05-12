@@ -14,6 +14,12 @@ type (
 		Scene  string `json:"scene" query:"scene"`
 		rest.PageQuickParams
 	}
+	PageNftEventParams struct {
+		NftAssetId string `json:"nft_asset_id" query:"nft_asset_id"`
+		SortBy     string `query:"sort_by" json:"sort_by"`
+		Scene      string `json:"scene" query:"scene"`
+		rest.PageQuickParams
+	}
 	PaymentToken struct {
 		ID       int64  `json:"id" bson:"id"`
 		Symbol   string `json:"symbol,omitempty" bson:"symbol"`
@@ -74,6 +80,20 @@ type (
 		IsLiked           bool             `json:"is_liked"`
 		User              *UserSummaryResp `json:"user"    `
 	}
+
+	NftAccount struct {
+		Address       string           `json:"address"`
+		MisesUser     *UserSummaryResp `json:"mises_user"`
+		ProfileImgUrl string           `json:"profile_img_url"`
+	}
+	NftEventResp struct {
+		Id           string        `json:"id"`
+		EventType    string        `json:"event_type"`
+		FromAccount  *NftAccount   `json:"from_account"`
+		ToAccount    *NftAccount   `json:"to_account"`
+		PaymentToken *PaymentToken `json:"payment_token"`
+		CreatedDate  string        `json:"created_date"`
+	}
 	LikeRequest struct {
 		rest.PageQuickParams
 	}
@@ -130,6 +150,87 @@ func BuildLikeResp(like *pb.Like) *LikeResp {
 	return resp
 }
 
+func PageNftEvent(c echo.Context) error {
+	params := &PageNftEventParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.PageNftEvent(ctx, &pb.PageNftEventRequest{
+		CurrentUid: GetCurrentUID(c),
+		NftAssetId: params.NftAssetId,
+		Paginator: &pb.PageQuick{
+			NextId: params.PageQuickParams.NextID,
+			Limit:  uint64(params.PageQuickParams.Limit),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessRespWithPagination(c, BuildNftEventSliceResp(svcresp.Event), svcresp.Paginator)
+}
+
+func BuildNftEventSliceResp(events []*pb.NftEvent) []*NftEventResp {
+	resp := make([]*NftEventResp, len(events))
+	for i, event := range events {
+		resp[i] = BuildNftEventResp(event)
+	}
+	return resp
+}
+
+func BuildNftEventResp(event *pb.NftEvent) *NftEventResp {
+	if event == nil {
+		return nil
+	}
+	resp := &NftEventResp{
+		Id:           event.Id,
+		EventType:    event.EventType,
+		CreatedDate:  event.CreatedDate,
+		PaymentToken: nil,
+		FromAccount:  BuildNftAccountResp(event.FromAccount),
+		ToAccount:    BuildNftAccountResp(event.ToAccount),
+	}
+	return resp
+}
+
+func BuildPaymentTokenSliceResp(in []*pb.PaymentToken) []*PaymentToken {
+	resp := make([]*PaymentToken, len(in))
+	for i, v := range in {
+		resp[i] = BuildPaymentToken(v)
+	}
+	return resp
+}
+
+func BuildPaymentToken(in *pb.PaymentToken) *PaymentToken {
+	if in == nil {
+		return nil
+	}
+	resp := &PaymentToken{
+		ID:       int64(in.Id),
+		Symbol:   in.Symbol,
+		Name:     in.Name,
+		ETHPrice: in.GetEthPrice(),
+		USDPrice: in.UsdPrice,
+		Address:  in.Address,
+		Decimals: in.Decimals,
+	}
+	return resp
+}
+
+func BuildNftAccountResp(in *pb.NftAccount) *NftAccount {
+	if in == nil {
+		return nil
+	}
+	resp := &NftAccount{
+		Address:       in.Address,
+		ProfileImgUrl: in.ProfileImgUrl,
+		MisesUser:     BuildUserSummaryResp(in.MisesUser),
+	}
+	return resp
+}
 func GetNftAsset(c echo.Context) error {
 
 	grpcsvc, ctx, err := rest.GrpcSocialService()
