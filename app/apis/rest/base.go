@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	grpcpool "github.com/go-kit/kit/util/grpcpool"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	pb "github.com/mises-id/sns-socialsvc/proto"
 	grpcclient "github.com/mises-id/sns-socialsvc/svc/client/grpc"
 	storagepb "github.com/mises-id/sns-storagesvc/proto"
@@ -18,6 +19,7 @@ import (
 var (
 	socialSvcPool  *grpcpool.Pool
 	storageSvcPool *grpcpool.Pool
+	store          sync.Map
 )
 
 type PoolCfg struct {
@@ -28,7 +30,14 @@ type PoolCfg struct {
 }
 type PageQuickParams struct {
 	Limit  int64  `json:"limit" query:"limit"`
+	Total  int64  `json:"total" query:"total"`
 	NextID string `json:"last_id" query:"last_id"`
+}
+type PageParams struct {
+	PageNum      int64 `json:"page_num" query:"page_num"`
+	PageSize     int64 `json:"page_size" query:"page_size"`
+	TotalPage    int64 `json:"total_page"`
+	TotalRecords int64 `json:"total_records"`
 }
 
 // BuildSuccessResp return a success response with payload
@@ -46,7 +55,20 @@ func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination
 		"data": data,
 		"pagination": PageQuickParams{
 			Limit:  int64(pagination.Limit),
+			Total:  int64(pagination.Total),
 			NextID: pagination.NextId,
+		},
+	})
+}
+func BuildSuccessRespWithPage(c echo.Context, data interface{}, pagination *pb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"data": data,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
 		},
 	})
 }
@@ -83,6 +105,9 @@ func GrpcStorageService() (storagepb.StoragesvcServer, context.Context, error) {
 
 	svcclient, err := storagesvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
+}
+func InMemoryStore() *sync.Map {
+	return &store
 }
 
 func ResetSvrPool(cfg PoolCfg) {

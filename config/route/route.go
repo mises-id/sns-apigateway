@@ -1,8 +1,8 @@
 package route
 
 import (
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	v1 "github.com/mises-id/sns-apigateway/app/apis/rest/v1"
 	appmw "github.com/mises-id/sns-apigateway/app/middleware"
@@ -15,6 +15,9 @@ func SetRoutes(e *echo.Echo) {
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	groupV1.GET("/user/:uid", v1.FindUser)
+	groupV1.GET("/channel_user/:misesid", v1.GetChannelUser)
+	groupV1.GET("/channel/info", v1.ChannelInfo)
+	groupV1.GET("/channel_user/page", v1.PageChannelUser)
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 
@@ -25,6 +28,7 @@ func SetRoutes(e *echo.Echo) {
 		Limit:   "8M",
 	}))
 	userGroup.GET("/user/me", v1.MyProfile)
+	userGroup.GET("/share/twitter", v1.ShareTweetUrl)
 	userGroup.PATCH("/user/me", v1.UpdateUser)
 	userGroup.POST("/user/follow", v1.Follow)
 	userGroup.DELETE("/user/follow", v1.Unfollow)
@@ -36,6 +40,8 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/user/:uid/like", v1.ListUserLike)
 	groupV1.GET("/user/:uid/status", v1.ListUserStatus)
 	groupV1.GET("/status/recommend", v1.RecommendStatus)
+	groupV1.GET("/status/list", v1.ListStatus)
+	groupV1.GET("/status/recent", v1.RecentStatus)
 	userGroup.GET("/timeline/me", v1.Timeline)
 	userGroup.POST("/status", v1.CreateStatus)
 	userGroup.PATCH("/status/:id", v1.UpdateStatus)
@@ -56,4 +62,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.PUT("/message/read", v1.ReadMessage)
 
 	groupV1.GET("/user/recommend", v1.RecommendUser)
+
+	groupV1.GET("/mises/gasprices", v1.GasPrices)
+	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
 }

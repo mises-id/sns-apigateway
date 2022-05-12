@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/app/middleware"
 	"github.com/mises-id/sns-apigateway/lib/codes"
@@ -15,6 +15,7 @@ import (
 
 type SignInParams struct {
 	Provider  string `json:"provider"`
+	Referrer  string `json:"referrer"`
 	UserAuthz *struct {
 		Auth string `json:"auth"`
 	} `json:"user_authz"`
@@ -37,6 +38,9 @@ type UserFullResp struct {
 	Avatar         *AvatarResp `json:"avatar"`
 	IsFollowed     bool        `json:"is_followed"`
 	IsBlocked      bool        `json:"is_blocked"`
+	IsLogined      bool        `json:"is_logined"`
+	IsAirdropped   bool        `json:"is_airdropped"`
+	AirdropStatus  bool        `json:"airdrop_status"`
 	FollowingCount uint64      `json:"followings_count"`
 	FansCount      uint64      `json:"fans_count"`
 	LikedCount     uint64      `json:"liked_count"`
@@ -44,11 +48,12 @@ type UserFullResp struct {
 }
 
 type UserSummaryResp struct {
-	UID        uint64      `json:"uid"`
-	Username   string      `json:"username"`
-	Misesid    string      `json:"misesid"`
-	Avatar     *AvatarResp `json:"avatar"`
-	IsFollowed bool        `json:"is_followed"`
+	UID         uint64      `json:"uid"`
+	Username    string      `json:"username"`
+	Misesid     string      `json:"misesid"`
+	Avatar      *AvatarResp `json:"avatar"`
+	HelpMisesid string      `json:"help_misesid"`
+	IsFollowed  bool        `json:"is_followed"`
 }
 
 func GetCurrentUID(c echo.Context) uint64 {
@@ -76,12 +81,33 @@ func SignIn(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.SignIn(ctx, &pb.SignInRequest{Auth: params.UserAuthz.Auth})
+	svcresp, err := grpcsvc.SignIn(ctx, &pb.SignInRequest{
+		Auth:     params.UserAuthz.Auth,
+		Referrer: params.Referrer,
+	})
 	if err != nil {
 		return err
 	}
 	return rest.BuildSuccessResp(c, echo.Map{
-		"token": svcresp.Jwt,
+		"token":      svcresp.Jwt,
+		"is_created": svcresp.IsCreated,
+	})
+}
+
+func ShareTweetUrl(c echo.Context) error {
+	uid := GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.ShareTweetUrl(ctx, &pb.ShareTweetUrlRequest{
+		CurrentUid: uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, echo.Map{
+		"url": svcresp.Url,
 	})
 }
 
@@ -198,7 +224,10 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		Email:          user.Email,
 		Address:        user.Address,
 		IsFollowed:     followed,
+		IsAirdropped:   user.IsAirdropped,
+		AirdropStatus:  user.AirdropStatus,
 		IsBlocked:      user.IsBlocked,
+		IsLogined:      user.IsLogined,
 		FollowingCount: uint64(user.FollowingsCount),
 		FansCount:      uint64(user.FansCount),
 		LikedCount:     uint64(user.LikedCount),
@@ -220,10 +249,11 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 		return nil
 	}
 	resp := &UserSummaryResp{
-		UID:        user.Uid,
-		Username:   user.Username,
-		Misesid:    user.Misesid,
-		IsFollowed: user.IsFollowed,
+		UID:         user.Uid,
+		Username:    user.Username,
+		Misesid:     user.Misesid,
+		IsFollowed:  user.IsFollowed,
+		HelpMisesid: user.HelpMisesid,
 	}
 	if len(user.Avatar) > 0 {
 		resp.Avatar = &AvatarResp{

@@ -2,9 +2,11 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
 	pb "github.com/mises-id/sns-socialsvc/proto"
@@ -13,8 +15,15 @@ import (
 type ListUserStatusParams struct {
 	rest.PageQuickParams
 }
+type ListStatusParams struct {
+	Ids     string `json:"ids" query:"ids"`
+	ListNum uint64 `json:"list_num" query:"list_num"`
+}
 
 type RecommendStatusParams struct {
+	rest.PageQuickParams
+}
+type RecentStatusParams struct {
 	rest.PageQuickParams
 }
 
@@ -104,7 +113,7 @@ func BuildStatusResp(info *pb.StatusInfo) *StatusResp {
 	}
 	if info.ImageMeta != nil {
 		resp.Images = info.ImageMeta.Images
-		resp.ThumbImages = info.ImageMeta.Images
+		resp.ThumbImages = info.ImageMeta.ThumbImages
 	} else {
 		resp.Images = []string{}
 		resp.ThumbImages = []string{}
@@ -126,6 +135,7 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(1)
 	svcresp, err := grpcsvc.GetStatus(ctx, &pb.GetStatusRequest{
 		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
@@ -133,6 +143,7 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(svcresp.Status)
 
 	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
@@ -167,6 +178,31 @@ func ListUserStatus(c echo.Context) error {
 	}
 
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
+}
+
+//list status
+func ListStatus(c echo.Context) error {
+
+	params := &ListStatusParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	ids := strings.Split(params.Ids, ",")
+	svcresp, err := grpcsvc.NewListStatus(ctx, &pb.NewListStatusRequest{
+		CurrentUid: GetCurrentUID(c),
+		FromTypes:  []string{"post", "forward"},
+		Ids:        ids,
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, BuildStatusRespSlice(svcresp.Statuses))
 }
 
 func Timeline(c echo.Context) error {
@@ -237,6 +273,32 @@ func RecommendStatus(c echo.Context) error {
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), &pb.PageQuick{
 		NextId: string(nextID),
 	})
+
+}
+func RecentStatus(c echo.Context) error {
+
+	params := &RecentStatusParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+
+	svcresp, err := grpcsvc.ListRecommended(ctx, &pb.ListStatusRequest{
+		CurrentUid: GetCurrentUID(c),
+		Paginator: &pb.PageQuick{
+			NextId: params.PageQuickParams.NextID,
+			Limit:  uint64(params.PageQuickParams.Limit),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 
 }
 

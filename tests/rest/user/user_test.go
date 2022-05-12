@@ -1,3 +1,4 @@
+//go:build tests
 // +build tests
 
 package user
@@ -42,6 +43,7 @@ func (suite *UserServerSuite) SetupTest() {
 		Gender:     enum.GenderFemale,
 		AvatarPath: "DummyAvatarPath",
 		Misesid:    "1001",
+		Username:   "",
 	}, &models.User{
 		UID:     1002,
 		Gender:  enum.GenderFemale,
@@ -124,7 +126,7 @@ func (suite *UserServerSuite) TestUpdateUser() {
 		resp = suite.Expect.PATCH("/api/v1/user/me").WithJSON(map[string]interface{}{
 			"by": "username",
 			"username": map[string]interface{}{
-				"username": "Hello",
+				"username": "..Hello",
 			},
 		}).WithHeader("Authorization", "Bearer "+token).Expect().Status(http.StatusUnprocessableEntity).JSON().Object()
 		resp.Value("code").Equal(codes.UsernameExistedCode)
