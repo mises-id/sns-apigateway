@@ -79,6 +79,7 @@ type (
 		AssetContract     *AssetContract   `json:"asset_contract"`
 		IsLiked           bool             `json:"is_liked"`
 		User              *UserSummaryResp `json:"user"    `
+		Rarity            float64          `json:"rarity"`
 	}
 
 	NftAccount struct {
@@ -189,7 +190,7 @@ func BuildNftEventResp(event *pb.NftEvent) *NftEventResp {
 		Id:           event.Id,
 		EventType:    event.EventType,
 		CreatedDate:  event.CreatedDate,
-		PaymentToken: nil,
+		PaymentToken: BuildPaymentToken(event.PaymentToken),
 		FromAccount:  BuildNftAccountResp(event.FromAccount),
 		ToAccount:    BuildNftAccountResp(event.ToAccount),
 	}
@@ -273,6 +274,7 @@ func BuildNftAssetResp(asset *pb.NftAsset) *NftAssetResp {
 		Name:              asset.Name,
 		IsLiked:           asset.IsLiked,
 		User:              BuildUserSummaryResp(asset.User),
+		Rarity:            4,
 	}
 	if asset.Collection != nil {
 		resp.Collection = BuildNftCollectionResp(asset.Collection)
@@ -291,10 +293,24 @@ func BuildAssetContractResp(in *pb.AssetContract) *AssetContract {
 	return resp
 }
 
+func BuildStatsResp(in *pb.Stats) *Stats {
+	if in == nil {
+		return nil
+	}
+	resp := &Stats{
+		FloorPrice: float64(in.FloorPrice),
+	}
+	return resp
+}
+
 func BuildNftCollectionResp(in *pb.NftCollection) *NftCollection {
 	resp := &NftCollection{
-		Name: in.Name,
-		Slug: in.Slug,
+		Name:  in.Name,
+		Slug:  in.Slug,
+		Stats: BuildStatsResp(in.Stats),
+	}
+	if in.PaymentToken != nil {
+		resp.PaymentTokens = BuildPaymentTokenSliceResp(in.PaymentToken)
 	}
 	return resp
 }

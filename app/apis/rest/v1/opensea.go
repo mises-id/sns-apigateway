@@ -88,10 +88,11 @@ func ListOpenseaAsset(c echo.Context) error {
 		return err
 	}
 	svcresp, err := grpcsvc.ListOpenseaAsset(ctx, &pb.ListOpenseaAssetRequest{
-		Owner:   params.Owner,
-		Limit:   params.Limit,
-		Cursor:  params.Cursor,
-		Network: params.Network,
+		CurrentUid: GetCurrentUID(c),
+		Owner:      params.Owner,
+		Limit:      params.Limit,
+		Cursor:     params.Cursor,
+		Network:    params.Network,
 	})
 	if err != nil {
 		return err
