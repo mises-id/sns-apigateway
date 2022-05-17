@@ -14,7 +14,7 @@ func SetRoutes(e *echo.Echo) {
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
-	groupOpensea := e.Group("/api/v1", middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(4)), mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
+	groupOpensea := e.Group("/api/v1", middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(4)), mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 	groupV1.GET("/user/:uid", v1.FindUser)
 	groupV1.GET("/channel_user/:misesid", v1.GetChannelUser)
 	groupV1.GET("/channel/info", v1.ChannelInfo)

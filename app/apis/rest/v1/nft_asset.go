@@ -274,7 +274,7 @@ func BuildNftAssetResp(asset *pb.NftAsset) *NftAssetResp {
 		Name:              asset.Name,
 		IsLiked:           asset.IsLiked,
 		User:              BuildUserSummaryResp(asset.User),
-		Rarity:            4,
+		Rarity:            0,
 	}
 	if asset.Collection != nil {
 		resp.Collection = BuildNftCollectionResp(asset.Collection)

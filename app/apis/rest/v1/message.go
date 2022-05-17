@@ -37,9 +37,27 @@ type NewLikeStatusMeta struct {
 	StatusImageURL string `json:"status_image_url"`
 }
 
+type NewLikeNftMeta struct {
+	UID           uint64 `json:"uid"`
+	NftAssetID    string `json:"nft_asset_id"`
+	NftAssetName  string `json:"nft_asset_name"`
+	NftAssetImage string `json:"nft_asset_image"`
+}
+
 func (NewLikeStatusMeta) isMessageMeta() {}
 
 type NewLikeCommentMeta struct {
+	UID             uint64 `json:"uid"`
+	CommentID       string `json:"comment_id"`
+	CommentUsername string `json:"comment_username"`
+	CommentContent  string `json:"comment_content"`
+}
+
+func (NewLikeNftMeta) isMessageMeta()        {}
+func (NewLikeNftCommentMeta) isMessageMeta() {}
+func (NewNftCommentMeta) isMessageMeta()     {}
+
+type NewLikeNftCommentMeta struct {
 	UID             uint64 `json:"uid"`
 	CommentID       string `json:"comment_id"`
 	CommentUsername string `json:"comment_username"`
@@ -57,6 +75,16 @@ type NewCommentMeta struct {
 	ParentUsername       string `json:"parent_username"`
 	StatusContentSummary string `json:"status_content_summary"`
 	StatusImageURL       string `json:"status_image_url"`
+}
+type NewNftCommentMeta struct {
+	UID            uint64 `json:"uid"`
+	GroupID        string `json:"group_id"`
+	CommentID      string `json:"comment_id"`
+	Content        string `json:"content"`
+	ParentContent  string `json:"parent_content"`
+	ParentUsername string `json:"parent_username"`
+	NftAssetName   string `json:"nft_asset_name"`
+	NftAssetImage  string `json:"nft_asset_image"`
 }
 
 func (NewCommentMeta) isMessageMeta() {}
@@ -85,6 +113,7 @@ type MessageResp struct {
 	MetaData         MessageMeta      `json:"meta_data"`
 	State            string           `json:"state"`
 	Status           *StatusResp      `json:"status"`
+	NftAsset         *NftAssetResp    `json:"nft_asset"`
 	StatusIsDeleted  bool             `json:"ststus_is_deleted"`
 	CommentIsDeleted bool             `json:"comment_is_deleted"`
 	CreatedAt        time.Time        `json:"created_at"`
@@ -115,6 +144,7 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 			StatusIsDeleted:  in.StatusIsDeleted,
 			CommentIsDeleted: in.CommentIsDeleted,
 			Status:           BuildStatusResp(in.Status),
+			NftAsset:         BuildNftAssetResp(in.NftAsset),
 			CreatedAt:        time.Unix(int64(in.CreatedAt), 0),
 		}
 		switch in.MessageType {
@@ -142,6 +172,31 @@ func BuildMessageResp(in *pb.Message) *MessageResp {
 				ParentUsername:       in.NewCommentMeta.ParentUserName,
 				StatusContentSummary: in.NewCommentMeta.StatusContentSummary,
 				StatusImageURL:       in.NewCommentMeta.StatusImageUrl,
+			}
+		case "new_like_nft":
+			ret.MetaData = &NewLikeNftMeta{
+				UID:           in.NewLikeNft.Uid,
+				NftAssetID:    in.NewLikeNft.NftAssetId,
+				NftAssetName:  in.NewLikeNft.NftAssetName,
+				NftAssetImage: in.NewLikeNft.NftAssetImage,
+			}
+		case "new_like_nft_comment":
+			ret.MetaData = &NewLikeNftCommentMeta{
+				UID:             in.NewLikeNftCommentMeta.Uid,
+				CommentID:       in.NewLikeNftCommentMeta.CommentId,
+				CommentUsername: in.NewLikeNftCommentMeta.CommentUsername,
+				CommentContent:  in.NewLikeNftCommentMeta.CommentContent,
+			}
+		case "new_nft_comment":
+			ret.MetaData = &NewNftCommentMeta{
+				UID:            in.NewNftComment.Uid,
+				GroupID:        in.NewNftComment.GroupId,
+				CommentID:      in.NewNftComment.CommentId,
+				Content:        in.NewNftComment.Content,
+				ParentContent:  in.NewNftComment.ParentContent,
+				ParentUsername: in.NewNftComment.ParentUserName,
+				NftAssetName:   in.NewNftComment.NftAssetName,
+				NftAssetImage:  in.NewNftComment.NftAssetImage,
 			}
 		case "new_fans":
 			ret.MetaData = &NewFanMeta{
