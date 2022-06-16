@@ -23,6 +23,7 @@ func SetRoutes(e *echo.Echo) {
 	groupOpensea.GET("/opensea/assets", v1.ListOpenseaAsset)
 	groupOpensea.GET("/opensea/assets_contract", v1.GetOpenseaAssetContract)
 	groupV1.POST("/signin", v1.SignIn)
+	groupV1.GET("/twitter/callback", v1.TwitterCallback)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
@@ -79,4 +80,8 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/mises/gasprices", v1.GasPrices)
 	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
+
+	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
+	userGroup.GET("/airdrop/info", v1.AirdropInfo)
+	userGroup.POST("/airdrop/receive", v1.ReceiveAirdrop)
 }

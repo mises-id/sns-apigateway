@@ -273,7 +273,6 @@ func RecommendStatus(c echo.Context) error {
 
 }
 func RecentStatus(c echo.Context) error {
-
 	params := &RecentStatusParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
