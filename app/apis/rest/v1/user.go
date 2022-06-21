@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -70,6 +71,7 @@ type (
 	}
 	UserTwitterAuthResp struct {
 		TwitterUserId    string    `json:"twitter_user_id" bson:"twitter_user_id"`
+		Misesid          string    `json:"misesid"`
 		Name             string    `json:"name" bson:"name"`
 		Username         string    `json:"username" bson:"username"`
 		FollowersCount   uint64    `json:"followers_count" bson:"followers_count"`
@@ -163,9 +165,8 @@ func TwitterCallback(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, echo.Map{
-		"url": svcresp.Url,
-	})
+	return c.Redirect(http.StatusMovedPermanently, svcresp.Url)
+
 }
 func ReceiveAirdrop(c echo.Context) error {
 	params := &ReceiveAirdropParams{}
@@ -231,6 +232,7 @@ func BuildUserTwitterAuthResp(in *pb.UserTwitterAuth) *UserTwitterAuthResp {
 	}
 	out := &UserTwitterAuthResp{
 		TwitterUserId:    in.TwitterUserId,
+		Misesid:          in.Misesid,
 		Name:             in.Name,
 		Username:         in.Username,
 		FollowersCount:   in.FollowersCount,
