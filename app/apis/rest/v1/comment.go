@@ -12,6 +12,7 @@ import (
 
 type CreateCommentParams struct {
 	CommentableID string `json:"status_id"`
+	NftAssetID    string `json:"nft_asset_id"`
 	ParentID      string `json:"parent_id"`
 	Content       string `json:"content"`
 }
@@ -19,6 +20,7 @@ type CreateCommentParams struct {
 type ListCommentParams struct {
 	rest.PageQuickParams
 	CommentableID string `query:"status_id"`
+	NftAssetID    string `query:"nft_asset_id"`
 	TopicID       string `query:"topic_id"`
 }
 
@@ -102,6 +104,7 @@ func ListComment(c echo.Context) error {
 		CurrentUid: GetCurrentUID(c),
 		StatusId:   params.CommentableID,
 		TopicId:    params.TopicID,
+		NftAssetId: params.NftAssetID,
 		Paginator: &pb.PageQuick{
 			NextId: params.PageQuickParams.NextID,
 			Limit:  uint64(params.PageQuickParams.Limit),
@@ -128,6 +131,7 @@ func CreateComment(c echo.Context) error {
 		StatusId:   params.CommentableID,
 		Content:    params.Content,
 		ParentId:   params.ParentID,
+		NftAssetId: params.NftAssetID,
 	})
 	if err != nil {
 		return err

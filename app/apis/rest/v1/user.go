@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/app/middleware"
 	"github.com/mises-id/sns-apigateway/lib/codes"
+	"github.com/sirupsen/logrus"
 
 	pb "github.com/mises-id/sns-socialsvc/proto"
 )
@@ -20,11 +22,17 @@ type SignInParams struct {
 		Auth string `json:"auth"`
 	} `json:"user_authz"`
 }
+type TwitterCallbackParam struct {
+	UID           uint64 `json:"uid" query:"uid"`
+	OauthToken    string `json:"oauth_token" query:"oauth_token"`
+	OauthVerifier string `json:"oauth_verifier" query:"oauth_verifier"`
+}
 
 type AvatarResp struct {
-	Small  string `json:"small"`
-	Medium string `json:"medium"`
-	Large  string `json:"large"`
+	Small      string `json:"small"`
+	Medium     string `json:"medium"`
+	Large      string `json:"large"`
+	NftAssetId string `json:"nft_asset_id"`
 }
 
 type UserFullResp struct {
@@ -35,6 +43,7 @@ type UserFullResp struct {
 	Mobile         string      `json:"mobile"`
 	Email          string      `json:"email"`
 	Address        string      `json:"address"`
+	Intro          string      `json:"intro"`
 	Avatar         *AvatarResp `json:"avatar"`
 	IsFollowed     bool        `json:"is_followed"`
 	IsBlocked      bool        `json:"is_blocked"`
@@ -55,6 +64,33 @@ type UserSummaryResp struct {
 	HelpMisesid string      `json:"help_misesid"`
 	IsFollowed  bool        `json:"is_followed"`
 }
+
+type (
+	ReceiveAirdropParams struct {
+		Tweet string `json:"tweet"`
+	}
+	UserTwitterAuthResp struct {
+		TwitterUserId    string    `json:"twitter_user_id" bson:"twitter_user_id"`
+		Misesid          string    `json:"misesid"`
+		Name             string    `json:"name" bson:"name"`
+		Username         string    `json:"username" bson:"username"`
+		FollowersCount   uint64    `json:"followers_count" bson:"followers_count"`
+		TweetCount       uint64    `json:"tweet_count" bson:"tweet_count"`
+		TwitterCreatedAt time.Time `json:"twitter_created_at" bson:"twitter_created_at"`
+		Amount           float32   `json:"amount" bson:"amount"`
+		CreatedAt        time.Time `json:"created_at" bson:"created_at"`
+	}
+	AirdropResp struct {
+		Coin      float32   `json:"coin" bson:"coin"`
+		CreatedAt time.Time `json:"created_at" bson:"created_at"`
+		FinishAt  time.Time `json:"finish_at" bson:"finish_at"`
+		Status    string    `json:"status" bson:"status"`
+	}
+	AirdropInfoResp struct {
+		Twitter *UserTwitterAuthResp `json:"twitter"`
+		Airdrop *AirdropResp         `json:"airdrop"`
+	}
+)
 
 func GetCurrentUID(c echo.Context) uint64 {
 	var currentUID uint64
@@ -92,6 +128,120 @@ func SignIn(c echo.Context) error {
 		"token":      svcresp.Jwt,
 		"is_created": svcresp.IsCreated,
 	})
+}
+
+func TwitterAuthUrl(c echo.Context) error {
+	uid := GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetTwitterAuthUrl(ctx, &pb.GetTwitterAuthUrlRequest{
+		CurrentUid: uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, echo.Map{
+		"url": svcresp.Url,
+	})
+}
+
+func TwitterCallback(c echo.Context) error {
+	params := &TwitterCallbackParam{}
+	if err := c.Bind(params); err != nil {
+		return err
+	}
+	logrus.Infoln(params)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.TwitterCallback(ctx, &pb.TwitterCallbackRequest{
+		CurrentUid:    params.UID,
+		OauthToken:    params.OauthToken,
+		OauthVerifier: params.OauthVerifier,
+	})
+	if err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusMovedPermanently, svcresp.Url)
+
+}
+func ReceiveAirdrop(c echo.Context) error {
+	params := &ReceiveAirdropParams{}
+	if err := c.Bind(params); err != nil {
+		return err
+	}
+	logrus.Infoln(params)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	_, err = grpcsvc.ReceiveAirdrop(ctx, &pb.ReceiveAirdropRequest{
+		CurrentUid: GetCurrentUID(c),
+		Tweet:      params.Tweet,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, nil)
+}
+
+func AirdropInfo(c echo.Context) error {
+	uid := GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetAirdropInfo(ctx, &pb.GetAirdropInfoRequest{
+		CurrentUid: uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildAirdropInfoResp(svcresp))
+}
+
+func BuildAirdropInfoResp(in *pb.GetAirdropInfoResponse) *AirdropInfoResp {
+	if in == nil {
+		return nil
+	}
+	out := &AirdropInfoResp{
+		Airdrop: BuildAirdropResp(in.Airdrop),
+		Twitter: BuildUserTwitterAuthResp(in.Twitter),
+	}
+	return out
+}
+
+func BuildAirdropResp(in *pb.Airdrop) *AirdropResp {
+	if in == nil {
+		return nil
+	}
+	out := &AirdropResp{
+		Coin:      in.Coin,
+		CreatedAt: time.Unix(int64(in.CreatedAt), 0),
+		FinishAt:  time.Unix(int64(in.FinishAt), 0),
+		Status:    in.Status,
+	}
+	return out
+}
+func BuildUserTwitterAuthResp(in *pb.UserTwitterAuth) *UserTwitterAuthResp {
+	if in == nil {
+		return nil
+	}
+	out := &UserTwitterAuthResp{
+		TwitterUserId:    in.TwitterUserId,
+		Misesid:          in.Misesid,
+		Name:             in.Name,
+		Username:         in.Username,
+		FollowersCount:   in.FollowersCount,
+		TweetCount:       in.TweetCount,
+		Amount:           in.Amount,
+		CreatedAt:        time.Unix(int64(in.CreatedAt), 0),
+		TwitterCreatedAt: time.Unix(int64(in.TwitterCreatedAt), 0),
+	}
+	return out
 }
 
 func ShareTweetUrl(c echo.Context) error {
@@ -152,14 +302,22 @@ type UserProfileParams struct {
 	Mobile  string `json:"mobile"`
 	Eamil   string `json:"email"`
 	Address string `json:"address"`
+	Intro   string `json:"intro"`
+}
+type UpdateUserConfigParams struct {
+	NftState bool `json:"nft_state"`
 }
 
+type UserConfig struct {
+	NftState bool `json:"nft_state"`
+}
 type UserNameParams struct {
 	Username string `json:"username"`
 }
 
 type UserAvatarParams struct {
 	AttachmentPath string `json:"attachment_path"`
+	NftAssetId     string `json:"nft_asset_id"`
 }
 
 type UserUpdateParams struct {
@@ -167,6 +325,53 @@ type UserUpdateParams struct {
 	Profile  *UserProfileParams `json:"profile"`
 	Username *UserNameParams    `json:"username"`
 	Avatar   *UserAvatarParams  `json:"avatar"`
+}
+
+func UpdateUserConfig(c echo.Context) error {
+	params := &UpdateUserConfigParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument
+	}
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.UpdateUserConfig(ctx, &pb.UpdateUserConfigRequest{
+		CurrentUid: GetCurrentUID(c),
+		NftState:   params.NftState,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildUserConfig(svcresp.Config))
+}
+
+func GetUserConfig(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	uid, err := GetUIDParam(c)
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.GetUserConfig(ctx, &pb.GetUserConfigRequest{
+		CurrentUid: GetCurrentUID(c),
+		Uid:        uid,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildUserConfig(svcresp.Config))
+}
+
+func BuildUserConfig(config *pb.UserConfig) *UserConfig {
+	if config == nil {
+		return nil
+	}
+	return &UserConfig{
+		NftState: config.NftState,
+	}
 }
 
 func UpdateUser(c echo.Context) error {
@@ -193,11 +398,13 @@ func UpdateUser(c echo.Context) error {
 			Mobile:  params.Profile.Mobile,
 			Email:   params.Profile.Eamil,
 			Address: params.Profile.Address,
+			Intro:   params.Profile.Intro,
 		})
 	case "avatar":
 		serverresp, err = grpcsvc.UpdateUserAvatar(ctx, &pb.UpdateUserAvatarRequest{
 			Uid:            uid,
 			AttachmentPath: params.Avatar.AttachmentPath,
+			NftAssetId:     params.Avatar.NftAssetId,
 		})
 	case "username":
 		serverresp, err = grpcsvc.UpdateUserName(ctx, &pb.UpdateUserNameRequest{
@@ -232,13 +439,14 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		FansCount:      uint64(user.FansCount),
 		LikedCount:     uint64(user.LikedCount),
 		NewFansCount:   uint64(user.NewFansCount),
+		Intro:          user.Intro,
 	}
-	if len(user.Avatar) > 0 {
+	if user.AvatarUrl != nil {
 		resp.Avatar = &AvatarResp{
-			// TODO support multiple sizes avatar
-			Small:  user.Avatar,
-			Medium: user.Avatar,
-			Large:  user.Avatar,
+			Small:      user.AvatarUrl.Small,
+			Medium:     user.AvatarUrl.Medium,
+			Large:      user.AvatarUrl.Large,
+			NftAssetId: user.AvatarUrl.NftAssetId,
 		}
 	}
 	return resp
@@ -255,12 +463,12 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 		IsFollowed:  user.IsFollowed,
 		HelpMisesid: user.HelpMisesid,
 	}
-	if len(user.Avatar) > 0 {
+	if user.AvatarUrl != nil {
 		resp.Avatar = &AvatarResp{
-			// TODO support multiple sizes avatar
-			Small:  user.Avatar,
-			Medium: user.Avatar,
-			Large:  user.Avatar,
+			Small:      user.AvatarUrl.Small,
+			Medium:     user.AvatarUrl.Medium,
+			Large:      user.AvatarUrl.Large,
+			NftAssetId: user.AvatarUrl.NftAssetId,
 		}
 	}
 	return resp
@@ -285,6 +493,50 @@ func BuildUserLikeResplice(in []*pb.StatusLike) []*UserLikeResp {
 	}
 
 	return resp
+}
+
+func PageUserNftAsset(c echo.Context) error {
+	uid, err := GetUIDParam(c)
+	if err != nil {
+		return err
+	}
+	params := &PageNftAssetParams{}
+	if err = c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	params.UID = uid
+
+	return PageNftAsset(c, params)
+}
+func PageNftAsset(c echo.Context, params *PageNftAssetParams) error {
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.PageNftAsset(ctx, &pb.PageNftAssetRequest{
+		CurrentUid: GetCurrentUID(c),
+		Uid:        params.UID,
+		SortBy:     params.SortBy,
+		Scene:      params.Scene,
+		Paginator: &pb.PageQuick{
+			NextId: params.PageQuickParams.NextID,
+			Limit:  uint64(params.PageQuickParams.Limit),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessRespWithPagination(c, BuildNftAssetRespSlice(svcresp.Assets), svcresp.Paginator)
+}
+
+func MyNftAsset(c echo.Context) error {
+	params := &PageNftAssetParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	params.UID = GetCurrentUID(c)
+	return PageNftAsset(c, params)
 }
 
 func ListUserLike(c echo.Context) error {

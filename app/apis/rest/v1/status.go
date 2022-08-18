@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -135,7 +134,6 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(1)
 	svcresp, err := grpcsvc.GetStatus(ctx, &pb.GetStatusRequest{
 		CurrentUid: GetCurrentUID(c),
 		Statusid:   c.Param("id"),
@@ -143,7 +141,6 @@ func GetStatus(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(svcresp.Status)
 
 	return rest.BuildSuccessResp(c, BuildStatusResp(svcresp.Status))
 }
@@ -276,7 +273,6 @@ func RecommendStatus(c echo.Context) error {
 
 }
 func RecentStatus(c echo.Context) error {
-
 	params := &RecentStatusParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")

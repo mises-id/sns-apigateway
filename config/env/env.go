@@ -21,7 +21,7 @@ type Env struct {
 	StorageProvider string        `env:"STORAGE_PROVIDER" envDefault:"local"`
 	JWTSecret       string        `env:"JWT_SECRET" envDefault:"jwt secret"`
 	TokenDuration   time.Duration `env:"TOKEN_DURATION" envDefault:"24h"`
-	AllowOrigins    string        `env:"ALLOW_ORIGINS" envDefault:""`
+	AllowOrigins    string        `env:"ALLOW_ORIGINS" envDefault:"*"`
 	LocalFilePath   string        `env:"LocalFilePath" envDefault:"/tmp/sns-apigateway/"`
 	MisesNodes      string        `env:"MISES_NODES" envDefault:"https://e1.mises.site:443,https://e2.mises.site:443,https://w1.mises.site:443,https://w2.mises.site:443"`
 	RootPath        string
