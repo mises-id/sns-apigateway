@@ -25,7 +25,9 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/twitter/callback", v1.TwitterCallback)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
-
+	//website
+	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
+	groupV1.GET("/website/page", v1.PageWebsite)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 
 	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
