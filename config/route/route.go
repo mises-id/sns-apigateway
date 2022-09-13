@@ -11,6 +11,7 @@ import (
 
 // SetRoutes sets the routes of echo http server
 func SetRoutes(e *echo.Echo) {
+	e.Static("/", "assets")
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
@@ -28,6 +29,7 @@ func SetRoutes(e *echo.Echo) {
 	//website
 	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
 	groupV1.GET("/website/page", v1.PageWebsite)
+	groupV1.POST("/website/recommend", v1.CreateRecommendJson)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 
 	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
