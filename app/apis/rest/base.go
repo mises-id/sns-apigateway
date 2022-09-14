@@ -75,6 +75,18 @@ func BuildSuccessRespWebsiteWithPagination(c echo.Context, data interface{}, pag
 		},
 	})
 }
+func BuildSuccessRespWithWebsitePage(c echo.Context, data interface{}, pagination *websitesvcpb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"data": data,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
+		},
+	})
+}
 func BuildSuccessRespWithPage(c echo.Context, data interface{}, pagination *pb.Page) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"code": 0,

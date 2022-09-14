@@ -9,6 +9,12 @@ import (
 
 type (
 	ListWebsiteCategoryParams struct{}
+	WebsiteCategoryResp       struct {
+		ID         string `json:"id"`
+		Name       string `json:"name"`
+		Desc       string `json:"desc"`
+		TypeString string `json:"type_string"`
+	}
 )
 
 func ListWebsiteCategory(c echo.Context) error {
@@ -28,5 +34,26 @@ func ListWebsiteCategory(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessResp(c, svcresp)
+	return rest.BuildSuccessResp(c, BuildWebsiteCategorySliceResp(svcresp.Data))
+}
+
+func BuildWebsiteCategorySliceResp(data []*pb.WebsiteCategory) []*WebsiteCategoryResp {
+	resp := make([]*WebsiteCategoryResp, len(data))
+	for i, v := range data {
+		resp[i] = BuildWebsiteCategoryResp(v)
+	}
+	return resp
+}
+
+func BuildWebsiteCategoryResp(data *pb.WebsiteCategory) *WebsiteCategoryResp {
+	if data == nil {
+		return nil
+	}
+	resp := &WebsiteCategoryResp{
+		ID:         data.Id,
+		Name:       data.Name,
+		TypeString: data.TypeString,
+		Desc:       data.Desc,
+	}
+	return resp
 }
