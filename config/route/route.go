@@ -11,11 +11,13 @@ import (
 
 // SetRoutes sets the routes of echo http server
 func SetRoutes(e *echo.Echo) {
+	e.Static("/", "assets")
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	groupOpensea := e.Group("/api/v1", middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(4)), mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 	groupV1.GET("/user/:uid", v1.FindUser)
+	groupV1.GET("/mises_user/:misesid", v1.FindMisesUser)
 	groupV1.GET("/channel_user/:misesid", v1.GetChannelUser)
 	groupV1.GET("/channel/info", v1.ChannelInfo)
 	groupV1.GET("/channel_user/page", v1.PageChannelUser)
@@ -25,7 +27,10 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.POST("/signin", v1.SignIn)
 	groupV1.GET("/twitter/callback", v1.TwitterCallback)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
-
+	//website
+	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
+	groupV1.GET("/website/page", v1.PageWebsite)
+	groupV1.POST("/website/recommend", v1.CreateRecommendJson)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 
 	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
