@@ -296,6 +296,23 @@ func FindUser(c echo.Context) error {
 	}
 	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, svcresp.IsFollowed))
 }
+func FindMisesUser(c echo.Context) error {
+	currentUID := GetCurrentUID(c)
+	misesidParam := c.Param("misesid")
+
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.FindMisesUser(ctx, &pb.FindMisesUserRequest{
+		Misesid:    misesidParam,
+		CurrentUid: currentUID,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, svcresp.IsFollowed))
+}
 
 type UserProfileParams struct {
 	Gender  string `json:"gender"`
