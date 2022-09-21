@@ -10,10 +10,11 @@ import (
 type (
 	ListWebsiteCategoryParams struct{}
 	WebsiteCategoryResp       struct {
-		ID         string `json:"id"`
-		Name       string `json:"name"`
-		Desc       string `json:"desc"`
-		TypeString string `json:"type_string"`
+		ID          string `json:"id"`
+		Name        string `json:"name"`
+		ShorterName string `json:"shorter_name"`
+		Desc        string `json:"desc"`
+		TypeString  string `json:"type_string"`
 	}
 )
 
@@ -50,10 +51,11 @@ func BuildWebsiteCategoryResp(data *pb.WebsiteCategory) *WebsiteCategoryResp {
 		return nil
 	}
 	resp := &WebsiteCategoryResp{
-		ID:         data.Id,
-		Name:       data.Name,
-		TypeString: data.TypeString,
-		Desc:       data.Desc,
+		ID:          data.Id,
+		Name:        data.Name,
+		ShorterName: data.ShorterName,
+		TypeString:  data.TypeString,
+		Desc:        data.Desc,
 	}
 	return resp
 }
