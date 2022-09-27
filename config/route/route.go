@@ -25,6 +25,7 @@ func SetRoutes(e *echo.Echo) {
 	groupOpensea.GET("/opensea/assets", v1.ListOpenseaAsset)
 	groupOpensea.GET("/opensea/assets_contract", v1.GetOpenseaAssetContract)
 	groupV1.POST("/signin", v1.SignIn)
+	groupV1.POST("/complaint", v1.Complaint)
 	groupV1.GET("/twitter/callback", v1.TwitterCallback)
 	groupV1.GET("/user/:uid/friendship", v1.ListFriendship)
 	//website
