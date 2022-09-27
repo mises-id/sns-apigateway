@@ -180,3 +180,5 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0.20220315093538-763383563639
 
 replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20220317102522-80f09a270501
+
+replace github.com/go-redis/redis/v8 => github.com/mises-id/redis/v8 v8.11.6-0.20220412060519-ab8472510a62
