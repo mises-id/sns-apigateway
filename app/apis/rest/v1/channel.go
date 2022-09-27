@@ -151,5 +151,7 @@ func ChannelInfo(c echo.Context) error {
 		"total_channel_user": svcresp.TotalChannelUser,
 		"airdrop_amount":     svcresp.AirdropAmount,
 		"medium_url":         svcresp.MediumUrl,
+		"ios_link":           svcresp.IosLink,
+		"ios_medium_link":    svcresp.IosMediumLink,
 	})
 }

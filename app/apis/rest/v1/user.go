@@ -34,6 +34,11 @@ type AvatarResp struct {
 	Large      string `json:"large"`
 	NftAssetId string `json:"nft_asset_id"`
 }
+type ComplaintParams struct {
+	TargetType string `json:"target_type" body:"target_type"`
+	TargetID   string `json:"target_id" body:"target_id"`
+	Reason     string `json:"reason" body:"reason"`
+}
 
 type UserFullResp struct {
 	UID            uint64      `json:"uid"`
@@ -173,7 +178,6 @@ func ReceiveAirdrop(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return err
 	}
-	logrus.Infoln(params)
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
@@ -188,6 +192,27 @@ func ReceiveAirdrop(c echo.Context) error {
 	return rest.BuildSuccessResp(c, nil)
 }
 
+func Complaint(c echo.Context) error {
+	params := &ComplaintParams{}
+	if err := c.Bind(params); err != nil {
+		return err
+	}
+	uid := GetCurrentUID(c)
+	grpcsvc, ctx, err := rest.GrpcSocialService()
+	if err != nil {
+		return err
+	}
+	_, err = grpcsvc.Complaint(ctx, &pb.ComplaintRequest{
+		CurrentUid: uid,
+		TargetType: params.TargetType,
+		TargetId:   params.TargetID,
+		Reason:     params.Reason,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, nil)
+}
 func AirdropInfo(c echo.Context) error {
 	uid := GetCurrentUID(c)
 	grpcsvc, ctx, err := rest.GrpcSocialService()
