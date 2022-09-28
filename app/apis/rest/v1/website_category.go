@@ -30,7 +30,30 @@ func ListWebsiteCategory(c echo.Context) error {
 		return err
 	}
 
-	svcresp, err := grpcsvc.WebsiteCategoryList(ctx, &pb.WebsiteCategoryListRequest{})
+	svcresp, err := grpcsvc.WebsiteCategoryList(ctx, &pb.WebsiteCategoryListRequest{
+		Type: "web3",
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, BuildWebsiteCategorySliceResp(svcresp.Data))
+}
+func ListExtensionsCategory(c echo.Context) error {
+
+	params := &ListWebsiteCategoryParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	if err != nil {
+		return err
+	}
+
+	svcresp, err := grpcsvc.WebsiteCategoryList(ctx, &pb.WebsiteCategoryListRequest{
+		Type: "extensions",
+	})
 	if err != nil {
 		return err
 	}
