@@ -14,6 +14,7 @@ import (
 type (
 	WebsiteParams struct {
 		WebSiteCategoryID string `json:"website_category_id" query:"website_category_id"`
+		SubcategoryID     string `json:"subcategory_id" query:"subcategory_id"`
 		ListNum           uint64 `json:"list_num" query:"list_num"`
 		Keywords          string `json:"keywords" query:"keywords"`
 		rest.PageParams
@@ -22,16 +23,17 @@ type (
 	WebsiteResp struct {
 		ID                string               `json:"id"`
 		WebsiteCategoryID string               `json:"website_category_id"`
+		SubcategoryID     string               `json:"subcategory_id"`
 		Title             string               `json:"title"`
 		Url               string               `json:"url"`
 		Logo              string               `json:"logo"`
 		Desc              string               `json:"desc"`
 		WebSiteCategory   *WebsiteCategoryResp `json:"website_category"`
+		Subcategory       *WebsiteCategoryResp `json:"subcategory"`
 	}
 )
 
 func PageWebsite(c echo.Context) error {
-
 	params := &WebsiteParams{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
@@ -44,6 +46,7 @@ func PageWebsite(c echo.Context) error {
 		Type:              "web3",
 		Keywords:          params.Keywords,
 		WebsiteCategoryId: params.WebSiteCategoryID,
+		SubcategoryId:     params.SubcategoryID,
 		Paginator: &pb.Page{
 			PageNum:  uint64(params.PageParams.PageNum),
 			PageSize: uint64(params.PageParams.PageSize),
@@ -52,7 +55,30 @@ func PageWebsite(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
+	return rest.BuildSuccessRespWithWebsitePage(c, BuildWebsiteSliceResp(svcresp.Data), svcresp.Paginator)
+}
+func PageExtensions(c echo.Context) error {
+	params := &WebsiteParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.WebsitePage(ctx, &pb.WebsitePageRequest{
+		Type:              "extensions",
+		Keywords:          params.Keywords,
+		WebsiteCategoryId: params.WebSiteCategoryID,
+		SubcategoryId:     params.SubcategoryID,
+		Paginator: &pb.Page{
+			PageNum:  uint64(params.PageParams.PageNum),
+			PageSize: uint64(params.PageParams.PageSize),
+		},
+	})
+	if err != nil {
+		return err
+	}
 	return rest.BuildSuccessRespWithWebsitePage(c, BuildWebsiteSliceResp(svcresp.Data), svcresp.Paginator)
 }
 
@@ -89,6 +115,9 @@ func CreateRecommendJson(c echo.Context) error {
 }
 
 func BuildWebsiteSliceResp(data []*pb.Website) []*WebsiteResp {
+	if data == nil {
+		return nil
+	}
 	resp := make([]*WebsiteResp, len(data))
 	for i, v := range data {
 		resp[i] = BuildWebsiteResp(v)
@@ -103,6 +132,7 @@ func BuildWebsiteResp(data *pb.Website) *WebsiteResp {
 	resp := &WebsiteResp{
 		ID:                data.Id,
 		WebsiteCategoryID: data.WebsiteCategoryId,
+		SubcategoryID:     data.SubcategoryId,
 		Title:             data.Title,
 		Url:               data.Url,
 		Logo:              data.Logo,
@@ -110,6 +140,9 @@ func BuildWebsiteResp(data *pb.Website) *WebsiteResp {
 	}
 	if data.WebsiteCategory != nil {
 		resp.WebSiteCategory = BuildWebsiteCategoryResp(data.WebsiteCategory)
+	}
+	if data.Subcategory != nil {
+		resp.Subcategory = BuildWebsiteCategoryResp(data.Subcategory)
 	}
 	return resp
 }

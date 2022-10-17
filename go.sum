@@ -786,8 +786,8 @@ github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165 h1:Mxckg274TgMJdV9
 github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165/go.mod h1:DgFsaQj1L1J6bmxSDY2kL3Ojfc84sm7c9zYKwsp/wjM=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 h1:i7i9Dr+EBf/MtroFdgl1yt8xNYPPRWg+njtcZnktaB0=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27/go.mod h1:maeY2/FsDxFGNKCyt3XnP1fi5ygJNMUGIr3v0PQ6z0w=
-github.com/mises-id/mises-websitesvc v0.0.0-20220921095603-989533a60eb6 h1:1PHfSL90zuQaeRXXAz5/rrOzeUyqlkgm7N4dODaDSLI=
-github.com/mises-id/mises-websitesvc v0.0.0-20220921095603-989533a60eb6/go.mod h1:LnhUoabs31y9uwngtmHGbFqnYIe4w91zSY2M3LgdtZk=
+github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3 h1:8ED0ljBx8abvXQD23eg9+pMTuz+YWx3688SYm070scQ=
+github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3/go.mod h1:LnhUoabs31y9uwngtmHGbFqnYIe4w91zSY2M3LgdtZk=
 github.com/mises-id/redis/v8 v8.11.6-0.20220412060519-ab8472510a62 h1:LyvjKF8iDU7xzRFXZNJMIqVOKfUe5PptlwL+oAFT2wY=
 github.com/mises-id/redis/v8 v8.11.6-0.20220412060519-ab8472510a62/go.mod h1:25mL1NKxbJhB63ihiK8MnNeTRd+xAizd6bOdydrTLUQ=
 github.com/mises-id/sdk v0.0.0-20220422062246-abc698ec55a2 h1:AbkqcwglcH+5xMGNitqutkUFil1kEx3+RQ5u311ClaE=

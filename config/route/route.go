@@ -31,7 +31,9 @@ func SetRoutes(e *echo.Echo) {
 	//website
 	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
 	groupV1.GET("/website/page", v1.PageWebsite)
-	groupV1.POST("/website/recommend", v1.CreateRecommendJson)
+	//extension
+	groupV1.GET("/extensions_category/list", v1.ListExtensionsCategory)
+	groupV1.GET("/extensions/page", v1.PageExtensions)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 
 	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
