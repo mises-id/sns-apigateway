@@ -10,11 +10,13 @@ import (
 type (
 	ListWebsiteCategoryParams struct{}
 	WebsiteCategoryResp       struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		ShorterName string `json:"shorter_name"`
-		Desc        string `json:"desc"`
-		TypeString  string `json:"type_string"`
+		ID               string                 `json:"id"`
+		ParentID         string                 `json:"parent_id"`
+		Name             string                 `json:"name"`
+		ShorterName      string                 `json:"shorter_name"`
+		Desc             string                 `json:"desc"`
+		TypeString       string                 `json:"type_string"`
+		ChildrenCategory []*WebsiteCategoryResp `json:"children_category"`
 	}
 )
 
@@ -62,6 +64,9 @@ func ListExtensionsCategory(c echo.Context) error {
 }
 
 func BuildWebsiteCategorySliceResp(data []*pb.WebsiteCategory) []*WebsiteCategoryResp {
+	if data == nil {
+		return nil
+	}
 	resp := make([]*WebsiteCategoryResp, len(data))
 	for i, v := range data {
 		resp[i] = BuildWebsiteCategoryResp(v)
@@ -75,10 +80,12 @@ func BuildWebsiteCategoryResp(data *pb.WebsiteCategory) *WebsiteCategoryResp {
 	}
 	resp := &WebsiteCategoryResp{
 		ID:          data.Id,
+		ParentID:    data.ParentId,
 		Name:        data.Name,
 		ShorterName: data.ShorterName,
 		TypeString:  data.TypeString,
 		Desc:        data.Desc,
 	}
+	resp.ChildrenCategory = BuildWebsiteCategorySliceResp(data.ChildrenCategory)
 	return resp
 }

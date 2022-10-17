@@ -16,7 +16,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/mises-websitesvc v0.0.0-20220928091018-814cc2bbd69c
+	github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3
 	github.com/mises-id/sns-socialsvc v0.0.0-20220927034855-3858e55a8a9d
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
 	github.com/sirupsen/logrus v1.8.1
@@ -182,4 +182,3 @@ replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0
 replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20220317102522-80f09a270501
 
 replace github.com/go-redis/redis/v8 => github.com/mises-id/redis/v8 v8.11.6-0.20220412060519-ab8472510a62
-
