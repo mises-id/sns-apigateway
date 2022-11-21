@@ -10,7 +10,6 @@ import (
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/app/middleware"
 	"github.com/mises-id/sns-apigateway/lib/codes"
-	"github.com/sirupsen/logrus"
 
 	pb "github.com/mises-id/sns-socialsvc/proto"
 )
@@ -157,7 +156,6 @@ func TwitterCallback(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return err
 	}
-	logrus.Infoln(params)
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {
 		return err
