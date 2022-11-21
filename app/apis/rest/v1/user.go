@@ -10,6 +10,7 @@ import (
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/app/middleware"
 	"github.com/mises-id/sns-apigateway/lib/codes"
+	"github.com/mssola/user_agent"
 
 	pb "github.com/mises-id/sns-socialsvc/proto"
 )
@@ -94,6 +95,13 @@ type (
 		Twitter *UserTwitterAuthResp `json:"twitter"`
 		Airdrop *AirdropResp         `json:"airdrop"`
 	}
+	UserAgent struct {
+		ua       string
+		ipaddr   string
+		os       string
+		browser  string
+		platform string
+	}
 )
 
 func GetCurrentUID(c echo.Context) uint64 {
@@ -121,9 +129,17 @@ func SignIn(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	user_agent := userAgent(c)
 	svcresp, err := grpcsvc.SignIn(ctx, &pb.SignInRequest{
 		Auth:     params.UserAuthz.Auth,
 		Referrer: params.Referrer,
+		UserAgent: &pb.UserAgent{
+			Ua:       user_agent.ua,
+			Ipaddr:   user_agent.ipaddr,
+			Os:       user_agent.os,
+			Browser:  user_agent.browser,
+			Platform: user_agent.platform,
+		},
 	})
 	if err != nil {
 		return err
@@ -149,6 +165,19 @@ func TwitterAuthUrl(c echo.Context) error {
 	return rest.BuildSuccessResp(c, echo.Map{
 		"url": svcresp.Url,
 	})
+}
+
+func userAgent(c echo.Context) *UserAgent {
+	res := &UserAgent{}
+	uastr := c.Request().UserAgent()
+	ua := user_agent.New(uastr)
+	res.ua = uastr
+	res.ipaddr = c.RealIP()
+	browserName, browserVersion := ua.Browser()
+	res.browser = browserName + " " + browserVersion
+	res.os = ua.OS()
+	res.platform = ua.Platform()
+	return res
 }
 
 func TwitterCallback(c echo.Context) error {

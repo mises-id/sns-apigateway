@@ -17,7 +17,7 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3
-	github.com/mises-id/sns-socialsvc v0.0.0-20220927034855-3858e55a8a9d
+	github.com/mises-id/sns-socialsvc v0.0.0-20221121024704-401393947c2e
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
@@ -105,7 +105,7 @@ require (
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
-	github.com/mises-id/sdk v0.0.0-20220422062246-abc698ec55a2 // indirect
+	github.com/mises-id/sdk v0.0.0-20221108052606-a5196f11407d // indirect
 	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220623061854-3cb69fa867f2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
