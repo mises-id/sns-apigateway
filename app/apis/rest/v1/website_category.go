@@ -64,9 +64,6 @@ func ListExtensionsCategory(c echo.Context) error {
 }
 
 func BuildWebsiteCategorySliceResp(data []*pb.WebsiteCategory) []*WebsiteCategoryResp {
-	if data == nil {
-		return nil
-	}
 	resp := make([]*WebsiteCategoryResp, len(data))
 	for i, v := range data {
 		resp[i] = BuildWebsiteCategoryResp(v)

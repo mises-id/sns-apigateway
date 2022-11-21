@@ -8,6 +8,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var ErrTooManyRequestFunc = func(c echo.Context, identifier string, err error) error {
+	code := codes.ErrTooManyRequest
+	if err != nil {
+		code = code.New(err.Error())
+	}
+	return c.JSON(code.HTTPStatus, echo.Map{
+		"code":    code.Code,
+		"message": code.Msg,
+	})
+}
 var ErrorResponseMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := next(c)

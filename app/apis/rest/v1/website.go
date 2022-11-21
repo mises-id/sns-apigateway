@@ -115,9 +115,6 @@ func CreateRecommendJson(c echo.Context) error {
 }
 
 func BuildWebsiteSliceResp(data []*pb.Website) []*WebsiteResp {
-	if data == nil {
-		return nil
-	}
 	resp := make([]*WebsiteResp, len(data))
 	for i, v := range data {
 		resp[i] = BuildWebsiteResp(v)

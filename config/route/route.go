@@ -1,6 +1,8 @@
 package route
 
 import (
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
@@ -89,7 +91,17 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/mises/gasprices", v1.GasPrices)
 	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
 
-	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
+	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      0.01,
+		Burst:     5,
+		ExpiresIn: 60 * time.Minute,
+	})
+	rateConfig := middleware.RateLimiterConfig{
+		Store:       storeC,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+	}
+	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl, middleware.RateLimiterWithConfig(rateConfig))
+	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
 	userGroup.GET("/airdrop/info", v1.AirdropInfo)
 	userGroup.POST("/airdrop/receive", v1.ReceiveAirdrop)
 }
