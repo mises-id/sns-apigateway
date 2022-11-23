@@ -94,7 +94,7 @@ func SetRoutes(e *echo.Echo) {
 	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
 		Rate:      0.01,
 		Burst:     5,
-		ExpiresIn: 60 * time.Minute,
+		ExpiresIn: 8 * time.Hour,
 	})
 	rateConfig := middleware.RateLimiterConfig{
 		Store:       storeC,

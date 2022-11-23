@@ -9,6 +9,8 @@ import (
 
 	grpcpool "github.com/go-kit/kit/util/grpcpool"
 	"github.com/labstack/echo/v4"
+	airdropsvcpb "github.com/mises-id/mises-airdropsvc/proto"
+	airdropsvcgrpcclient "github.com/mises-id/mises-airdropsvc/svc/client/grpc"
 	websitesvcpb "github.com/mises-id/mises-websitesvc/proto"
 	websitesvcgrpcclient "github.com/mises-id/mises-websitesvc/svc/client/grpc"
 	pb "github.com/mises-id/sns-socialsvc/proto"
@@ -22,6 +24,7 @@ var (
 	socialSvcPool  *grpcpool.Pool
 	storageSvcPool *grpcpool.Pool
 	websiteSvcPool *grpcpool.Pool
+	airdropSvcPool *grpcpool.Pool
 	store          sync.Map
 )
 
@@ -29,6 +32,7 @@ type PoolCfg struct {
 	SocialSvcURI  string
 	StorageSvcURI string
 	WebsiteSvcURI string
+	AirdropSvcURI string
 	Capacity      int
 	IdleTimeout   time.Duration
 }
@@ -76,6 +80,29 @@ func BuildSuccessRespWebsiteWithPagination(c echo.Context, data interface{}, pag
 	})
 }
 func BuildSuccessRespWithWebsitePage(c echo.Context, data interface{}, pagination *websitesvcpb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"data": data,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
+		},
+	})
+}
+func BuildSuccessRespAirdropWithPagination(c echo.Context, data interface{}, pagination *airdropsvcpb.PageQuick) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"data": data,
+		"pagination": PageQuickParams{
+			Limit:  int64(pagination.Limit),
+			Total:  int64(pagination.Total),
+			NextID: pagination.NextId,
+		},
+	})
+}
+func BuildSuccessRespWithAirdropPage(c echo.Context, data interface{}, pagination *airdropsvcpb.Page) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"code": 0,
 		"data": data,
@@ -146,6 +173,19 @@ func GrpcWebsiteService() (websitesvcpb.WebsitesvcServer, context.Context, error
 	svcclient, err := websitesvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
+func GrpcAirdropService() (airdropsvcpb.AirdropsvcServer, context.Context, error) {
+	conn, err := airdropSvcPool.Get(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create grpcclient: %q", err)
+	}
+	defer conn.Close()
+
+	// Create a context with the header key and value
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	svcclient, err := airdropsvcgrpcclient.New(conn.ClientConn)
+	return svcclient, ctx, err
+}
 func InMemoryStore() *sync.Map {
 	return &store
 }
@@ -166,11 +206,15 @@ func ResetSvrPool(cfg PoolCfg) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.WebsiteSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+	airdropSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		println("grpcpool", "new connection created")
+		return grpc.DialContext(ctx, cfg.AirdropSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func init() {
-	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", 1, 60})
+	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", 1, 60})
 }
