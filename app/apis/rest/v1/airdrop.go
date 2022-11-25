@@ -21,6 +21,9 @@ type (
 		Misesid          string    `json:"misesid"`
 		Name             string    `json:"name" bson:"name"`
 		Username         string    `json:"username" bson:"username"`
+		CheckState       string    `json:"check_state" bson:"check_state"`
+		InvalidCode      string    `json:"invalid_code" bson:"invalid_code"`
+		Reason           string    `json:"reason" bson:"reason"`
 		FollowersCount   uint64    `json:"followers_count" bson:"followers_count"`
 		TweetCount       uint64    `json:"tweet_count" bson:"tweet_count"`
 		TwitterCreatedAt time.Time `json:"twitter_created_at" bson:"twitter_created_at"`
@@ -144,6 +147,9 @@ func BuildUserTwitterAuthResp(in *pb.UserTwitterAuth) *UserTwitterAuthResp {
 		Misesid:          in.Misesid,
 		Name:             in.Name,
 		Username:         in.Username,
+		Reason:           in.Reason,
+		CheckState:       in.CheckState,
+		InvalidCode:      in.InvalidCode,
 		FollowersCount:   in.FollowersCount,
 		TweetCount:       in.TweetCount,
 		Amount:           in.Amount,

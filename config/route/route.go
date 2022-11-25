@@ -92,9 +92,9 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
 
 	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
-		Rate:      0.01,
+		Rate:      0.00001,
 		Burst:     5,
-		ExpiresIn: 8 * time.Hour,
+		ExpiresIn: 24 * time.Hour,
 	})
 	rateConfig := middleware.RateLimiterConfig{
 		Store:       storeC,

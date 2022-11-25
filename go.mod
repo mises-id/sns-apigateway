@@ -104,7 +104,7 @@ require (
 	github.com/metaverse/truss v0.3.1 // indirect
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
-	github.com/mises-id/mises-airdropsvc v0.0.0-20221123080202-7b4ef746965d
+	github.com/mises-id/mises-airdropsvc v0.0.0-20221125074740-2899f4abd2b2
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
 	github.com/mises-id/sdk v0.0.0-20221108052606-a5196f11407d // indirect
 	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220920081129-d682f954bf94 // indirect

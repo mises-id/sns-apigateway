@@ -695,8 +695,8 @@ github.com/mises-id/cosmos-sdk v0.44.6-0.20220315093538-763383563639 h1:IMr0Xv3q
 github.com/mises-id/cosmos-sdk v0.44.6-0.20220315093538-763383563639/go.mod h1:1toU4zx+rBP7+CDD9TW3kb9G7i1Mc29wdZvLYKHwYrY=
 github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165 h1:Mxckg274TgMJdV94KB4WNt89t+WR8Uw/38uNi9tNpP0=
 github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165/go.mod h1:DgFsaQj1L1J6bmxSDY2kL3Ojfc84sm7c9zYKwsp/wjM=
-github.com/mises-id/mises-airdropsvc v0.0.0-20221123080202-7b4ef746965d h1:LAhyeb+x8xQ2OpyDNibVs3o0QS8v6zXbh3tH4G/h8mE=
-github.com/mises-id/mises-airdropsvc v0.0.0-20221123080202-7b4ef746965d/go.mod h1:pvuVGT6UE2tqrPuavW08Q46YkYTqJpHY8Gu4sCZWuAg=
+github.com/mises-id/mises-airdropsvc v0.0.0-20221125074740-2899f4abd2b2 h1:CW6gwA8pZ67C/mk+NLVX7HdVKoeuSvnjeOAXBrNwH6o=
+github.com/mises-id/mises-airdropsvc v0.0.0-20221125074740-2899f4abd2b2/go.mod h1:pvuVGT6UE2tqrPuavW08Q46YkYTqJpHY8Gu4sCZWuAg=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 h1:i7i9Dr+EBf/MtroFdgl1yt8xNYPPRWg+njtcZnktaB0=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27/go.mod h1:maeY2/FsDxFGNKCyt3XnP1fi5ygJNMUGIr3v0PQ6z0w=
 github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3 h1:8ED0ljBx8abvXQD23eg9+pMTuz+YWx3688SYm070scQ=
