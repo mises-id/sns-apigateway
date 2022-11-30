@@ -17,10 +17,10 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3
-	github.com/mises-id/sns-socialsvc v0.0.0-20221121024704-401393947c2e
+	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
 	github.com/sirupsen/logrus v1.9.0
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.8.1
 	github.com/tendermint/tendermint v0.34.16
 	github.com/urfave/cli v1.22.5
 	go.mongodb.org/mongo-driver v1.11.0
@@ -104,7 +104,7 @@ require (
 	github.com/metaverse/truss v0.3.1 // indirect
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
-	github.com/mises-id/mises-airdropsvc v0.0.0-20221125074740-2899f4abd2b2
+	github.com/mises-id/mises-airdropsvc v0.0.0-20221130054556-d620ec688270
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
 	github.com/mises-id/sdk v0.0.0-20221108052606-a5196f11407d // indirect
 	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220920081129-d682f954bf94 // indirect
@@ -137,7 +137,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.10.1 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
