@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/mises-id/sns-apigateway/lib/codes"
 	"github.com/mssola/user_agent"
 
+	airdroppb "github.com/mises-id/mises-airdropsvc/proto"
 	pb "github.com/mises-id/sns-socialsvc/proto"
 )
 
@@ -21,11 +21,6 @@ type SignInParams struct {
 	UserAuthz *struct {
 		Auth string `json:"auth"`
 	} `json:"user_authz"`
-}
-type TwitterCallbackParam struct {
-	UID           uint64 `json:"uid" query:"uid"`
-	OauthToken    string `json:"oauth_token" query:"oauth_token"`
-	OauthVerifier string `json:"oauth_verifier" query:"oauth_verifier"`
 }
 
 type AvatarResp struct {
@@ -74,33 +69,13 @@ type (
 	ReceiveAirdropParams struct {
 		Tweet string `json:"tweet"`
 	}
-	UserTwitterAuthResp struct {
-		TwitterUserId    string    `json:"twitter_user_id" bson:"twitter_user_id"`
-		Misesid          string    `json:"misesid"`
-		Name             string    `json:"name" bson:"name"`
-		Username         string    `json:"username" bson:"username"`
-		FollowersCount   uint64    `json:"followers_count" bson:"followers_count"`
-		TweetCount       uint64    `json:"tweet_count" bson:"tweet_count"`
-		TwitterCreatedAt time.Time `json:"twitter_created_at" bson:"twitter_created_at"`
-		Amount           float32   `json:"amount" bson:"amount"`
-		CreatedAt        time.Time `json:"created_at" bson:"created_at"`
-	}
-	AirdropResp struct {
-		Coin      float32   `json:"coin" bson:"coin"`
-		CreatedAt time.Time `json:"created_at" bson:"created_at"`
-		FinishAt  time.Time `json:"finish_at" bson:"finish_at"`
-		Status    string    `json:"status" bson:"status"`
-	}
-	AirdropInfoResp struct {
-		Twitter *UserTwitterAuthResp `json:"twitter"`
-		Airdrop *AirdropResp         `json:"airdrop"`
-	}
 	UserAgent struct {
-		ua       string
-		ipaddr   string
-		os       string
-		browser  string
-		platform string
+		ua        string
+		ipaddr    string
+		os        string
+		browser   string
+		platform  string
+		device_id string
 	}
 )
 
@@ -139,6 +114,7 @@ func SignIn(c echo.Context) error {
 			Os:       user_agent.os,
 			Browser:  user_agent.browser,
 			Platform: user_agent.platform,
+			DeviceId: user_agent.device_id,
 		},
 	})
 	if err != nil {
@@ -147,23 +123,6 @@ func SignIn(c echo.Context) error {
 	return rest.BuildSuccessResp(c, echo.Map{
 		"token":      svcresp.Jwt,
 		"is_created": svcresp.IsCreated,
-	})
-}
-
-func TwitterAuthUrl(c echo.Context) error {
-	uid := GetCurrentUID(c)
-	grpcsvc, ctx, err := rest.GrpcSocialService()
-	if err != nil {
-		return err
-	}
-	svcresp, err := grpcsvc.GetTwitterAuthUrl(ctx, &pb.GetTwitterAuthUrlRequest{
-		CurrentUid: uid,
-	})
-	if err != nil {
-		return err
-	}
-	return rest.BuildSuccessResp(c, echo.Map{
-		"url": svcresp.Url,
 	})
 }
 
@@ -177,29 +136,10 @@ func userAgent(c echo.Context) *UserAgent {
 	res.browser = browserName + " " + browserVersion
 	res.os = ua.OS()
 	res.platform = ua.Platform()
+	res.device_id = c.Request().Header.Get("mises-device-id")
 	return res
 }
 
-func TwitterCallback(c echo.Context) error {
-	params := &TwitterCallbackParam{}
-	if err := c.Bind(params); err != nil {
-		return err
-	}
-	grpcsvc, ctx, err := rest.GrpcSocialService()
-	if err != nil {
-		return err
-	}
-	svcresp, err := grpcsvc.TwitterCallback(ctx, &pb.TwitterCallbackRequest{
-		CurrentUid:    params.UID,
-		OauthToken:    params.OauthToken,
-		OauthVerifier: params.OauthVerifier,
-	})
-	if err != nil {
-		return err
-	}
-	return c.Redirect(http.StatusMovedPermanently, svcresp.Url)
-
-}
 func ReceiveAirdrop(c echo.Context) error {
 	params := &ReceiveAirdropParams{}
 	if err := c.Bind(params); err != nil {
@@ -239,61 +179,6 @@ func Complaint(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, nil)
-}
-func AirdropInfo(c echo.Context) error {
-	uid := GetCurrentUID(c)
-	grpcsvc, ctx, err := rest.GrpcSocialService()
-	if err != nil {
-		return err
-	}
-	svcresp, err := grpcsvc.GetAirdropInfo(ctx, &pb.GetAirdropInfoRequest{
-		CurrentUid: uid,
-	})
-	if err != nil {
-		return err
-	}
-	return rest.BuildSuccessResp(c, BuildAirdropInfoResp(svcresp))
-}
-
-func BuildAirdropInfoResp(in *pb.GetAirdropInfoResponse) *AirdropInfoResp {
-	if in == nil {
-		return nil
-	}
-	out := &AirdropInfoResp{
-		Airdrop: BuildAirdropResp(in.Airdrop),
-		Twitter: BuildUserTwitterAuthResp(in.Twitter),
-	}
-	return out
-}
-
-func BuildAirdropResp(in *pb.Airdrop) *AirdropResp {
-	if in == nil {
-		return nil
-	}
-	out := &AirdropResp{
-		Coin:      in.Coin,
-		CreatedAt: time.Unix(int64(in.CreatedAt), 0),
-		FinishAt:  time.Unix(int64(in.FinishAt), 0),
-		Status:    in.Status,
-	}
-	return out
-}
-func BuildUserTwitterAuthResp(in *pb.UserTwitterAuth) *UserTwitterAuthResp {
-	if in == nil {
-		return nil
-	}
-	out := &UserTwitterAuthResp{
-		TwitterUserId:    in.TwitterUserId,
-		Misesid:          in.Misesid,
-		Name:             in.Name,
-		Username:         in.Username,
-		FollowersCount:   in.FollowersCount,
-		TweetCount:       in.TweetCount,
-		Amount:           in.Amount,
-		CreatedAt:        time.Unix(int64(in.CreatedAt), 0),
-		TwitterCreatedAt: time.Unix(int64(in.TwitterCreatedAt), 0),
-	}
-	return out
 }
 
 func ShareTweetUrl(c echo.Context) error {
@@ -542,11 +427,31 @@ func BuildUserSummaryResp(user *pb.UserInfo) *UserSummaryResp {
 	}
 	return resp
 }
+func BuildAirdropSvcUserSummaryResp(user *airdroppb.UserInfo) *UserSummaryResp {
+	if user == nil {
+		return nil
+	}
+	resp := &UserSummaryResp{
+		UID:         user.Uid,
+		Username:    user.Username,
+		Misesid:     user.Misesid,
+		IsFollowed:  user.IsFollowed,
+		HelpMisesid: user.HelpMisesid,
+	}
+	if user.AvatarUrl != nil {
+		resp.Avatar = &AvatarResp{
+			Small:      user.AvatarUrl.Small,
+			Medium:     user.AvatarUrl.Medium,
+			Large:      user.AvatarUrl.Large,
+			NftAssetId: user.AvatarUrl.NftAssetId,
+		}
+	}
+	return resp
+}
 
 type ListUserLikeParams struct {
 	rest.PageQuickParams
 }
-
 type UserLikeResp struct {
 	Status    *StatusResp `json:"status"`
 	CreatedAt time.Time   `json:"created_at"`

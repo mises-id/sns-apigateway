@@ -7,7 +7,7 @@ import (
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
 
-	pb "github.com/mises-id/sns-socialsvc/proto"
+	pb "github.com/mises-id/mises-airdropsvc/proto"
 )
 
 type (
@@ -60,7 +60,7 @@ func BuildChannelUserResp(channel_user *pb.ChannelUserInfo) *PageChannelUserOutp
 	}
 	resp := &PageChannelUserOutput{
 		ID:           channel_user.Id,
-		User:         BuildUserSummaryResp(channel_user.User),
+		User:         BuildAirdropSvcUserSummaryResp(channel_user.User),
 		Channel_id:   channel_user.ChannelId,
 		Amount:       channel_user.Amount,
 		TxID:         channel_user.TxId,
@@ -78,7 +78,7 @@ func BuildGetChannelUserResp(channel_user *pb.ChannelUserInfo) *GetChannelUserOu
 	resp := &GetChannelUserOutput{
 		ID:             channel_user.Id,
 		ChannelMisesid: channel_user.ChannelMisesid,
-		User:           BuildUserSummaryResp(channel_user.User),
+		User:           BuildAirdropSvcUserSummaryResp(channel_user.User),
 		AirdropState:   channel_user.AirdropState,
 		ValidState:     channel_user.ValidState,
 		CreatedAt:      time.Unix(int64(channel_user.CreatedAt), 0),
@@ -93,7 +93,7 @@ func PageChannelUser(c echo.Context) error {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
 
-	grpcsvc, ctx, err := rest.GrpcSocialService()
+	grpcsvc, ctx, err := rest.GrpcAirdropService()
 	if err != nil {
 		return err
 	}
@@ -108,16 +108,12 @@ func PageChannelUser(c echo.Context) error {
 		return err
 	}
 
-	return rest.BuildSuccessRespWithPage(c, BuildChannelUserSliceResp(svcresp.ChannelUsers), svcresp.Paginator)
+	return rest.BuildSuccessRespWithAirdropPage(c, BuildChannelUserSliceResp(svcresp.ChannelUsers), svcresp.Paginator)
 }
 
 func GetChannelUser(c echo.Context) error {
-	/* params := &GetChannelUserInput{}
-	if err := c.Bind(params); err != nil {
-		return err
-	} */
 	misesid := c.Param("misesid")
-	grpcsvc, ctx, err := rest.GrpcSocialService()
+	grpcsvc, ctx, err := rest.GrpcAirdropService()
 	if err != nil {
 		return err
 	}
@@ -134,7 +130,7 @@ func ChannelInfo(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return err
 	}
-	grpcsvc, ctx, err := rest.GrpcSocialService()
+	grpcsvc, ctx, err := rest.GrpcAirdropService()
 	if err != nil {
 		return err
 	}

@@ -17,15 +17,15 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3
-	github.com/mises-id/sns-socialsvc v0.0.0-20221121024704-401393947c2e
+	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
-	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.7.0
+	github.com/sirupsen/logrus v1.9.0
+	github.com/stretchr/testify v1.8.1
 	github.com/tendermint/tendermint v0.34.16
 	github.com/urfave/cli v1.22.5
-	go.mongodb.org/mongo-driver v1.10.2
+	go.mongodb.org/mongo-driver v1.11.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.51.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
-	github.com/btcsuite/btcd/btcec/v2 v2.1.2 // indirect
+	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/confio/ics23/go v0.6.6 // indirect
@@ -49,7 +49,7 @@ require (
 	github.com/cosmos/iavl v0.17.3 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/cosmos/ledger-go v0.9.2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/danieljoos/wincred v1.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
@@ -60,7 +60,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/dvsekhvalnov/jose2go v0.0.0-20200901110807-248326c1351b // indirect
 	github.com/ebfe/keccak v0.0.0-20150115210727-5cc570678d1b // indirect
-	github.com/ethereum/go-ethereum v1.10.17 // indirect
+	github.com/ethereum/go-ethereum v1.10.26 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
@@ -104,9 +104,10 @@ require (
 	github.com/metaverse/truss v0.3.1 // indirect
 	github.com/michimani/gotwi v0.10.0 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20181016162300-f8f6d4d2b643 // indirect
+	github.com/mises-id/mises-airdropsvc v0.0.0-20221130054556-d620ec688270
 	github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 // indirect
 	github.com/mises-id/sdk v0.0.0-20221108052606-a5196f11407d // indirect
-	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220623061854-3cb69fa867f2 // indirect
+	github.com/mises-id/sns-storagesvc/sdk v0.0.0-20220920081129-d682f954bf94 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
@@ -136,7 +137,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.10.1 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
@@ -164,7 +165,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
