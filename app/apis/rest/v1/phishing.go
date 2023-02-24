@@ -19,6 +19,7 @@ type (
 	}
 	VerifyContractParams struct {
 		Address string `json:"address" query:"address"`
+		DomainName string `json:"domain" query:"domain"`
 	}
 	VerifyContractResp struct {
 		Address         string `json:"address" bson:"address"`
@@ -69,6 +70,7 @@ func VerifyContract(c echo.Context) error {
 	}
 	svcresp, err := grpcsvc.VerifyContract(ctx, &pb.VerifyContractRequest{
 		Address: params.Address,
+		DomainName: params.DomainName,
 	})
 	if err != nil {
 		return err

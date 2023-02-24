@@ -16,7 +16,7 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.10.0
-	github.com/mises-id/mises-websitesvc v0.0.0-20230208065900-341fc14af6e2
+	github.com/mises-id/mises-websitesvc v0.0.0-20230216080809-bfe5cecf2074
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
 	github.com/sirupsen/logrus v1.9.0
