@@ -38,7 +38,7 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/extensions_category/list", v1.ListExtensionsCategory)
 	groupV1.GET("/extensions/page", v1.PageExtensions)
 	//phishing
-	groupV1.GET("/phishing_site/check", v1.PhishingCheck)
+	groupV1.POST("/phishing_site/check", v1.PhishingCheck)
 	groupV1.GET("/web3safe/verify_contract", v1.VerifyContract)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 

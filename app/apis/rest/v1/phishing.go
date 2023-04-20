@@ -9,13 +9,19 @@ import (
 
 type (
 	PhishingSiteParams struct {
-		DomainName string `json:"domain_name" query:"domain_name"`
+		DomainName string `json:"domain" query:"domain"`
+		Logo string `json:"logo" query:"logo"`
+		Content string `json:"content"`
 	}
 	PhishingSiteResp struct {
-		DomainName string `json:"domain_name"`
-		Type       int64  `json:"type"`
-		TypeString string `json:"type_string"`
-		Origin     string `json:"origin"`
+		DomainName string `json:"domain"`
+		Level string `json:"level"`
+		SuggestedUrl     string `json:"suggested_url"`
+		HtmlBodyFuzzyHash     string `json:"html_body_fuzzy_hash"`
+		LogoPhash string `json:"logo_phash"`
+		TitleKeyword string `json:"title_keyword"`
+		Tag string `json:"tag"`
+		HtmlTextSimhash string `json:"html_text_simhash"`
 	}
 	VerifyContractParams struct {
 		Address string `json:"address" query:"address"`
@@ -39,6 +45,8 @@ func PhishingCheck(c echo.Context) error {
 	}
 	svcresp, err := grpcsvc.PhishingCheck(ctx, &pb.PhishingCheckRequest{
 		DomainName: params.DomainName,
+		Logo:params.Logo,
+		Content:params.Content,
 	})
 	if err != nil {
 		return err
@@ -52,9 +60,13 @@ func BuildPhishingSiteResp(data *pb.PhishingCheckResponse) *PhishingSiteResp {
 	}
 	resp := &PhishingSiteResp{
 		DomainName: data.DomainName,
-		Type:       int64(data.Type),
-		TypeString: data.TypeString,
-		Origin:     data.Origin,
+		Level: data.Level,
+		SuggestedUrl: data.SuggestedUrl,
+		HtmlBodyFuzzyHash: data.HtmlBodyFuzzyHash,
+		LogoPhash: data.LogoPhash,
+		TitleKeyword: data.TitleKeyword,
+		Tag: data.Tag,
+		HtmlTextSimhash: data.HtmlTextSimhash,
 	}
 	return resp
 }
