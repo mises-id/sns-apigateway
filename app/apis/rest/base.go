@@ -56,6 +56,27 @@ func BuildSuccessResp(c echo.Context, data interface{}) error {
 	})
 }
 
+func BuildSuccessRespWithRequestID(c echo.Context, requestID string, data interface{}) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code":       0,
+		"data":       data,
+		"request_id": requestID,
+	})
+}
+func BuildSuccessRespWithWebsitePageAndRequestID(c echo.Context, requestID string, data interface{}, pagination *websitesvcpb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code":       0,
+		"data":       data,
+		"request_id": requestID,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
+		},
+	})
+}
+
 // BuildSuccessResp return a success response with payload
 func BuildSuccessRespWithPagination(c echo.Context, data interface{}, pagination *pb.PageQuick) error {
 	return c.JSON(http.StatusOK, echo.Map{

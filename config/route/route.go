@@ -90,6 +90,14 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/mises/gasprices", v1.GasPrices)
 	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
+	//swap
+	groupV1.GET("/swap/order/:from_address", v1.PageSwapOrder)
+	groupV1.GET("/swap/order/:from_address/:tx_hash", v1.FindSwapOrder)
+	groupV1.GET("/swap/approve/allowance", v1.GetSwapApproveAllowance)
+	groupV1.GET("/swap/approve/transaction", v1.ApproveSwapTransaction)
+	groupV1.GET("/swap/trades", v1.SwapTrades)
+	groupV1.GET("/swap/quote", v1.SwapQuote)
+	groupV1.GET("/swap/token/list", v1.ListTokens)
 
 	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
 		Rate:      0.00001,
