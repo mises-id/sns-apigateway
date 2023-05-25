@@ -17,7 +17,7 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-swapsvc v0.0.0-20230523034458-1911b2d69bf9
-	github.com/mises-id/mises-websitesvc v0.0.0-20221017024738-6ab49e3b70c3
+	github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
 	github.com/sirupsen/logrus v1.9.0
@@ -150,7 +150,7 @@ require (
 	github.com/tendermint/tm-db v0.6.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.31.0 // indirect
-	github.com/valyala/fasttemplate v1.2.1 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
@@ -163,13 +163,13 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/term v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
-	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
+	golang.org/x/time v0.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect

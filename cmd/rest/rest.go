@@ -41,8 +41,19 @@ func Start(ctx context.Context) error {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderXRequestedWith, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "mises-device-id", "User-Wallet-Address"},
 	}))
 	route.SetRoutes(e)
-	p := prometheus.NewPrometheus("echo", urlSkipper)
-	p.Use(e)
+	/* p := prometheus.NewPrometheus("echo", urlSkipper)
+	p.Use(e) */
+	// Create Prometheus server and Middleware
+	echoPrometheus := echo.New()
+	echoPrometheus.HideBanner = true
+	prom := prometheus.NewPrometheus("echo", nil)
+
+	// Scrape metrics from Main Server
+	e.Use(prom.HandlerFunc)
+	// Setup metrics endpoint at another server
+	prom.SetMetricsPath(echoPrometheus)
+
+	go func() { echoPrometheus.Logger.Fatal(echoPrometheus.Start(":8360")) }()
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", env.Envs.Port)); err != nil {
 			log.Fatal(err)
