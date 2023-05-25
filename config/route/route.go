@@ -13,7 +13,7 @@ import (
 
 // SetRoutes sets the routes of echo http server
 func SetRoutes(e *echo.Echo) {
-	e.Static("/", "assets")
+	//e.Static("/", "assets")
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
@@ -33,9 +33,13 @@ func SetRoutes(e *echo.Echo) {
 	//website
 	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
 	groupV1.GET("/website/page", v1.PageWebsite)
+	groupV1.GET("/website/search", v1.SearchWebsite)
 	//extension
 	groupV1.GET("/extensions_category/list", v1.ListExtensionsCategory)
 	groupV1.GET("/extensions/page", v1.PageExtensions)
+	//phishing
+	groupV1.POST("/phishing_site/check", v1.PhishingCheck)
+	groupV1.GET("/web3safe/verify_contract", v1.VerifyContract)
 	userGroup := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 
 	userGroup.POST("/upload", v1.UploadFile, middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
@@ -100,8 +104,8 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/swap/token/list", v1.ListTokens)
 
 	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
-		Rate:      0.00001,
-		Burst:     5,
+		Rate:      0.0001,
+		Burst:     10,
 		ExpiresIn: 24 * time.Hour,
 	})
 	rateConfig := middleware.RateLimiterConfig{

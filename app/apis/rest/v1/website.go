@@ -31,6 +31,10 @@ type (
 		WebSiteCategory   *WebsiteCategoryResp `json:"website_category"`
 		Subcategory       *WebsiteCategoryResp `json:"subcategory"`
 	}
+
+	WebsiteSearchParams struct {
+		Keywords string `json:"keywords" query:"keywords"`
+	}
 )
 
 func PageWebsite(c echo.Context) error {
@@ -57,6 +61,26 @@ func PageWebsite(c echo.Context) error {
 	}
 	return rest.BuildSuccessRespWithWebsitePage(c, BuildWebsiteSliceResp(svcresp.Data), svcresp.Paginator)
 }
+
+func SearchWebsite(c echo.Context) error {
+	params := &WebsiteSearchParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.WebsiteSearch(ctx, &pb.WebsiteSearchRequest{
+		Type:     "web3",
+		Keywords: params.Keywords,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, BuildWebsiteSliceResp(svcresp.Data))
+}
+
 func PageExtensions(c echo.Context) error {
 	params := &WebsiteParams{}
 	if err := c.Bind(params); err != nil {
