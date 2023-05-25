@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-	pb "github.com/mises-id/mises-websitesvc/proto"
+	pb "github.com/mises-id/mises-swapsvc/proto"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
 )
@@ -34,12 +34,13 @@ type (
 	}
 	SwapTradeRequest struct {
 		SwapPublicRequest
-		Amount           string  `json:"amount" query:"amount"`
-		FromTokenAddress string  `json:"from_token_address" query:"from_token_address"`
-		ToTokenAddress   string  `json:"to_token_address" query:"to_token_address"`
-		FromAddress      string  `json:"from_address" query:"from_address"`
-		DestReceiver     string  `json:"dest_receiver" query:"dest_receiver"`
-		Slippage         float32 `json:"slippage" query:"slippage"`
+		Amount            string  `json:"amount" query:"amount"`
+		FromTokenAddress  string  `json:"from_token_address" query:"from_token_address"`
+		ToTokenAddress    string  `json:"to_token_address" query:"to_token_address"`
+		FromAddress       string  `json:"from_address" query:"from_address"`
+		DestReceiver      string  `json:"dest_receiver" query:"dest_receiver"`
+		Slippage          float32 `json:"slippage" query:"slippage"`
+		AggregatorAddress string  `json:"aggregator_address" query:"aggregator_address"`
 	}
 	SwapQuoteRequest struct {
 		SwapPublicRequest
@@ -150,7 +151,7 @@ func PageSwapOrder(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
@@ -166,7 +167,7 @@ func PageSwapOrder(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessRespWithWebsitePageAndRequestID(c, params.RequestID, BuildSwapOrderSliceResp(svcresp.Data), svcresp.Paginator)
+	return rest.BuildSuccessRespWithSwapPage(c, params.RequestID, BuildSwapOrderSliceResp(svcresp.Data), svcresp.Paginator)
 }
 
 func FindSwapOrder(c echo.Context) error {
@@ -174,7 +175,7 @@ func FindSwapOrder(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
@@ -196,7 +197,7 @@ func ListTokens(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
@@ -215,7 +216,7 @@ func GetSwapApproveAllowance(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
@@ -237,7 +238,7 @@ func ApproveSwapTransaction(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
@@ -258,30 +259,55 @@ func SwapTrades(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
 	svcresp, err := grpcsvc.SwapTrades(ctx, &pb.SwapTradesRequest{
-		ChainID:          params.ChainID,
-		FromTokenAddress: params.FromTokenAddress,
-		ToTokenAddress:   params.ToTokenAddress,
-		FromAddress:      params.FromAddress,
-		DestReceiver:     params.DestReceiver,
-		Amount:           params.Amount,
-		Slippage:         params.Slippage,
+		ChainID:           params.ChainID,
+		FromTokenAddress:  params.FromTokenAddress,
+		ToTokenAddress:    params.ToTokenAddress,
+		FromAddress:       params.FromAddress,
+		DestReceiver:      params.DestReceiver,
+		Amount:            params.Amount,
+		Slippage:          params.Slippage,
+		AggregatorAddress: params.AggregatorAddress,
 	})
 	if err != nil {
 		return err
 	}
 	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapTradeSlice(svcresp.Data))
 }
+func SwapTrade(c echo.Context) error {
+	params := &SwapTradeRequest{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcSwapService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.SwapTrade(ctx, &pb.SwapTradeRequest{
+		ChainID:           params.ChainID,
+		FromTokenAddress:  params.FromTokenAddress,
+		ToTokenAddress:    params.ToTokenAddress,
+		FromAddress:       params.FromAddress,
+		DestReceiver:      params.DestReceiver,
+		Amount:            params.Amount,
+		Slippage:          params.Slippage,
+		AggregatorAddress: params.AggregatorAddress,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapTradeInfo(svcresp.Data))
+}
 func SwapQuote(c echo.Context) error {
 	params := &SwapQuoteRequest{}
 	if err := c.Bind(params); err != nil {
 		return codes.ErrInvalidArgument.New("invalid query params")
 	}
-	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}

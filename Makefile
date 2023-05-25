@@ -21,3 +21,14 @@ deploy-backup: build \
 	upload-backup \
 	replace-backup \
 	restart-backup
+#mises-master
+upload-master:
+	scp ./main mises_master:/apps/sns-apigateway/
+replace-master:
+	ssh mises_master "mv /apps/sns-apigateway/main /apps/sns-apigateway/sns-apigateway"
+restart-master:
+	ssh mises_master "sudo supervisorctl restart apigateway"
+deploy-master: build \
+	upload-master \
+	replace-master \
+	restart-master
