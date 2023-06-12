@@ -177,7 +177,7 @@ func ListUserStatus(c echo.Context) error {
 	return rest.BuildSuccessRespWithPagination(c, BuildStatusRespSlice(svcresp.Statuses), svcresp.Paginator)
 }
 
-//list status
+// list status
 func ListStatus(c echo.Context) error {
 
 	params := &ListStatusParams{}

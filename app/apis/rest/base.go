@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	airdropsvcpb "github.com/mises-id/mises-airdropsvc/proto"
 	airdropsvcgrpcclient "github.com/mises-id/mises-airdropsvc/svc/client/grpc"
+	swapvcpb "github.com/mises-id/mises-swapsvc/proto"
+	swapsvcgrpcclient "github.com/mises-id/mises-swapsvc/svc/client/grpc"
 	websitesvcpb "github.com/mises-id/mises-websitesvc/proto"
 	websitesvcgrpcclient "github.com/mises-id/mises-websitesvc/svc/client/grpc"
 	pb "github.com/mises-id/sns-socialsvc/proto"
@@ -25,6 +27,7 @@ var (
 	storageSvcPool *grpcpool.Pool
 	websiteSvcPool *grpcpool.Pool
 	airdropSvcPool *grpcpool.Pool
+	swapSvcPool    *grpcpool.Pool
 	store          sync.Map
 )
 
@@ -33,6 +36,7 @@ type PoolCfg struct {
 	StorageSvcURI string
 	WebsiteSvcURI string
 	AirdropSvcURI string
+	SwapSvcURI    string
 	Capacity      int
 	IdleTimeout   time.Duration
 }
@@ -53,6 +57,40 @@ func BuildSuccessResp(c echo.Context, data interface{}) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"code": 0,
 		"data": data,
+	})
+}
+
+func BuildSuccessRespWithRequestID(c echo.Context, requestID string, data interface{}) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code":       0,
+		"data":       data,
+		"request_id": requestID,
+	})
+}
+func BuildSuccessRespWithWebsitePageAndRequestID(c echo.Context, requestID string, data interface{}, pagination *websitesvcpb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code":       0,
+		"data":       data,
+		"request_id": requestID,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
+		},
+	})
+}
+func BuildSuccessRespWithSwapPage(c echo.Context, requestID string, data interface{}, pagination *swapvcpb.Page) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code":       0,
+		"data":       data,
+		"request_id": requestID,
+		"pagination": PageParams{
+			PageNum:      int64(pagination.PageNum),
+			PageSize:     int64(pagination.PageSize),
+			TotalRecords: int64(pagination.TotalRecords),
+			TotalPage:    int64(pagination.TotalPage),
+		},
 	})
 }
 
@@ -173,6 +211,19 @@ func GrpcWebsiteService() (websitesvcpb.WebsitesvcServer, context.Context, error
 	svcclient, err := websitesvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
+func GrpcSwapService() (swapvcpb.SwapsvcServer, context.Context, error) {
+	conn, err := swapSvcPool.Get(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create grpcclient: %q", err)
+	}
+	defer conn.Close()
+
+	// Create a context with the header key and value
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	svcclient, err := swapsvcgrpcclient.New(conn.ClientConn)
+	return svcclient, ctx, err
+}
 func GrpcAirdropService() (airdropsvcpb.AirdropsvcServer, context.Context, error) {
 	conn, err := airdropSvcPool.Get(context.Background())
 	if err != nil {
@@ -210,11 +261,15 @@ func ResetSvrPool(cfg PoolCfg) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.AirdropSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+	swapSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		println("grpcpool", "new connection created")
+		return grpc.DialContext(ctx, cfg.SwapSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func init() {
-	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", 1, 60})
+	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", 1, 60})
 }

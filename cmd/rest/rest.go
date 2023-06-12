@@ -31,14 +31,14 @@ func Start(ctx context.Context) error {
 		Skipper: func(c echo.Context) bool { return c.Path() == "/" },
 		Format: `{"timestamp":"${time_rfc3339}","serviceContext":{"service":"mises-sns"},"message":"${remote_ip} ${status} ${method} ${uri}",` +
 			`"severity":"INFO","context":{"request_id":"${id}","remote_ip":"${remote_ip}","host":"${host}","method":"${method}","uri":"${uri}",` +
-			`"user_agent":"${user_agent}","status":"${status}","error":"${error}","latency_human":"${latency_human}","device_id":"${header:mises-device-id}"}}` + "\n",
+			`"user_agent":"${user_agent}","status":"${status}","error":"${error}","latency_human":"${latency_human}","device_id":"${header:mises-device-id}","user_wallet_address":"${header:User-Wallet-Address}"}}` + "\n",
 	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: strings.Split(env.Envs.AllowOrigins, ","),
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodDelete, http.MethodOptions, http.MethodPut, http.MethodPost, http.MethodDelete, http.MethodPatch},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderXRequestedWith, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "mises-device-id"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderXRequestedWith, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "mises-device-id", "User-Wallet-Address"},
 	}))
 	route.SetRoutes(e)
 	/* p := prometheus.NewPrometheus("echo", urlSkipper)

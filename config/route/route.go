@@ -16,6 +16,7 @@ func SetRoutes(e *echo.Echo) {
 	//e.Static("/", "assets")
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
+	e.GET("/health/swap", v1.SwapHealth)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	groupOpensea := e.Group("/api/v1", middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(4)), mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 	groupV1.GET("/user/:uid", v1.FindUser)
@@ -94,18 +95,84 @@ func SetRoutes(e *echo.Echo) {
 
 	groupV1.GET("/mises/gasprices", v1.GasPrices)
 	groupV1.GET("/mises/chaininfo", v1.ChainInfo)
-
 	storeC := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
 		Rate:      0.0001,
-		Burst:     10,
-		ExpiresIn: 24 * time.Hour,
+		Burst:     20,
+		ExpiresIn: 1 * time.Hour,
 	})
 	rateConfig := middleware.RateLimiterConfig{
 		Store:       storeC,
 		DenyHandler: mw.ErrTooManyRequestFunc,
 	}
+	//swap
+	swapRateConfigCommon := getSwapRateConfigCommon()
+	swapRateConfiWithUserWalletAddress := getSwapRateConfigWithUserWalletAddress()
+	swapCommonRateLimiter := middleware.RateLimiterWithConfig(swapRateConfigCommon)
+	swapRateLimiterWithUserWalletAddress := middleware.RateLimiterWithConfig(swapRateConfiWithUserWalletAddress)
+	swapGroup := e.Group("/api/v1", swapCommonRateLimiter, swapRateLimiterWithUserWalletAddress, mw.ErrorResponseMiddleware)
+	swapGroup.GET("/swap/order/:from_address", v1.PageSwapOrder)
+	swapGroup.GET("/swap/order/:from_address/:tx_hash", v1.FindSwapOrder)
+	swapGroup.GET("/swap/approve/allowance", v1.GetSwapApproveAllowance)
+	swapGroup.GET("/swap/approve/transaction", v1.ApproveSwapTransaction)
+	swapGroup.GET("/swap/trade", v1.SwapTrade)
+	swapGroup.GET("/swap/quote", v1.SwapQuote)
+	swapGroup.GET("/swap/token/list", v1.ListTokens, middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+	}))
+
 	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl, middleware.RateLimiterWithConfig(rateConfig))
 	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
 	userGroup.GET("/airdrop/info", v1.AirdropInfo)
 	userGroup.POST("/airdrop/receive", v1.ReceiveAirdrop)
+}
+
+func getSwapRateConfigCommon() middleware.RateLimiterConfig {
+	swapCommonStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      100,
+		Burst:     1000,
+		ExpiresIn: 1 * time.Minute,
+	})
+	swapRateConfigCommon := middleware.RateLimiterConfig{
+		Store:       swapCommonStore,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+		IdentifierExtractor: func(ctx echo.Context) (string, error) {
+			id := ctx.RealIP() + ctx.Path()
+			return id, nil
+		},
+		Skipper: func(c echo.Context) bool {
+			userWalletAddress := getgUserWalletAddress(c)
+			if userWalletAddress != "" {
+				return true
+			}
+			return false
+		},
+	}
+	return swapRateConfigCommon
+}
+func getSwapRateConfigWithUserWalletAddress() middleware.RateLimiterConfig {
+	swapStoreWithUserWalletAddress := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      5,
+		Burst:     60,
+		ExpiresIn: 1 * time.Minute,
+	})
+	swapRateConfigWithUserWalletAddress := middleware.RateLimiterConfig{
+		Store:       swapStoreWithUserWalletAddress,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			id := getgUserWalletAddress(c) + c.Path()
+			return id, nil
+		},
+		Skipper: func(c echo.Context) bool {
+			userWalletAddress := getgUserWalletAddress(c)
+			if userWalletAddress == "" {
+				return true
+			}
+			return false
+		},
+	}
+	return swapRateConfigWithUserWalletAddress
+}
+
+func getgUserWalletAddress(c echo.Context) string {
+	return c.Request().Header.Get("User-Wallet-Address")
 }
