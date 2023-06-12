@@ -16,6 +16,7 @@ func SetRoutes(e *echo.Echo) {
 	//e.Static("/", "assets")
 	e.GET("/", rest.Probe)
 	e.GET("/healthz", rest.Probe)
+	e.GET("/health/swap", v1.SwapHealth)
 	groupV1 := e.Group("/api/v1", mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	groupOpensea := e.Group("/api/v1", middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(4)), mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
 	groupV1.GET("/user/:uid", v1.FindUser)
@@ -108,15 +109,16 @@ func SetRoutes(e *echo.Echo) {
 	swapRateConfiWithUserWalletAddress := getSwapRateConfigWithUserWalletAddress()
 	swapCommonRateLimiter := middleware.RateLimiterWithConfig(swapRateConfigCommon)
 	swapRateLimiterWithUserWalletAddress := middleware.RateLimiterWithConfig(swapRateConfiWithUserWalletAddress)
-	swapGroup := e.Group("/api/v1", swapCommonRateLimiter, swapRateLimiterWithUserWalletAddress)
+	swapGroup := e.Group("/api/v1", swapCommonRateLimiter, swapRateLimiterWithUserWalletAddress, mw.ErrorResponseMiddleware)
 	swapGroup.GET("/swap/order/:from_address", v1.PageSwapOrder)
 	swapGroup.GET("/swap/order/:from_address/:tx_hash", v1.FindSwapOrder)
 	swapGroup.GET("/swap/approve/allowance", v1.GetSwapApproveAllowance)
 	swapGroup.GET("/swap/approve/transaction", v1.ApproveSwapTransaction)
-	swapGroup.GET("/swap/trades", v1.SwapTrades)
 	swapGroup.GET("/swap/trade", v1.SwapTrade)
 	swapGroup.GET("/swap/quote", v1.SwapQuote)
-	swapGroup.GET("/swap/token/list", v1.ListTokens)
+	swapGroup.GET("/swap/token/list", v1.ListTokens, middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+	}))
 
 	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl, middleware.RateLimiterWithConfig(rateConfig))
 	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)

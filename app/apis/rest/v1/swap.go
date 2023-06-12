@@ -63,6 +63,7 @@ type (
 		Symbol   string `json:"symbol"`
 		Price    string `json:"-"`
 		Value    string `json:"-"`
+		ChainID  uint64 `json:"chain_id"`
 	}
 	Transaction struct {
 		Hash        string `json:"hash"`
@@ -254,29 +255,16 @@ func ApproveSwapTransaction(c echo.Context) error {
 	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildApproveTransaction(svcresp))
 }
 
-func SwapTrades(c echo.Context) error {
-	params := &SwapTradeRequest{}
-	if err := c.Bind(params); err != nil {
-		return codes.ErrInvalidArgument.New("invalid query params")
-	}
+func SwapHealth(c echo.Context) error {
 	grpcsvc, ctx, err := rest.GrpcSwapService()
 	if err != nil {
 		return err
 	}
-	svcresp, err := grpcsvc.SwapTrades(ctx, &pb.SwapTradesRequest{
-		ChainID:           params.ChainID,
-		FromTokenAddress:  params.FromTokenAddress,
-		ToTokenAddress:    params.ToTokenAddress,
-		FromAddress:       params.FromAddress,
-		DestReceiver:      params.DestReceiver,
-		Amount:            params.Amount,
-		Slippage:          params.Slippage,
-		AggregatorAddress: params.AggregatorAddress,
-	})
+	_, err = grpcsvc.Health(ctx, &pb.HealthRequest{})
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapTradeSlice(svcresp.Data))
+	return rest.BuildSuccessResp(c, nil)
 }
 func SwapTrade(c echo.Context) error {
 	params := &SwapTradeRequest{}
@@ -503,6 +491,7 @@ func NewToken(data *pb.Token) *Token {
 		LogoUri:  data.LogoUri,
 		Decimals: data.Decimals,
 		Symbol:   data.Symbol,
+		ChainID:  data.ChainID,
 	}
 	resp.Name = data.Name
 	return &resp
