@@ -122,7 +122,7 @@ type (
 	ApproveSwapTransactionResponse struct {
 		Data     string `json:"data"`
 		To       string `json:"to"`
-		GasPrice string `json:"gas_rice"`
+		GasPrice string `json:"gas_price"`
 		Value    string `json:"value"`
 	}
 	SwapQuoteInfo struct {
