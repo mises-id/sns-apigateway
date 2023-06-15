@@ -122,7 +122,7 @@ type (
 	ApproveSwapTransactionResponse struct {
 		Data     string `json:"data"`
 		To       string `json:"to"`
-		GasPrice string `json:"gas_rice"`
+		GasPrice string `json:"gas_price"`
 		Value    string `json:"value"`
 	}
 	SwapQuoteInfo struct {
@@ -135,6 +135,12 @@ type (
 		Error            string      `json:"error"`
 		FetchTime        int64       `json:"fetch_time"`
 		Fee              float32     `json:"fee"`
+		ComparePercent   float32     `json:"compare_percent"`
+	}
+	SwapQuoteResponse struct {
+		BestQuote *SwapQuoteInfo   `json:"best_quote“`
+		Error     string           `json:"error"`
+		AllQuote  []*SwapQuoteInfo `json:"all_quote"`
 	}
 )
 
@@ -308,7 +314,19 @@ func SwapQuote(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapQuoteSlice(svcresp.Data))
+	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapQuoteResponse(svcresp))
+}
+
+func buildSwapQuoteResponse(data *pb.SwapQuoteResponse) *SwapQuoteResponse {
+	if data == nil {
+		return nil
+	}
+	resp := &SwapQuoteResponse{
+		BestQuote: buildSwapQuoteInfo(data.BestQuote),
+		AllQuote:  buildSwapQuoteSlice(data.AllQuote),
+		Error:     data.Error,
+	}
+	return resp
 }
 
 func buildSwapQuoteSlice(data []*pb.SwapQuoteInfo) []*SwapQuoteInfo {
@@ -332,6 +350,7 @@ func buildSwapQuoteInfo(data *pb.SwapQuoteInfo) *SwapQuoteInfo {
 		Fee:              data.Fee,
 		EstimateGasFee:   data.EstimateGasFee,
 		Error:            data.Error,
+		ComparePercent:   data.ComparePercent,
 	}
 	if data.Aggregator != nil {
 		resp.Aggregator = &Aggregator{
