@@ -59,7 +59,8 @@ const (
 	NotFoundCode            = 404000
 	UnprocessableEntityCode = 422000
 	UsernameDuplicateCode   = 422001
-	TooManyRequestCode      = 422001
+	TooManyRequestCode      = 429001
+	RequestTimeoutCode      = 408001
 	InternalCode            = 500000
 	UnimplementedCode       = 500001
 )
@@ -79,6 +80,7 @@ var (
 	ErrUnprocessableEntity = Code{HTTPStatus: http.StatusUnprocessableEntity, Code: UnprocessableEntityCode, Msg: "unprocessable entity"}
 	ErrUsernameDuplicate   = Code{HTTPStatus: http.StatusUnprocessableEntity, Code: UsernameDuplicateCode, Msg: "username duplicate"}
 	ErrTooManyRequest      = Code{HTTPStatus: http.StatusTooManyRequests, Code: TooManyRequestCode, Msg: "too many requests"}
+	ErrRequestTimeoutCode  = Code{HTTPStatus: http.StatusRequestTimeout, Code: RequestTimeoutCode, Msg: "request timeout"}
 	ErrInternal            = Code{HTTPStatus: http.StatusInternalServerError, Code: InternalCode, Msg: "Unknown error"}
 	ErrUnimplemented       = Code{HTTPStatus: http.StatusInternalServerError, Code: InternalCode, Msg: "Unknown error"}
 )
