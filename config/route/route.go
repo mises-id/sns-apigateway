@@ -116,6 +116,7 @@ func SetRoutes(e *echo.Echo) {
 	swapGroup.GET("/swap/approve/transaction", v1.ApproveSwapTransaction)
 	swapGroup.GET("/swap/trade", v1.SwapTrade)
 	swapGroup.GET("/swap/quote", v1.SwapQuote)
+	swapGroup.POST("/swap/wallets_and_tokens", v1.WalletsAndTokens)
 	swapGroup.GET("/swap/token/list", v1.ListTokens, middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5,
 	}))

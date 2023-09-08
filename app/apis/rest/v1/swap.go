@@ -123,6 +123,7 @@ type (
 		Data     string `json:"data"`
 		To       string `json:"to"`
 		GasPrice string `json:"gas_price"`
+		GasLimit string `json:"gas_limit"`
 		Value    string `json:"value"`
 	}
 	SwapQuoteInfo struct {
@@ -135,7 +136,20 @@ type (
 		Error            string      `json:"error"`
 		FetchTime        int64       `json:"fetch_time"`
 		Fee              float32     `json:"fee"`
+		ComparePercent   float32     `json:"compare_percent"`
 	}
+	SwapQuoteResponse struct {
+		BestQuote *SwapQuoteInfo   `json:"best_quote"`
+		Error     string           `json:"error"`
+		AllQuote  []*SwapQuoteInfo `json:"all_quote"`
+	}
+	WalletsAndTokensRequest struct {
+		ChainID uint64
+		Wallets []string
+		Tokens  []string
+	}
+
+	WalletsAndTokensResponse *map[string]map[string]string
 )
 
 func GetChainIDParam(c echo.Context) (uint64, error) {
@@ -308,7 +322,19 @@ func SwapQuote(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapQuoteSlice(svcresp.Data))
+	return rest.BuildSuccessRespWithRequestID(c, params.RequestID, buildSwapQuoteResponse(svcresp))
+}
+
+func buildSwapQuoteResponse(data *pb.SwapQuoteResponse) *SwapQuoteResponse {
+	if data == nil {
+		return nil
+	}
+	resp := &SwapQuoteResponse{
+		BestQuote: buildSwapQuoteInfo(data.BestQuote),
+		AllQuote:  buildSwapQuoteSlice(data.AllQuote),
+		Error:     data.Error,
+	}
+	return resp
 }
 
 func buildSwapQuoteSlice(data []*pb.SwapQuoteInfo) []*SwapQuoteInfo {
@@ -332,6 +358,7 @@ func buildSwapQuoteInfo(data *pb.SwapQuoteInfo) *SwapQuoteInfo {
 		Fee:              data.Fee,
 		EstimateGasFee:   data.EstimateGasFee,
 		Error:            data.Error,
+		ComparePercent:   data.ComparePercent,
 	}
 	if data.Aggregator != nil {
 		resp.Aggregator = &Aggregator{
@@ -394,6 +421,7 @@ func buildApproveTransaction(data *pb.ApproveSwapTransactionResponse) *ApproveSw
 		To:       data.To,
 		GasPrice: data.GasPrice,
 		Value:    data.Value,
+		GasLimit: data.GasLimit,
 	}
 	return resp
 }
@@ -494,5 +522,37 @@ func NewToken(data *pb.Token) *Token {
 		ChainID:  data.ChainID,
 	}
 	resp.Name = data.Name
+	return &resp
+}
+
+func WalletsAndTokens(c echo.Context) error {
+	params := &WalletsAndTokensRequest{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcSwapService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.WalletsAndTokens(ctx, &pb.WalletsAndTokensRequest{
+		ChainID: params.ChainID,
+		Wallets: params.Wallets,
+		Tokens:  params.Tokens,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, buildWalletsAndTokens(svcresp))
+}
+
+func buildWalletsAndTokens(in *pb.WalletsAndTokensResponse) WalletsAndTokensResponse {
+	var defaultResponse WalletsAndTokensResponse = &map[string]map[string]string{}
+	if in == nil {
+		return defaultResponse
+	}
+	resp := map[string]map[string]string{}
+	for k, v := range in.Data {
+		resp[k] = v.Token
+	}
 	return &resp
 }
