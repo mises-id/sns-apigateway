@@ -131,6 +131,28 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/ad_mining/estimate_bonus", v1.EstimateAdBonus)
 	groupV1.GET("/mb_airdrop/user/:misesid", v1.FindMBAirdropUser)
 	groupV1.GET("/mb_airdrop/claim", v1.ClaimMBAirdrop)
+	groupV1.GET("/mining/config", v1.GeMiningConfig)
+	userGroup.GET("/mining/bonus", v1.GetBonus)
+	redeemBonusRateConfigWithUser := middleware.RateLimiterWithConfig(getRedeemBonusRateConfigWithUser())
+	userGroup.POST("/mining/redeem_bonus", v1.RedeemBonus, redeemBonusRateConfigWithUser)
+}
+func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
+
+	redeemBonusRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      1,
+		Burst:     60,
+		ExpiresIn: 1 * time.Minute,
+	})
+	redeemBonusRateConfigWithUser := middleware.RateLimiterConfig{
+		Store:       redeemBonusRateLimitStore,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			id := getCurrentEthAddress(c)
+			return id, nil
+		},
+	}
+
+	return redeemBonusRateConfigWithUser
 }
 
 func getSwapRateConfigCommon() middleware.RateLimiterConfig {
@@ -156,6 +178,7 @@ func getSwapRateConfigCommon() middleware.RateLimiterConfig {
 	}
 	return swapRateConfigCommon
 }
+
 func getSwapRateConfigWithUserWalletAddress() middleware.RateLimiterConfig {
 	swapStoreWithUserWalletAddress := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
 		Rate:      5,
@@ -182,4 +205,11 @@ func getSwapRateConfigWithUserWalletAddress() middleware.RateLimiterConfig {
 
 func getgUserWalletAddress(c echo.Context) string {
 	return c.Request().Header.Get("User-Wallet-Address")
+}
+func getCurrentEthAddress(c echo.Context) string {
+	var currentEthAddress string
+	if c.Get("CurrentEthAddress") != nil {
+		currentEthAddress = c.Get("CurrentEthAddress").(string)
+	}
+	return currentEthAddress
 }
