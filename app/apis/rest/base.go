@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	airdropsvcpb "github.com/mises-id/mises-airdropsvc/proto"
 	airdropsvcgrpcclient "github.com/mises-id/mises-airdropsvc/svc/client/grpc"
+	miningsvcpb "github.com/mises-id/mises-miningsvc/proto"
+	miningsvcgrpcclient "github.com/mises-id/mises-miningsvc/svc/client/grpc"
 	swapvcpb "github.com/mises-id/mises-swapsvc/proto"
 	swapsvcgrpcclient "github.com/mises-id/mises-swapsvc/svc/client/grpc"
 	websitesvcpb "github.com/mises-id/mises-websitesvc/proto"
@@ -28,6 +30,7 @@ var (
 	websiteSvcPool *grpcpool.Pool
 	airdropSvcPool *grpcpool.Pool
 	swapSvcPool    *grpcpool.Pool
+	mingsvcSvcPool *grpcpool.Pool
 	store          sync.Map
 )
 
@@ -37,6 +40,7 @@ type PoolCfg struct {
 	WebsiteSvcURI string
 	AirdropSvcURI string
 	SwapSvcURI    string
+	MiningSvcURI  string
 	Capacity      int
 	IdleTimeout   time.Duration
 }
@@ -224,6 +228,21 @@ func GrpcSwapService() (swapvcpb.SwapsvcServer, context.Context, error) {
 	svcclient, err := swapsvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
+
+func GrpcMiningService() (miningsvcpb.MiningsvcServer, context.Context, error) {
+	conn, err := mingsvcSvcPool.Get(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create grpcclient: %q", err)
+	}
+	defer conn.Close()
+
+	// Create a context with the header key and value
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	svcclient, err := miningsvcgrpcclient.New(conn.ClientConn)
+	return svcclient, ctx, err
+}
+
 func GrpcAirdropService() (airdropsvcpb.AirdropsvcServer, context.Context, error) {
 	conn, err := airdropSvcPool.Get(context.Background())
 	if err != nil {
@@ -245,31 +264,42 @@ func ResetSvrPool(cfg PoolCfg) {
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	socialSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.SocialSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	storageSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.StorageSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	websiteSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.WebsiteSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	airdropSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.AirdropSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	swapSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
 		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.SwapSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
+	mingsvcSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		println("grpcpool", "new connection created")
+		return grpc.DialContext(ctx, cfg.MiningSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	if err != nil {
 		panic(err)
 	}
 }
 
 func init() {
-	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", 1, 60})
+	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", ":3540", 1, 60})
 }

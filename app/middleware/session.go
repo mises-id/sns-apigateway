@@ -18,9 +18,10 @@ var (
 )
 
 type UserSession struct {
-	UID      uint64 `bson:"_id"`
-	Username string `bson:"username,omitempty"`
-	Misesid  string `bson:"misesid,omitempty"`
+	UID        uint64 `bson:"_id"`
+	Username   string `bson:"username,omitempty"`
+	Misesid    string `bson:"misesid,omitempty"`
+	EthAddress string `bson:"eth_address,omitempty"`
 }
 
 func Auth(ctx context.Context, authToken string) (*UserSession, error) {
@@ -35,9 +36,10 @@ func Auth(ctx context.Context, authToken string) (*UserSession, error) {
 	}
 	mapClaims := claim.Claims.(jwt.MapClaims)
 	return &UserSession{
-		UID:      uint64(mapClaims["uid"].(float64)),
-		Misesid:  mapClaims["misesid"].(string),
-		Username: mapClaims["username"].(string),
+		UID:        uint64(mapClaims["uid"].(float64)),
+		Misesid:    mapClaims["misesid"].(string),
+		EthAddress: mapClaims["eth_address"].(string),
+		Username:   mapClaims["username"].(string),
 	}, nil
 }
 

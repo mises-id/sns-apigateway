@@ -42,6 +42,8 @@ var ErrorResponseMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 					err = codes.ErrUsernameExisted
 				case grpccodes.Unavailable:
 					err = codes.ErrInternal
+				case grpccodes.DeadlineExceeded:
+					err = codes.ErrRequestTimeout
 				}
 			}
 
