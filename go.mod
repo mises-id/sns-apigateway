@@ -16,8 +16,8 @@ require (
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
+	github.com/mises-id/mises-miningsvc v0.0.0-20230908061632-02cbf7c7bfd8
 	github.com/mises-id/mises-swapsvc v0.0.0-20230814055413-e9f08887e452
-	github.com/mises-id/mises-miningsvc v0.0.0-20230831053837-74eb04b8d9cb
 	github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94
@@ -192,7 +192,5 @@ replace github.com/cosmos/cosmos-sdk => github.com/mises-id/cosmos-sdk v0.44.6-0
 replace github.com/tendermint/tendermint => github.com/mises-id/tendermint v0.34.15-0.20220317102522-80f09a270501
 
 replace github.com/go-redis/redis/v8 => github.com/mises-id/redis/v8 v8.11.6-0.20220412060519-ab8472510a62
-
-replace github.com/mises-id/mises-miningsvc => ../mises-miningsvc
 
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.6
