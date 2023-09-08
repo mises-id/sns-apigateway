@@ -35,12 +35,16 @@ func Auth(ctx context.Context, authToken string) (*UserSession, error) {
 		return nil, err
 	}
 	mapClaims := claim.Claims.(jwt.MapClaims)
-	return &UserSession{
-		UID:        uint64(mapClaims["uid"].(float64)),
-		Misesid:    mapClaims["misesid"].(string),
-		EthAddress: mapClaims["eth_address"].(string),
-		Username:   mapClaims["username"].(string),
-	}, nil
+	userSession := &UserSession{
+		UID:      uint64(mapClaims["uid"].(float64)),
+		Misesid:  mapClaims["misesid"].(string),
+		Username: mapClaims["username"].(string),
+	}
+	ethAddress, ok := mapClaims["eth_address"].(string)
+	if ok {
+		userSession.EthAddress = ethAddress
+	}
+	return userSession, nil
 }
 
 var SetCurrentUserMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -59,6 +63,7 @@ var SetCurrentUserMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			c.Set("CurrentUser", userSession)
 			c.Set("CurrentUID", userSession.UID)
+			c.Set("CurrentEthAddress", userSession.EthAddress)
 		}
 
 		return next(c)

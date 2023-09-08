@@ -86,6 +86,13 @@ func GetCurrentUID(c echo.Context) uint64 {
 	}
 	return currentUID
 }
+func GetCurrentEthAddress(c echo.Context) string {
+	var currentEthAddress string
+	if c.Get("CurrentEthAddress") != nil {
+		currentEthAddress = c.Get("CurrentEthAddress").(string)
+	}
+	return currentEthAddress
+}
 func GetUIDParam(c echo.Context) (uint64, error) {
 	uidParam := c.Param("uid")
 	uid, err := strconv.ParseUint(uidParam, 10, 64)
