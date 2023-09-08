@@ -125,6 +125,12 @@ func SetRoutes(e *echo.Echo) {
 	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
 	userGroup.GET("/airdrop/info", v1.AirdropInfo)
 	userGroup.POST("/airdrop/receive", v1.ReceiveAirdrop)
+
+	// mining
+	groupV1.GET("/admob/ssv", v1.ADMobSSV)
+	groupV1.GET("/ad_mining/estimate_bonus", v1.EstimateAdBonus)
+	groupV1.GET("/mb_airdrop/user/:misesid", v1.FindMBAirdropUser)
+	groupV1.GET("/mb_airdrop/claim", v1.ClaimMBAirdrop)
 }
 
 func getSwapRateConfigCommon() middleware.RateLimiterConfig {

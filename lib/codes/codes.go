@@ -57,6 +57,7 @@ const (
 	UsernameExistedCode     = 403001
 	TokenExpiredCode        = 403002
 	NotFoundCode            = 404000
+	StatusRequestTimeout    = 408000
 	UnprocessableEntityCode = 422000
 	UsernameDuplicateCode   = 422001
 	TooManyRequestCode      = 429001
@@ -77,6 +78,7 @@ var (
 	ErrTokenExpired        = Code{HTTPStatus: http.StatusForbidden, Code: TokenExpiredCode, Msg: "authorization expired"}
 	ErrUsernameExisted     = Code{HTTPStatus: http.StatusUnprocessableEntity, Code: UsernameExistedCode, Msg: "username had existed"}
 	ErrNotFound            = Code{HTTPStatus: http.StatusNotFound, Code: NotFoundCode, Msg: "not found"}
+	ErrRequestTimeout      = Code{HTTPStatus: http.StatusRequestTimeout, Code: StatusRequestTimeout, Msg: "request timed out"}
 	ErrUnprocessableEntity = Code{HTTPStatus: http.StatusUnprocessableEntity, Code: UnprocessableEntityCode, Msg: "unprocessable entity"}
 	ErrUsernameDuplicate   = Code{HTTPStatus: http.StatusUnprocessableEntity, Code: UsernameDuplicateCode, Msg: "username duplicate"}
 	ErrTooManyRequest      = Code{HTTPStatus: http.StatusTooManyRequests, Code: TooManyRequestCode, Msg: "too many requests"}
