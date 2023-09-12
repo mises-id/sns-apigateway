@@ -12,12 +12,18 @@ type AdMiningConfig struct {
 }
 
 type MiningBonusConfig struct {
-	BonusToMbRate float32 `json:"bonus_to_mb_rate"`
+	BonusToMbRate        float32 `json:"bonus_to_mb_rate"`
+	MinRedeemBonusAmount float64 `json:"min_redeem_bonus_amount"`
+}
+
+type MBAirdropConfig struct {
+	MinReDeemMisAmount float64 `json:"min_redeem_mis_amount"`
 }
 
 type MiningConfigResponse struct {
-	Bonus    *MiningBonusConfig
-	AdMining *AdMiningConfig
+	Bonus     *MiningBonusConfig `json:"bonus"`
+	AdMining  *AdMiningConfig    `json:"ad_mining"`
+	MBAirdrop *MBAirdropConfig   `json:"mb_airdrop"`
 }
 
 type RedeemBonusRequest struct {
@@ -52,7 +58,11 @@ func buildMiningConfigResponse(in *miningsvc.GetMiningConfigResponse) (resp *Min
 		return
 	}
 
-	resp = &MiningConfigResponse{}
+	resp = &MiningConfigResponse{
+		MBAirdrop: &MBAirdropConfig{
+			MinReDeemMisAmount: in.MinRedeemMisAmount,
+		},
+	}
 	if in.AdMining != nil {
 		resp.AdMining = &AdMiningConfig{
 			LimitPerDay: in.AdMining.LimitPerDay,
@@ -60,7 +70,8 @@ func buildMiningConfigResponse(in *miningsvc.GetMiningConfigResponse) (resp *Min
 	}
 	if in.Bonus != nil {
 		resp.Bonus = &MiningBonusConfig{
-			BonusToMbRate: in.Bonus.BonusToMbRate,
+			BonusToMbRate:        in.Bonus.BonusToMbRate,
+			MinRedeemBonusAmount: in.Bonus.MinRedeemBonusAmount,
 		}
 	}
 

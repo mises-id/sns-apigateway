@@ -105,7 +105,10 @@ func GetUIDParam(c echo.Context) (uint64, error) {
 func SignIn(c echo.Context) error {
 	params := &SignInParams{}
 	if err := c.Bind(params); err != nil {
-		return err
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	if params.UserAuthz == nil {
+		return codes.ErrInvalidArgument.New("invalid auth params")
 	}
 	grpcsvc, ctx, err := rest.GrpcSocialService()
 	if err != nil {

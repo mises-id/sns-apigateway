@@ -11,12 +11,12 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v33 v33.0.0
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/khaiql/dbcleaner v2.3.0+incompatible
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/mises-id/mises-miningsvc v0.0.0-20230908093030-9cd0b12e25ad
+	github.com/mises-id/mises-miningsvc v0.0.0-20230912054059-9eaedd4ddc46
 	github.com/mises-id/mises-swapsvc v0.0.0-20230814055413-e9f08887e452
 	github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905

@@ -476,8 +476,8 @@ github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1/go.mod h1:kpwsk12EmLe
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
-github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.3.1 h1:KjJaJ9iWZ3jOFZIf1Lqf4laDRCasjl0BCmnEGxkdLb4=
+github.com/google/uuid v1.3.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/gax-go/v2 v2.1.0/go.mod h1:Q3nei7sK6ybPYH7twZdmQpAd1MKb7pfu6SK+H1/DsU0=
@@ -713,10 +713,8 @@ github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165 h1:Mxckg274TgMJdV9
 github.com/mises-id/kit v0.12.1-0.20211203081751-bc5397e8a165/go.mod h1:DgFsaQj1L1J6bmxSDY2kL3Ojfc84sm7c9zYKwsp/wjM=
 github.com/mises-id/mises-airdropsvc v0.0.0-20221130054556-d620ec688270 h1:tvmpjRuuuLe5bYKqGkCGf1ER+X6oDklGvY7MohFWb/E=
 github.com/mises-id/mises-airdropsvc v0.0.0-20221130054556-d620ec688270/go.mod h1:aYnJ8f3XahSVWKVj+Svxbl5EiIaIpDymhnhm2TROS8U=
-github.com/mises-id/mises-miningsvc v0.0.0-20230908061632-02cbf7c7bfd8 h1:Cp05cB163uOivxmmxALjnDHnMQIMoq+HfoC0bpbjY1A=
-github.com/mises-id/mises-miningsvc v0.0.0-20230908061632-02cbf7c7bfd8/go.mod h1:Bo7KPZNgK+tDIg+F7sSNh0Vp1nXmFiiXPx9l9chyOT8=
-github.com/mises-id/mises-miningsvc v0.0.0-20230908093030-9cd0b12e25ad h1:qH0SHxlbNeDzqc805B1y07uZQy2/4dSiwsiwRAc6Plk=
-github.com/mises-id/mises-miningsvc v0.0.0-20230908093030-9cd0b12e25ad/go.mod h1:Bo7KPZNgK+tDIg+F7sSNh0Vp1nXmFiiXPx9l9chyOT8=
+github.com/mises-id/mises-miningsvc v0.0.0-20230912054059-9eaedd4ddc46 h1:zD8i6PYDUK171P02MN6jxjgpkE+3PzfGg7i4xTscdUg=
+github.com/mises-id/mises-miningsvc v0.0.0-20230912054059-9eaedd4ddc46/go.mod h1:STI1rBf0V8yEBWXUjn4uWtrOujoBfJEzEDqdGQWR8t8=
 github.com/mises-id/mises-swapsvc v0.0.0-20230814055413-e9f08887e452 h1:d67cygjUgMqpCGITMb2q0aPsCrckYmsu6il9Q+O4KPE=
 github.com/mises-id/mises-swapsvc v0.0.0-20230814055413-e9f08887e452/go.mod h1:bDby41ImhEsBEsI77AOrrYpmWgcGS64rCuU9Sy61bgE=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 h1:i7i9Dr+EBf/MtroFdgl1yt8xNYPPRWg+njtcZnktaB0=

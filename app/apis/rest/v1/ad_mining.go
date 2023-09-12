@@ -22,6 +22,43 @@ type EstimateAdBonusResponse struct {
 	Point float32 `json:"point"`
 	Msg   string  `json:"msg"`
 }
+type AdMiningUseResponse struct {
+	EthAddress      string `json:"eth_address"`
+	LimitPerDay     uint32 `json:"limit_per_day"`
+	TodayBonusCount uint32 `json:"today_bonus_count"`
+}
+
+func MyAdMining(c echo.Context) (err error) {
+
+	ethAddress := GetCurrentEthAddress(c)
+
+	grpcsvc, ctx, err := rest.GrpcMiningService()
+	if err != nil {
+		return err
+	}
+	resp, err := grpcsvc.FindAdMiningUser(ctx, &miningsvc.FindAdMiningUserRequest{
+		EthAddress: ethAddress,
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, builAdMiningUserResponse(resp))
+}
+
+func builAdMiningUserResponse(in *miningsvc.FindAdMiningUserResponse) *AdMiningUseResponse {
+
+	if in == nil {
+		return nil
+	}
+	resp := &AdMiningUseResponse{
+		EthAddress:      in.EthAddress,
+		LimitPerDay:     in.LimitPerDay,
+		TodayBonusCount: in.TodayBonusCount,
+	}
+
+	return resp
+}
 
 func EstimateAdBonus(c echo.Context) error {
 
