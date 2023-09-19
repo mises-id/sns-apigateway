@@ -280,6 +280,7 @@ func SwapHealth(c echo.Context) error {
 	}
 	return rest.BuildSuccessResp(c, nil)
 }
+
 func SwapTrade(c echo.Context) error {
 	params := &SwapTradeRequest{}
 	if err := c.Bind(params); err != nil {
@@ -289,6 +290,7 @@ func SwapTrade(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	ethAddress := GetCurrentEthAddress(c)
 	svcresp, err := grpcsvc.SwapTrade(ctx, &pb.SwapTradeRequest{
 		ChainID:           params.ChainID,
 		FromTokenAddress:  params.FromTokenAddress,
@@ -298,6 +300,7 @@ func SwapTrade(c echo.Context) error {
 		Amount:            params.Amount,
 		Slippage:          params.Slippage,
 		AggregatorAddress: params.AggregatorAddress,
+		Misesid:           ethAddress,
 	})
 	if err != nil {
 		return err

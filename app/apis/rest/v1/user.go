@@ -86,6 +86,13 @@ func GetCurrentUID(c echo.Context) uint64 {
 	}
 	return currentUID
 }
+func GetCurrentMisesID(c echo.Context) string {
+	var currentMisesID string
+	if c.Get("CurrentMisesID") != nil {
+		currentMisesID = c.Get("CurrentMisesID").(string)
+	}
+	return currentMisesID
+}
 func GetCurrentEthAddress(c echo.Context) string {
 	var currentEthAddress string
 	if c.Get("CurrentEthAddress") != nil {

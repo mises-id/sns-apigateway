@@ -18,6 +18,7 @@ type MiningBonusConfig struct {
 
 type MBAirdropConfig struct {
 	MinReDeemMisAmount float64 `json:"min_redeem_mis_amount"`
+	MisRedeemMBFee     float64 `json:"mis_redeem_mb_fee"`
 }
 
 type MiningConfigResponse struct {
@@ -61,6 +62,7 @@ func buildMiningConfigResponse(in *miningsvc.GetMiningConfigResponse) (resp *Min
 	resp = &MiningConfigResponse{
 		MBAirdrop: &MBAirdropConfig{
 			MinReDeemMisAmount: in.MinRedeemMisAmount,
+			MisRedeemMBFee:     in.MisRedeemMbFee,
 		},
 	}
 	if in.AdMining != nil {
