@@ -266,32 +266,26 @@ func ResetSvrPool(cfg PoolCfg) {
 	defer cancel()
 
 	socialSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.SocialSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
 	storageSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.StorageSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
 	websiteSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.WebsiteSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
 	airdropSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.AirdropSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
 	swapSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.SwapSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
 	mingsvcSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
-		println("grpcpool", "new connection created")
 		return grpc.DialContext(ctx, cfg.MiningSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 

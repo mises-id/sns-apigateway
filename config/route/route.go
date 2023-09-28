@@ -136,6 +136,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.GET("/mining/bonus", v1.GetBonus)
 	userGroup.GET("/ad_mining/me", v1.MyAdMining)
 	userGroup.POST("/mining/redeem_bonus", v1.RedeemBonus, redeemBonusRateConfigWithUser)
+	userGroup.POST("/ad_mining/log", v1.AdMiningLog, redeemBonusRateConfigWithUser)
 }
 func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
 
