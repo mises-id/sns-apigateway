@@ -49,16 +49,16 @@ var ErrorResponseMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 
 			code, ok := err.(codes.Code)
 			if !ok {
-				log.WithFields(map[string]interface{}{
-					"RequestID": c.Response().Header().Get(echo.HeaderXRequestID),
-					"Uri":       c.Request().RequestURI,
-				}).Error("Unkown Error:", err)
 				code = codes.ErrInternal
 			} else {
 				if msg != "" {
 					code = code.New(msg)
 				}
 			}
+			log.WithFields(map[string]interface{}{
+				"RequestID": c.Response().Header().Get(echo.HeaderXRequestID),
+				"Uri":       c.Request().RequestURI,
+			}).Error(err)
 
 			return c.JSON(code.HTTPStatus, code)
 		}

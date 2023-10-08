@@ -17,21 +17,54 @@ type EstimateAdBonusRequest struct {
 	TxID    string `json:"tx_id" query:"tx_id"`
 	Address string `json:"address" query:"address"`
 }
+type AdMiningLogRequest struct {
+	AdType string `json:"ad_type" query:"ad_type"`
+}
 
 type EstimateAdBonusResponse struct {
 	Point float32 `json:"point"`
 	Msg   string  `json:"msg"`
 }
-type AdMiningUseResponse struct {
+type AdMiningUserResponse struct {
 	EthAddress      string `json:"eth_address"`
 	LimitPerDay     uint32 `json:"limit_per_day"`
 	TodayBonusCount uint32 `json:"today_bonus_count"`
 }
 
+func AdMiningLog(c echo.Context) (err error) {
+
+	params := &AdMiningLogRequest{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	ethAddress := GetCurrentEthAddress(c)
+	grpcsvc, ctx, err := rest.GrpcMiningService()
+	if err != nil {
+		return err
+	}
+	user_agent := userAgent(c)
+	_, err = grpcsvc.AdMiningLog(ctx, &miningsvc.AdMiningLogRequest{
+		AdType:  params.AdType,
+		Address: ethAddress,
+		UserAgent: &miningsvc.UserAgent{
+			Ua:       user_agent.ua,
+			Ipaddr:   user_agent.ipaddr,
+			Os:       user_agent.os,
+			Browser:  user_agent.browser,
+			Platform: user_agent.platform,
+			DeviceId: user_agent.device_id,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, nil)
+}
+
 func MyAdMining(c echo.Context) (err error) {
 
 	ethAddress := GetCurrentEthAddress(c)
-
 	grpcsvc, ctx, err := rest.GrpcMiningService()
 	if err != nil {
 		return err
@@ -46,12 +79,12 @@ func MyAdMining(c echo.Context) (err error) {
 	return rest.BuildSuccessResp(c, builAdMiningUserResponse(resp))
 }
 
-func builAdMiningUserResponse(in *miningsvc.FindAdMiningUserResponse) *AdMiningUseResponse {
+func builAdMiningUserResponse(in *miningsvc.FindAdMiningUserResponse) *AdMiningUserResponse {
 
 	if in == nil {
 		return nil
 	}
-	resp := &AdMiningUseResponse{
+	resp := &AdMiningUserResponse{
 		EthAddress:      in.EthAddress,
 		LimitPerDay:     in.LimitPerDay,
 		TodayBonusCount: in.TodayBonusCount,
@@ -122,6 +155,7 @@ func buildADMobSSVResponseOnError(err error) *AdMiningCallbackResponse {
 
 	return resp
 }
+
 func buildADMobSSVResponse(in *miningsvc.AdMiningCallbackResponse) *AdMiningCallbackResponse {
 
 	if in == nil {

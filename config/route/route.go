@@ -109,7 +109,7 @@ func SetRoutes(e *echo.Echo) {
 	swapRateConfiWithUserWalletAddress := getSwapRateConfigWithUserWalletAddress()
 	swapCommonRateLimiter := middleware.RateLimiterWithConfig(swapRateConfigCommon)
 	swapRateLimiterWithUserWalletAddress := middleware.RateLimiterWithConfig(swapRateConfiWithUserWalletAddress)
-	swapGroup := e.Group("/api/v1", swapCommonRateLimiter, swapRateLimiterWithUserWalletAddress, mw.ErrorResponseMiddleware)
+	swapGroup := e.Group("/api/v1", swapCommonRateLimiter, swapRateLimiterWithUserWalletAddress, mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware)
 	swapGroup.GET("/swap/order/:from_address", v1.PageSwapOrder)
 	swapGroup.GET("/swap/order/:from_address/:tx_hash", v1.FindSwapOrder)
 	swapGroup.GET("/swap/approve/allowance", v1.GetSwapApproveAllowance)
@@ -127,22 +127,23 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/airdrop/receive", v1.ReceiveAirdrop)
 
 	// mining
+	redeemBonusRateConfigWithUser := middleware.RateLimiterWithConfig(getRedeemBonusRateConfigWithUser())
 	groupV1.GET("/admob/ssv", v1.ADMobSSV)
 	groupV1.GET("/ad_mining/estimate_bonus", v1.EstimateAdBonus)
 	groupV1.GET("/mb_airdrop/user/:misesid", v1.FindMBAirdropUser)
-	groupV1.GET("/mb_airdrop/claim", v1.ClaimMBAirdrop)
+	userGroup.GET("/mb_airdrop/claim", v1.ClaimMBAirdrop, redeemBonusRateConfigWithUser)
 	groupV1.GET("/mining/config", v1.GeMiningConfig)
 	userGroup.GET("/mining/bonus", v1.GetBonus)
 	userGroup.GET("/ad_mining/me", v1.MyAdMining)
-	redeemBonusRateConfigWithUser := middleware.RateLimiterWithConfig(getRedeemBonusRateConfigWithUser())
 	userGroup.POST("/mining/redeem_bonus", v1.RedeemBonus, redeemBonusRateConfigWithUser)
+	userGroup.POST("/ad_mining/log", v1.AdMiningLog, redeemBonusRateConfigWithUser)
 }
 func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
 
 	redeemBonusRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
 		Rate:      1,
-		Burst:     60,
-		ExpiresIn: 1 * time.Minute,
+		Burst:     1,
+		ExpiresIn: 1 * time.Second,
 	})
 	redeemBonusRateConfigWithUser := middleware.RateLimiterConfig{
 		Store:       redeemBonusRateLimitStore,

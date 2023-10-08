@@ -32,7 +32,7 @@ func Auth(ctx context.Context, authToken string) (*UserSession, error) {
 		if err.Error() == "Token is expired" {
 			return nil, codes.ErrTokenExpired
 		}
-		return nil, err
+		return nil, codes.ErrInvalidAuthToken.New(err.Error())
 	}
 	mapClaims := claim.Claims.(jwt.MapClaims)
 	userSession := &UserSession{
@@ -63,6 +63,7 @@ var SetCurrentUserMiddleware = func(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			c.Set("CurrentUser", userSession)
 			c.Set("CurrentUID", userSession.UID)
+			c.Set("CurrentMisesID", userSession.Misesid)
 			c.Set("CurrentEthAddress", userSession.EthAddress)
 		}
 
