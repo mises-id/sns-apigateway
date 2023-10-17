@@ -24,6 +24,25 @@ type MBAirdropClaimParams struct {
 	TxHash         string `json:"tx_hash" query:"tx_hash"`
 }
 
+type AirdropDetectResponse struct {
+	Retry uint64 `json:"retry"`
+}
+
+func AirdropDetect(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcMiningService()
+	if err != nil {
+		return err
+	}
+	resp, err := grpcsvc.DetectAirdrop(ctx, &miningsvc.DetectAirdropRequest{
+		Misesid: GetCurrentMisesID(c),
+	})
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, &AirdropDetectResponse{resp.Retry})
+}
+
 func ClaimMBAirdrop(c echo.Context) (err error) {
 
 	misesid := GetCurrentMisesID(c)
