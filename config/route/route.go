@@ -121,6 +121,11 @@ func SetRoutes(e *echo.Echo) {
 		Level: 5,
 	}))
 
+	// bridge
+	bridgeRateLimiterWithIP := middleware.RateLimiterWithConfig(getBridgeRateLimiterWithIPConfig())
+	bridgeGroup := e.Group("/api/v1", bridgeRateLimiterWithIP, mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
+
+
 	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl, middleware.RateLimiterWithConfig(rateConfig))
 	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
 	userGroup.GET("/airdrop/info", v1.AirdropInfo)
@@ -138,6 +143,24 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.POST("/mining/redeem_bonus", v1.RedeemBonus, redeemBonusRateConfigWithUser)
 	userGroup.POST("/ad_mining/log", v1.AdMiningLog, redeemBonusRateConfigWithUser)
 }
+
+func getBridgeRateLimiterWithIPConfig() middleware.RateLimiterConfig {
+	bridgeRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      10,
+		Burst:     10,
+		ExpiresIn: 1 * time.Minute,
+	})
+	bridgeRateConfigWithIP := middleware.RateLimiterConfig{
+		Store:       bridgeRateLimitStore,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+		IdentifierExtractor: func(ctx echo.Context) (string, error) {
+			id := ctx.RealIP() + ctx.Path()
+			return id, nil
+		},
+	}
+	return bridgeRateConfigWithIP
+}
+
 func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
 
 	redeemBonusRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
