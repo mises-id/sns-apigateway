@@ -762,6 +762,14 @@ github.com/mises-id/mises-miningsvc v0.0.1 h1:q8BmJghbFUGJmHCkJHwOyed3u3ByqEx62Z
 github.com/mises-id/mises-miningsvc v0.0.1/go.mod h1:Iy/f1mLOn04UCfOkPHYTX4Oe0ugij4m4B8wX8xeEtmg=
 github.com/mises-id/mises-swapsvc v0.0.0-20230919073402-8fd4bafe2824 h1:kfcJ3/yoX7z0gSlGmvBzDJqASO8XsvrIFbpuV3Ul7QY=
 github.com/mises-id/mises-swapsvc v0.0.0-20230919073402-8fd4bafe2824/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
+github.com/mises-id/mises-swapsvc v0.0.0-20231107090536-e94d35c19153 h1:v1KWO1OoVWMPZcAjp8t1ExiiYlb5xXzRdc+3pKkObaI=
+github.com/mises-id/mises-swapsvc v0.0.0-20231107090536-e94d35c19153/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108024506-0c5ecb54229f h1:NGJyA/emZRwDniseVB8DkA7mH+t9v0FLunGzhuvIsQk=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108024506-0c5ecb54229f/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108024858-d68b0b9b7bb5 h1:AeEWGQubPxIYqeyNq7ubXSn+LtMb3VxJLsXZdXgabXk=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108024858-d68b0b9b7bb5/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108034543-f0e782dd30f1 h1:azPO30cuta9fU9bcEBcAq+mrCtBPiqFZ0zvOtBpnXEs=
+github.com/mises-id/mises-swapsvc v0.0.0-20231108034543-f0e782dd30f1/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 h1:i7i9Dr+EBf/MtroFdgl1yt8xNYPPRWg+njtcZnktaB0=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27/go.mod h1:maeY2/FsDxFGNKCyt3XnP1fi5ygJNMUGIr3v0PQ6z0w=
 github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977 h1:ZpVmfFpryl6zEw0BR9S5rWT6VmKxCLcB5n6e7QMKf/U=

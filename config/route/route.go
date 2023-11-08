@@ -124,7 +124,16 @@ func SetRoutes(e *echo.Echo) {
 	// bridge
 	bridgeRateLimiterWithIP := middleware.RateLimiterWithConfig(getBridgeRateLimiterWithIPConfig())
 	bridgeGroup := e.Group("/api/v1", bridgeRateLimiterWithIP, mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
-
+	bridgeGroup.POST("/bridge/get_currencies", v1.BridgeGetCurrencies)
+	bridgeGroup.POST("/bridge/get_pairs_params", v1.BridgeGetPairsParams)
+	bridgeGroup.POST("/bridge/get_exchange_amount", v1.BridgeGetExchangeAmount)
+	bridgeGroup.POST("/bridge/create_transaction", v1.BridgeCreateTransaction)
+	bridgeGroup.POST("/bridge/get_transaction_info", v1.BridgeGetTransactionInfo)
+	bridgeGroup.POST("/bridge/get_transaction_status", v1.BridgeGetTransactionStatus)
+	bridgeGroup.POST("/bridge/validate_address", v1.BridgeValidateAddress)
+	bridgeGroup.POST("/bridge/get_fix_rate_for_amount", v1.BridgeGetFixRateForAmount)
+	bridgeGroup.POST("/bridge/create_fix_transaction", v1.BridgeCreateFixTransaction)
+	bridgeGroup.POST("/bridge/history_list", v1.BridgeHistoryList)
 
 	userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl, middleware.RateLimiterWithConfig(rateConfig))
 	//userGroup.GET("/twitter/auth_url", v1.TwitterAuthUrl)
