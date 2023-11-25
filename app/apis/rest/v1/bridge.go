@@ -61,6 +61,7 @@ func BridgeCreateTransaction(c echo.Context) (err error) {
     if err != nil {
         return err
     }
+    params.EthAddress = GetCurrentEthAddress(c)
     ret, err := grpcsvc.BridgeCreateTransaction(ctx, params)
     if err != nil {
         return err
@@ -141,6 +142,7 @@ func BridgeCreateFixTransaction(c echo.Context) (err error) {
     if err != nil {
         return err
     }
+    params.EthAddress = GetCurrentEthAddress(c)
     ret, err := grpcsvc.BridgeCreateFixTransaction(ctx, params)
     if err != nil {
         return err
@@ -157,6 +159,7 @@ func BridgeHistoryList(c echo.Context) (err error) {
     if err != nil {
         return err
     }
+    params.EthAddress = GetCurrentEthAddress(c)
     ret, err := grpcsvc.BridgeHistoryList(ctx, params)
     if err != nil {
         return err
