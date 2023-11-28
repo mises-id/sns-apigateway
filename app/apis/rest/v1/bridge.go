@@ -7,6 +7,46 @@ import (
     "github.com/mises-id/sns-apigateway/lib/codes"
 )
 
+type BridgeGetCurrenciesItem struct {
+    Ticker             string   `json:"symbol"`
+    Name               string   `json:"name"`
+    ContractAddress    string   `json:"address"`
+    Image              string   `json:"logo_uri"`
+    Enabled            bool     `json:"bridgeEnabled"`
+    EnabledFrom        bool     `json:"bridgeEnabledFrom"`
+    EnabledTo          bool     `json:"bridgeEnabledTo"`
+    FixRateEnabled     bool     `json:"bridgeFixRateEnabled"`
+    PayinConfirmations uint64   `json:"bridgePayinConfirmations"`
+    ExtraIdName        string   `json:"bridgeExtraIdName"`
+    FixedTime          uint64   `json:"bridgeFixedTime"`
+    Protocol           string   `json:"bridgeProtocol"`
+    Blockchain         string   `json:"bridgeBlockchain"`
+    Notifications      *swapsvc.BridgeNotifications `json:"bridgeNotifications"`
+}
+
+func buildBridgeGetCurrenciesSuccessResp(c echo.Context, data []*swapsvc.BridgeCurrencyInfo) error {
+    ret := make([]*BridgeGetCurrenciesItem, 0, len(data))
+    for _, v := range data {
+        ret = append(ret, &BridgeGetCurrenciesItem{
+            Ticker: v.Ticker,
+            Name: v.Name,
+            ContractAddress: v.ContractAddress,
+            Image: v.Image,
+            Enabled: v.Enabled,
+            EnabledFrom: v.EnabledFrom,
+            EnabledTo: v.EnabledTo,
+            FixRateEnabled: v.FixRateEnabled,
+            PayinConfirmations: v.PayinConfirmations,
+            ExtraIdName: v.ExtraIdName,
+            FixedTime: v.FixedTime,
+            Protocol: v.Protocol,
+            Blockchain: v.Blockchain,
+            Notifications: v.Notifications,
+        })
+    }
+    return rest.BuildSuccessResp(c, ret)
+}
+
 func BridgeGetCurrencies(c echo.Context) (err error) {
     grpcsvc, ctx, err := rest.GrpcSwapService()
     if err != nil {
@@ -17,7 +57,7 @@ func BridgeGetCurrencies(c echo.Context) (err error) {
     if err != nil {
         return err
     }
-    return rest.BuildSuccessResp(c, ret.Data)
+    return buildBridgeGetCurrenciesSuccessResp(c, ret.Data)
 }
 
 func BridgeGetPairsParams(c echo.Context) (err error) {
