@@ -123,7 +123,8 @@ func SetRoutes(e *echo.Echo) {
 
 	// bridge
 	bridgeRateLimiterWithIP := middleware.RateLimiterWithConfig(getBridgeRateLimiterWithIPConfig())
-	bridgeGroup := e.Group("/api/v1", bridgeRateLimiterWithIP, mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
+	//bridgeGroup := e.Group("/api/v1", bridgeRateLimiterWithIP, mw.ErrorResponseMiddleware, appmw.SetCurrentUserMiddleware, appmw.RequireCurrentUserMiddleware)
+	bridgeGroup := e.Group("/api/v1", bridgeRateLimiterWithIP, mw.ErrorResponseMiddleware)
 	bridgeGroup.POST("/bridge/get_currencies", v1.BridgeGetCurrencies)
 	bridgeGroup.POST("/bridge/get_pairs_params", v1.BridgeGetPairsParams)
 	bridgeGroup.POST("/bridge/get_exchange_amount", v1.BridgeGetExchangeAmount)
