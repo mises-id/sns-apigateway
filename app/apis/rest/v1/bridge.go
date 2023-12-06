@@ -5,6 +5,7 @@ import (
     swapsvc "github.com/mises-id/mises-swapsvc/proto"
     "github.com/mises-id/sns-apigateway/app/apis/rest"
     "github.com/mises-id/sns-apigateway/lib/codes"
+    "time"
 )
 
 type BridgeGetCurrenciesItem struct {
@@ -22,6 +23,17 @@ type BridgeGetCurrenciesItem struct {
     Protocol           string   `json:"bridgeProtocol"`
     Blockchain         string   `json:"bridgeBlockchain"`
     Notifications      *swapsvc.BridgeNotifications `json:"bridgeNotifications"`
+}
+
+type NewBridgeHistoryItem struct {
+    Id           string `json:"id"`
+    Status       string `json:"status"`
+    CreatedAt    string `json:"createdAt"`
+    CurrencyFrom string `json:"currencyFrom"`
+    AmountFrom   string `json:"amountFrom"`
+    CurrencyTo   string `json:"currencyTo"`
+    AmountTo     string `json:"amountTo"`
+    TrackUrl     string `json:"trackUrl"`
 }
 
 func buildBridgeGetCurrenciesSuccessResp(c echo.Context, data []*swapsvc.BridgeCurrencyInfo) error {
@@ -190,6 +202,29 @@ func BridgeCreateFixTransaction(c echo.Context) (err error) {
     return rest.BuildSuccessResp(c, ret.Data)
 }
 
+func buildBridgeHistoryListSuccessResp(c echo.Context, data []*swapsvc.BridgeHistoryItem) error {
+    ret := make([]*NewBridgeHistoryItem, 0, len(data))
+    for _, v := range data {
+        ret = append(ret, &NewBridgeHistoryItem{
+            Id: v.Id,
+            Status: v.Status,
+            CreatedAt: bridgeHistoryFormatTime(v.CreatedAt),
+            CurrencyFrom: v.CurrencyFrom,
+            CurrencyTo: v.CurrencyTo,
+            AmountFrom: v.AmountFrom,
+            AmountTo: v.AmountTo,
+            TrackUrl: v.TrackUrl,
+        })
+    }
+    return rest.BuildSuccessResp(c, ret)
+}
+
+func bridgeHistoryFormatTime(unixTimestamp int64) string {
+    t := time.Unix(unixTimestamp, 0)
+    t = t.UTC()
+    return t.Format("02 Jan 2006, 15:04:05")
+}
+
 func BridgeHistoryList(c echo.Context) (err error) {
     params := &swapsvc.BridgeHistoryListRequest{}
     if err := c.Bind(params); err != nil {
@@ -204,5 +239,5 @@ func BridgeHistoryList(c echo.Context) (err error) {
     if err != nil {
         return err
     }
-    return rest.BuildSuccessResp(c, ret.Data)
+    return buildBridgeHistoryListSuccessResp(c, ret.Data)
 }
