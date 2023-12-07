@@ -17,7 +17,7 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-miningsvc v0.0.1
-	github.com/mises-id/mises-swapsvc v0.0.0-20231203234314-5c10fb5b4598
+	github.com/mises-id/mises-swapsvc v0.0.0-20231207071805-9f78ce4915c3
 	github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
 	github.com/mises-id/sns-storagesvc v0.0.0-20220920081129-d682f954bf94

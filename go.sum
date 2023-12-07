@@ -780,6 +780,8 @@ github.com/mises-id/mises-swapsvc v0.0.0-20231203222909-fc7ef7cdd7a0 h1:yzRbsF2Y
 github.com/mises-id/mises-swapsvc v0.0.0-20231203222909-fc7ef7cdd7a0/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
 github.com/mises-id/mises-swapsvc v0.0.0-20231203234314-5c10fb5b4598 h1:JmysZzcolrBGlanOsuXplgvaZO20TI9lgKUEqjv3VG4=
 github.com/mises-id/mises-swapsvc v0.0.0-20231203234314-5c10fb5b4598/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
+github.com/mises-id/mises-swapsvc v0.0.0-20231207071805-9f78ce4915c3 h1:e4vBw17ohxuc2wpITKiv2OwQ+sViGOGGkE3/e3Klgr0=
+github.com/mises-id/mises-swapsvc v0.0.0-20231207071805-9f78ce4915c3/go.mod h1:lVM3wuOaNb6P6TXFK6KT1sp84ozg0CrxtG1oSin26RM=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27 h1:i7i9Dr+EBf/MtroFdgl1yt8xNYPPRWg+njtcZnktaB0=
 github.com/mises-id/mises-tm v0.0.0-20220303064252-ef3c1ed6ee27/go.mod h1:maeY2/FsDxFGNKCyt3XnP1fi5ygJNMUGIr3v0PQ6z0w=
 github.com/mises-id/mises-websitesvc v0.0.0-20230420013945-3e2e2af1c977 h1:ZpVmfFpryl6zEw0BR9S5rWT6VmKxCLcB5n6e7QMKf/U=
