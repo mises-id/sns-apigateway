@@ -41,7 +41,7 @@ func buildBridgeGetCurrenciesSuccessResp(c echo.Context, data []*swapsvc.BridgeC
     for _, v := range data {
         ret = append(ret, &BridgeGetCurrenciesItem{
             Ticker: v.Ticker,
-            Name: v.Name,
+            Name: v.Fullname,
             ContractAddress: v.ContractAddress,
             Image: v.Image,
             Enabled: v.Enabled,
