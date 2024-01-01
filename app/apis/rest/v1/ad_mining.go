@@ -5,6 +5,7 @@ import (
 	miningsvc "github.com/mises-id/mises-miningsvc/proto"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
+	"github.com/sirupsen/logrus"
 )
 
 type AdMiningCallbackResponse struct {
@@ -145,6 +146,27 @@ func ADMobSSV(c echo.Context) error {
 	}
 
 	return rest.BuildSuccessResp(c, buildADMobSSVResponse(resp))
+}
+
+// mintegral callback
+func MintegralCallback(c echo.Context) error {
+
+	urlStr := c.Request().URL.String()
+	grpcsvc, ctx, err := rest.GrpcMiningService()
+	if err != nil {
+		logrus.Error("MintegralCallback:grpc:", err)
+		return rest.Build403Resp(c, "internal error")
+	}
+	_, err = grpcsvc.AdMiningCallback(ctx, &miningsvc.AdMiningCallbackRequest{
+		AdType:      "mintegral",
+		CallbackUrl: urlStr,
+	})
+	if err != nil {
+		logrus.Error("MintegralCallback:response:", err)
+		return rest.Build403Resp(c, "process error")
+	}
+
+	return rest.BuildSuccessResp(c, nil)
 }
 
 func buildADMobSSVResponseOnError(err error) *AdMiningCallbackResponse {

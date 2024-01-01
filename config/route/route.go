@@ -144,6 +144,7 @@ func SetRoutes(e *echo.Echo) {
 	// mining
 	redeemBonusRateConfigWithUser := middleware.RateLimiterWithConfig(getRedeemBonusRateConfigWithUser())
 	groupV1.GET("/admob/ssv", v1.ADMobSSV)
+	groupV1.GET("/adcallback/mintegral", v1.MintegralCallback)
 	groupV1.GET("/ad_mining/estimate_bonus", v1.EstimateAdBonus)
 	groupV1.GET("/mb_airdrop/user/:misesid", v1.FindMBAirdropUser)
 	userGroup.GET("/mb_airdrop/claim", v1.ClaimMBAirdrop, redeemBonusRateConfigWithUser)

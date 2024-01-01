@@ -57,6 +57,14 @@ type PageParams struct {
 }
 
 // BuildSuccessResp return a success response with payload
+func Build403Resp(c echo.Context, data interface{}) error {
+	return c.JSON(http.StatusForbidden, echo.Map{
+		"code": http.StatusForbidden,
+		"data": data,
+	})
+}
+
+// BuildSuccessResp return a success response with payload
 func BuildSuccessResp(c echo.Context, data interface{}) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"code": 0,
