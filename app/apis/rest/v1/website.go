@@ -35,6 +35,11 @@ type (
 	WebsiteSearchParams struct {
 		Keywords string `json:"keywords" query:"keywords"`
 	}
+
+	WebsiteInternalSearchParams struct {
+		Type     string `json:"type" query:"type"`
+		Keywords string `json:"keywords" query:"keywords"`
+	}
 )
 
 func PageWebsite(c echo.Context) error {
@@ -79,6 +84,25 @@ func SearchWebsite(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, BuildWebsiteSliceResp(svcresp.Data))
+}
+
+func WebsiteInternalSearch(c echo.Context) error {
+	params := &WebsiteInternalSearchParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.InternalSearch(ctx, &pb.InternalSearchRequest{
+		Type:     params.Type,
+		Keywords: params.Keywords,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, svcresp.Data)
 }
 
 func PageExtensions(c echo.Context) error {

@@ -35,6 +35,7 @@ func SetRoutes(e *echo.Echo) {
 	groupV1.GET("/website_category/list", v1.ListWebsiteCategory)
 	groupV1.GET("/website/page", v1.PageWebsite)
 	groupV1.GET("/website/search", v1.SearchWebsite)
+	groupV1.GET("/website/internal_search", v1.WebsiteInternalSearch)
 	//extension
 	groupV1.GET("/extensions_category/list", v1.ListExtensionsCategory)
 	groupV1.GET("/extensions/page", v1.PageExtensions)
