@@ -39,6 +39,7 @@ type (
 	WebsiteInternalSearchParams struct {
 		Type     string `json:"type" query:"type"`
 		Keywords string `json:"keywords" query:"keywords"`
+		Limit    int32  `json:"limit" query:"limit"`
 	}
 )
 
@@ -98,6 +99,7 @@ func WebsiteInternalSearch(c echo.Context) error {
 	svcresp, err := grpcsvc.InternalSearch(ctx, &pb.InternalSearchRequest{
 		Type:     params.Type,
 		Keywords: params.Keywords,
+		Limit:    params.Limit,
 	})
 	if err != nil {
 		return err
