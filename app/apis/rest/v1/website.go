@@ -41,6 +41,14 @@ type (
 		Keywords string `json:"keywords" query:"keywords"`
 		Limit    int32  `json:"limit" query:"limit"`
 	}
+
+	WebsiteInternalSearchResp struct {
+		ID       string  `json:"id"`
+		Title    string  `json:"title"`
+		Url      string  `json:"url"`
+		Logo     string  `json:"logo"`
+		Desc     string  `json:"desc"`
+	}
 )
 
 func PageWebsite(c echo.Context) error {
@@ -104,7 +112,7 @@ func WebsiteInternalSearch(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, svcresp.Data)
+	return rest.BuildSuccessResp(c, BuildInternalSearchSliceResp(svcresp.Data))
 }
 
 func PageExtensions(c echo.Context) error {
@@ -190,6 +198,28 @@ func BuildWebsiteResp(data *pb.Website) *WebsiteResp {
 	}
 	if data.Subcategory != nil {
 		resp.Subcategory = BuildWebsiteCategoryResp(data.Subcategory)
+	}
+	return resp
+}
+
+func BuildInternalSearchSliceResp(data []*pb.WebsiteBase) []*WebsiteInternalSearchResp {
+	resp := make([]*WebsiteInternalSearchResp, len(data))
+	for i, v := range data {
+		resp[i] = BuildInternalSearchResp(v)
+	}
+	return resp
+}
+
+func BuildInternalSearchResp(data *pb.WebsiteBase) *WebsiteInternalSearchResp {
+	if data == nil {
+		return nil
+	}
+	resp := &WebsiteInternalSearchResp{
+		ID:                data.Id,
+		Title:             data.Title,
+		Url:               data.Url,
+		Logo:              data.Logo,
+		Desc:              data.Desc,
 	}
 	return resp
 }
