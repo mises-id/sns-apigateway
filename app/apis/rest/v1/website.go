@@ -49,6 +49,16 @@ type (
 		Logo     string  `json:"logo"`
 		Desc     string  `json:"desc"`
 	}
+
+	WebsiteHotKeywordsParams struct {
+		Location string `json:"location" query:"location"`
+		Limit    int32  `json:"limit" query:"limit"`
+	}
+
+	WebsiteHotKeywordsResp struct {
+		Title    string  `json:"title"`
+		Desc     string  `json:"desc"`
+	}
 )
 
 func PageWebsite(c echo.Context) error {
@@ -113,6 +123,25 @@ func WebsiteInternalSearch(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, BuildInternalSearchSliceResp(svcresp.Data))
+}
+
+func WebsiteHotKeywords(c echo.Context) error {
+	params := &WebsiteHotKeywordsParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.New("invalid query params")
+	}
+	grpcsvc, ctx, err := rest.GrpcWebsiteService()
+	if err != nil {
+		return err
+	}
+	svcresp, err := grpcsvc.HotKeywords(ctx, &pb.HotKeywordsRequest{
+		Location: params.Location,
+		Limit:    params.Limit,
+	})
+	if err != nil {
+		return err
+	}
+	return rest.BuildSuccessResp(c, svcresp.Data)
 }
 
 func PageExtensions(c echo.Context) error {
