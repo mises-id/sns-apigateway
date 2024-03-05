@@ -50,14 +50,13 @@ type (
 		Desc     string  `json:"desc"`
 	}
 
+	WebsiteHotKeywordsResp struct {
+		Title    string  `json:"k"`
+	}
+
 	WebsiteHotKeywordsParams struct {
 		Location string `json:"location" query:"location"`
 		Limit    int32  `json:"limit" query:"limit"`
-	}
-
-	WebsiteHotKeywordsResp struct {
-		Title    string  `json:"title"`
-		Desc     string  `json:"desc"`
 	}
 )
 
@@ -141,7 +140,7 @@ func WebsiteHotKeywords(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, svcresp.Data)
+	return rest.BuildSuccessResp(c, BuildHotKeywordsResp(svcresp.Data))
 }
 
 func PageExtensions(c echo.Context) error {
@@ -231,10 +230,24 @@ func BuildWebsiteResp(data *pb.Website) *WebsiteResp {
 	return resp
 }
 
+func BuildHotKeywordsResp(data []*pb.KeywordBase) []*WebsiteHotKeywordsResp {
+	resp := make([]*WebsiteHotKeywordsResp, 0, len(data))
+	for _, v := range data {
+		if v != nil {
+			resp = append(resp, &WebsiteHotKeywordsResp{
+				Title: v.Title,
+			})
+		}
+	}
+	return resp
+}
+
 func BuildInternalSearchSliceResp(data []*pb.WebsiteBase) []*WebsiteInternalSearchResp {
-	resp := make([]*WebsiteInternalSearchResp, len(data))
-	for i, v := range data {
-		resp[i] = BuildInternalSearchResp(v)
+	resp := make([]*WebsiteInternalSearchResp, 0, len(data))
+	for _, v := range data {
+		if v != nil {
+			resp = append(resp, BuildInternalSearchResp(v))
+		}
 	}
 	return resp
 }
