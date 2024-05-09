@@ -21,7 +21,7 @@ func FetchOrderInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, resp)
+	return rest.BuildSuccessResp(c, resp.Data)
 }
 
 func FetchOrders(c echo.Context) error {
@@ -38,7 +38,7 @@ func FetchOrders(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, resp)
+	return rest.BuildSuccessResp(c, resp.Data)
 }
 
 func VpnInfo(c echo.Context) error {
@@ -55,7 +55,7 @@ func VpnInfo(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, resp)
+	return rest.BuildSuccessResp(c, resp.Data)
 }
 
 func CreateOrder(c echo.Context) error {
@@ -72,7 +72,7 @@ func CreateOrder(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, resp)
+	return rest.BuildSuccessResp(c, resp.Data)
 }
 
 func UpdateOrder(c echo.Context) error {
@@ -89,5 +89,5 @@ func UpdateOrder(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, resp)
+	return rest.BuildSuccessResp(c, resp.Data)
 }
