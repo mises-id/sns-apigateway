@@ -15,6 +15,8 @@ import (
 	miningsvcgrpcclient "github.com/mises-id/mises-miningsvc/svc/client/grpc"
 	swapvcpb "github.com/mises-id/mises-swapsvc/proto"
 	swapsvcgrpcclient "github.com/mises-id/mises-swapsvc/svc/client/grpc"
+	vpnsvcpb "github.com/mises-id/mises-vpnsvc/proto"
+	vpnsvcgrpcclient "github.com/mises-id/mises-vpnsvc/svc/client/grpc"
 	websitesvcpb "github.com/mises-id/mises-websitesvc/proto"
 	websitesvcgrpcclient "github.com/mises-id/mises-websitesvc/svc/client/grpc"
 	pb "github.com/mises-id/sns-socialsvc/proto"
@@ -31,6 +33,7 @@ var (
 	airdropSvcPool *grpcpool.Pool
 	swapSvcPool    *grpcpool.Pool
 	mingsvcSvcPool *grpcpool.Pool
+	vpnSvcPool     *grpcpool.Pool
 	store          sync.Map
 )
 
@@ -41,6 +44,7 @@ type PoolCfg struct {
 	AirdropSvcURI string
 	SwapSvcURI    string
 	MiningSvcURI  string
+	VpnSvcURI     string
 	Capacity      int
 	IdleTimeout   time.Duration
 }
@@ -223,6 +227,7 @@ func GrpcWebsiteService() (websitesvcpb.WebsitesvcServer, context.Context, error
 	svcclient, err := websitesvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
+
 func GrpcSwapService() (swapvcpb.SwapsvcServer, context.Context, error) {
 	conn, err := swapSvcPool.Get(context.Background())
 	if err != nil {
@@ -234,6 +239,20 @@ func GrpcSwapService() (swapvcpb.SwapsvcServer, context.Context, error) {
 	ctx := context.WithValue(context.Background(), "key", "value")
 
 	svcclient, err := swapsvcgrpcclient.New(conn.ClientConn)
+	return svcclient, ctx, err
+}
+
+func GrpcVpnService() (vpnsvcpb.VpnsvcServer, context.Context, error) {
+	conn, err := vpnSvcPool.Get(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create grpcclient: %q", err)
+	}
+	defer conn.Close()
+
+	// Create a context with the header key and value
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	svcclient, err := vpnsvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
 
@@ -297,11 +316,15 @@ func ResetSvrPool(cfg PoolCfg) {
 		return grpc.DialContext(ctx, cfg.MiningSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
+	vpnSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		return grpc.DialContext(ctx, cfg.VpnSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	if err != nil {
 		panic(err)
 	}
 }
 
 func init() {
-	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", ":3540", 1, 60})
+	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", ":3540", ":7040", 1, 60})
 }

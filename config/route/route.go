@@ -154,6 +154,15 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.GET("/ad_mining/me", v1.MyAdMining)
 	userGroup.POST("/mining/redeem_bonus", v1.RedeemBonus, redeemBonusRateConfigWithUser)
 	userGroup.POST("/ad_mining/log", v1.AdMiningLog, redeemBonusRateConfigWithUser)
+
+	// vpn
+	vpnRateLimitByUser := middleware.RateLimiterWithConfig(getVpnRateLimitByUser())
+	vpnGroup := userGroup.Group("/vpn", vpnRateLimitByUser)
+	vpnGroup.GET("/info", v1.VpnInfo)
+	vpnGroup.GET("/orders", v1.FetchOrders)
+	vpnGroup.GET("/order/:orderId", v1.FetchOrderInfo)
+	vpnGroup.POST("/order/create", v1.CreateOrder)
+	vpnGroup.PATCH("/order/update", v1.UpdateOrder)
 }
 
 func getBridgeRateLimiterWithIPConfig() middleware.RateLimiterConfig {
@@ -190,6 +199,25 @@ func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
 	}
 
 	return redeemBonusRateConfigWithUser
+}
+
+func getVpnRateLimitByUser() middleware.RateLimiterConfig {
+
+	vpnRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
+		Rate:      1,
+		Burst:     1,
+		ExpiresIn: 3 * time.Minute,
+	})
+	vpnRateLimitByUser := middleware.RateLimiterConfig{
+		Store:       vpnRateLimitStore,
+		DenyHandler: mw.ErrTooManyRequestFunc,
+		IdentifierExtractor: func(c echo.Context) (string, error) {
+			id := getCurrentEthAddress(c) + c.Path()
+			return id, nil
+		},
+	}
+
+	return vpnRateLimitByUser
 }
 
 func getSwapRateConfigCommon() middleware.RateLimiterConfig {
