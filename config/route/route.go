@@ -163,6 +163,8 @@ func SetRoutes(e *echo.Echo) {
 	vpnGroup.GET("/order/:orderId", v1.FetchOrderInfo)
 	vpnGroup.POST("/order/create", v1.CreateOrder)
 	vpnGroup.PATCH("/order/update", v1.UpdateOrder)
+	vpnGroup.GET("/server_list", v1.GetServerList)
+	vpnGroup.POST("/server_link", v1.GetServerLink)
 }
 
 func getBridgeRateLimiterWithIPConfig() middleware.RateLimiterConfig {

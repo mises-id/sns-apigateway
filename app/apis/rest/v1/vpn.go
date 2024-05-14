@@ -5,6 +5,7 @@ import (
 	pb "github.com/mises-id/mises-vpnsvc/proto"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/lib/codes"
+	"net/http"
 )
 
 func FetchOrderInfo(c echo.Context) error {
@@ -90,4 +91,50 @@ func UpdateOrder(c echo.Context) error {
 		return err
 	}
 	return rest.BuildSuccessResp(c, resp.Data)
+}
+
+func GetServerList(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcVpnService()
+	if err != nil {
+		return buildErrorRespForVpnClient(c, "service error")
+	}
+	params := &pb.GetServerListRequest{}
+	params.EthAddress = GetCurrentEthAddress(c)
+	resp, err := grpcsvc.GetServerList(ctx, params)
+	if err != nil {
+		return buildErrorRespForVpnClient(c, "get server list error")
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"msg": "success",
+		"servers": resp.Data.Servers,
+	})
+}
+
+func GetServerLink(c echo.Context) error {
+	grpcsvc, ctx, err := rest.GrpcVpnService()
+	if err != nil {
+		return buildErrorRespForVpnClient(c, "service error")
+	}
+	params := &pb.GetServerLinkRequest{}
+	if err := c.Bind(params); err != nil {
+		return buildErrorRespForVpnClient(c, "params error")
+	}
+	params.EthAddress = GetCurrentEthAddress(c)
+	resp, err := grpcsvc.GetServerLink(ctx, params)
+	if err != nil {
+		return buildErrorRespForVpnClient(c, "get vpn link error")
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 0,
+		"msg": "success",
+		"config": resp.Data,
+	})
+}
+
+func buildErrorRespForVpnClient(c echo.Context, errMsg string) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": -1,
+		"msg": errMsg,
+	})
 }
