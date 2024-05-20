@@ -206,9 +206,9 @@ func getRedeemBonusRateConfigWithUser() middleware.RateLimiterConfig {
 func getVpnRateLimitByUser() middleware.RateLimiterConfig {
 
 	vpnRateLimitStore := middleware.NewRateLimiterMemoryStoreWithConfig(middleware.RateLimiterMemoryStoreConfig{
-		Rate:      1,
-		Burst:     1,
-		ExpiresIn: 3 * time.Minute,
+		Rate:      5,
+		Burst:     5,
+		ExpiresIn: 5 * time.Minute,
 	})
 	vpnRateLimitByUser := middleware.RateLimiterConfig{
 		Store:       vpnRateLimitStore,
