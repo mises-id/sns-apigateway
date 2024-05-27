@@ -14,9 +14,7 @@ func FetchOrderInfo(c echo.Context) error {
 		return err
 	}
 	params := &pb.FetchOrderInfoRequest{}
-	if err := c.Bind(params); err != nil {
-		return codes.ErrInvalidArgument.New("invalid query params")
-	}
+	params.OrderId = c.Param("orderId")
 	params.EthAddress = GetCurrentEthAddress(c)
 	resp, err := grpcsvc.FetchOrderInfo(ctx, params)
 	if err != nil {
