@@ -35,7 +35,7 @@ require (
 	github.com/cosmos/iavl v0.20.0 // indirect
 	github.com/golang/glog v1.1.0 // indirect
 	github.com/holiman/uint256 v1.2.3 // indirect
-	github.com/mises-id/mises-vpnsvc v0.0.0-20240514091637-0b6a71125bc4 // indirect
+	github.com/mises-id/mises-vpnsvc v0.0.0-20240531084423-0f3d92d090c4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/zondax/ledger-go v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e // indirect
