@@ -333,7 +333,7 @@ func init() {
 			AirdropSvcURI:  ":3040",
 			SwapSvcURI:     ":4540",
 			MiningSvcURI:   ":3540",
-			NewsFlowSvcURI: ":3000",
+			NewsFlowSvcURI: ":7000",
 			Capacity:       1,
 			IdleTimeout:    60,
 		})
