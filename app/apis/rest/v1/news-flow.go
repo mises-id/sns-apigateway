@@ -10,7 +10,7 @@ import (
 )
 
 type ListNewsParams struct {
-	PageIndex int32 `json:"page_index" query:"page_index"`
+	BeforeNewsId *string `json:"before_news_id" query:"before_news_id"`
 }
 
 func ListNews(c echo.Context) error {
@@ -24,45 +24,17 @@ func ListNews(c echo.Context) error {
 		return err
 	}
 
-	resp, err := grpcsvc.FindNewsInPage(
-		ctx,
-		&pb.FindNewsInPageParams{
-			PageIndex: params.PageIndex,
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	return rest.BuildSuccessResp(c, NewListNewsRespFromPB(resp))
-}
-
-type ListNewsBeforeParams struct {
-	NewsId *string `json:"news_id" query:"news_id"`
-}
-
-func ListNewsBefore(c echo.Context) error {
-	params := &ListNewsBeforeParams{}
-	if err := c.Bind(params); err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid query params")
-	}
-
-	grpcsvc, ctx, err := rest.GrpcNewsFlowService()
-	if err != nil {
-		return err
-	}
-
 	resp, err := grpcsvc.FindNewsInPageBefore(
 		ctx,
 		&pb.FindNewsInPageBeforeRequest{
-			NewsId: params.NewsId,
+			NewsId: params.BeforeNewsId,
 		},
 	)
 	if err != nil {
 		return err
 	}
 
-	return rest.BuildSuccessResp(c, NewListNewsBeforeResponseFromPB(resp))
+	return rest.BuildSuccessResp(c, NewListNewsResponseFromPB(resp))
 }
 
 type GetNewsParams struct {
@@ -70,10 +42,7 @@ type GetNewsParams struct {
 }
 
 func GetNews(c echo.Context) error {
-	params := &GetNewsParams{}
-	if err := c.Bind(params); err != nil {
-		return codes.ErrInvalidArgument.Newf("invalid query params")
-	}
+	newsId := c.Param("id")
 
 	grpcsvc, ctx, err := rest.GrpcNewsFlowService()
 	if err != nil {
@@ -83,7 +52,7 @@ func GetNews(c echo.Context) error {
 	resp, err := grpcsvc.GetNewsById(
 		ctx,
 		&pb.GetNewsByIdRequest{
-			Id: params.Id,
+			Id: newsId,
 		},
 	)
 	if err != nil {
@@ -93,37 +62,19 @@ func GetNews(c echo.Context) error {
 	return rest.BuildSuccessResp(c, NewGetNewsByIdRespFromPB(resp))
 }
 
-type ListNewsResp struct {
-	NewsArray     []*News `json:"news_array"`
-	NextPageIndex int32   `json:"next_page_index"`
-}
-
-func NewListNewsRespFromPB(pbResp *pb.FindNewsInPageResult) *ListNewsResp {
-	newsArray := make([]*News, 0)
-	for _, pbNews := range pbResp.NewsArray {
-		if news := NewNewsFromPB(pbNews); news != nil {
-			newsArray = append(newsArray, news)
-		}
-	}
-	return &ListNewsResp{
-		NewsArray:     newsArray,
-		NextPageIndex: pbResp.NextPageIndex,
-	}
-}
-
-type ListNewsBeforeResponse struct {
+type ListNewsResponse struct {
 	NewsArray []*News `json:"news_array"`
 	HaveMore  bool    `json:"have_more"`
 }
 
-func NewListNewsBeforeResponseFromPB(pbResp *pb.FindNewsInPageBeforeResponse) *ListNewsBeforeResponse {
+func NewListNewsResponseFromPB(pbResp *pb.FindNewsInPageBeforeResponse) *ListNewsResponse {
 	newsArray := make([]*News, 0)
 	for _, pbNews := range pbResp.NewsArray {
 		if news := NewNewsFromPB(pbNews); news != nil {
 			newsArray = append(newsArray, news)
 		}
 	}
-	return &ListNewsBeforeResponse{
+	return &ListNewsResponse{
 		NewsArray: newsArray,
 		HaveMore:  pbResp.HaveMore,
 	}
