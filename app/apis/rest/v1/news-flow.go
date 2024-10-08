@@ -175,3 +175,81 @@ func NewNewsFromPB(pbNews *pb.News) *News {
 		Currencies:  currencies,
 	}
 }
+
+type ListStrategiesParams struct {
+	BeforeStrategyId *string `json:"before_strategy_id" query:"before_strategy_id"`
+}
+
+func ListStrategies(c echo.Context) error {
+	params := &ListStrategiesParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcNewsFlowService()
+	if err != nil {
+		return err
+	}
+
+	resp, err := grpcsvc.FindStrategiesInPageBefore(
+		ctx,
+		&pb.FindStrategiesInPageBeforeRequest{
+			StrategyId: params.BeforeStrategyId,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, NewListStrategiesResponseFromPB(resp))
+}
+
+type Strategy struct {
+	Id     string `json:"id"`
+	Source string `json:"source"`
+	// 如果source是youtube，则content id是video id
+	// 如果source是twitter，则content id是post id
+	ContentId   string    `json:"content_id"`
+	PublishedAt time.Time `json:"published_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Title       string    `json:"title"`
+	Thumbnail   string    `json:"thumbnail"`
+	Link        string    `json:"link"`
+	AuthorName  string    `json:"author_name"`
+	AuthorId    string    `json:"author_id"`
+}
+
+type ListStrategiesResponse struct {
+	Strategies []*Strategy `json:"strategies"`
+	HaveMore   bool        `json:"have_more"`
+}
+
+func NewListStrategiesResponseFromPB(pbResp *pb.FindStrategiesInPageBeforeResponse) *ListStrategiesResponse {
+	strategies := make([]*Strategy, 0)
+	for _, pbStrategy := range pbResp.Strategies {
+		if strategy := NewStrategyFromPB(pbStrategy); strategy != nil {
+			strategies = append(strategies, strategy)
+		}
+	}
+	return &ListStrategiesResponse{
+		Strategies: strategies,
+		HaveMore:   pbResp.HaveMore,
+	}
+}
+
+func NewStrategyFromPB(pbStrategy *pb.Strategy) *Strategy {
+	return &Strategy{
+		Id:     pbStrategy.Id,
+		Source: pbStrategy.Source,
+		// 如果source是youtube，则content id是video id
+		// 如果source是twitter，则content id是post id
+		ContentId:   pbStrategy.ContentId,
+		PublishedAt: pbStrategy.PublishedAt.AsTime(),
+		UpdatedAt:   pbStrategy.UpdatedAt.AsTime(),
+		Title:       pbStrategy.Title,
+		Thumbnail:   pbStrategy.Thumbnail,
+		Link:        pbStrategy.Link,
+		AuthorName:  pbStrategy.AuthorName,
+		AuthorId:    pbStrategy.AuthorId,
+	}
+}

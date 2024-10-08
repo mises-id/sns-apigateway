@@ -61,6 +61,7 @@ func SetRoutes(e *echo.Echo) {
 	userGroup.DELETE("/user/blacklist/:uid", v1.DeleteBlacklist)
 	groupV1.GET("/news", v1.ListNews)
 	groupV1.GET("/news/:id", v1.GetNews)
+	groupV1.GET("/strategies", v1.ListStrategies)
 
 	groupV1.GET("/user/:uid/like", v1.ListUserLike)
 	groupV1.GET("/user/:uid/status", v1.ListUserStatus)

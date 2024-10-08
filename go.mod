@@ -19,7 +19,7 @@ require (
 	github.com/labstack/echo-contrib v0.12.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/mises-id/mises-miningsvc v0.0.1
-	github.com/mises-id/mises-news-flow v0.0.0-incompatible
+	github.com/mises-id/mises-news-flow v0.0.0-20240929075608-3188332b4d5c
 	github.com/mises-id/mises-swapsvc v0.0.0-20231207071805-9f78ce4915c3
 	github.com/mises-id/mises-websitesvc v0.0.0-20240118032135-feffd573977f
 	github.com/mises-id/sns-socialsvc v0.0.0-20221130055324-bb97ffd6e905
@@ -200,4 +200,4 @@ replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.6
 
 replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.17.3
 
-replace github.com/mises-id/mises-news-flow => /Users/tingzhenlin/project/mises/mises-news-flow
+// replace github.com/mises-id/mises-news-flow => /Users/tingzhenlin/project/mises/mises-news-flow
