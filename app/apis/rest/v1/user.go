@@ -56,6 +56,24 @@ type UserFullResp struct {
 	NewFansCount   uint64      `json:"new_fans_count"`
 }
 
+type UserRestrictedResp struct {
+	UID            uint64      `json:"uid"`
+	Username       string      `json:"username"`
+	Misesid        string      `json:"misesid"`
+	Gender         string      `json:"gender"`
+	Intro          string      `json:"intro"`
+	Avatar         *AvatarResp `json:"avatar"`
+	IsFollowed     bool        `json:"is_followed"`
+	IsBlocked      bool        `json:"is_blocked"`
+	IsLogined      bool        `json:"is_logined"`
+	IsAirdropped   bool        `json:"is_airdropped"`
+	AirdropStatus  bool        `json:"airdrop_status"`
+	FollowingCount uint64      `json:"followings_count"`
+	FansCount      uint64      `json:"fans_count"`
+	LikedCount     uint64      `json:"liked_count"`
+	NewFansCount   uint64      `json:"new_fans_count"`
+}
+
 type UserSummaryResp struct {
 	UID         uint64      `json:"uid"`
 	Username    string      `json:"username"`
@@ -248,8 +266,9 @@ func FindUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, svcresp.IsFollowed))
+	return rest.BuildSuccessResp(c, BuildUserRestrictedResp(svcresp.User, svcresp.IsFollowed))
 }
+
 func FindMisesUser(c echo.Context) error {
 	currentUID := GetCurrentUID(c)
 	misesidParam := c.Param("misesid")
@@ -265,7 +284,7 @@ func FindMisesUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return rest.BuildSuccessResp(c, BuildUserFullResp(svcresp.User, svcresp.IsFollowed))
+	return rest.BuildSuccessResp(c, BuildUserRestrictedResp(svcresp.User, svcresp.IsFollowed))
 }
 
 type UserProfileParams struct {
@@ -401,6 +420,37 @@ func BuildUserFullResp(user *pb.UserInfo, followed bool) *UserFullResp {
 		Mobile:         user.Mobile,
 		Email:          user.Email,
 		Address:        user.Address,
+		IsFollowed:     followed,
+		IsAirdropped:   user.IsAirdropped,
+		AirdropStatus:  user.AirdropStatus,
+		IsBlocked:      user.IsBlocked,
+		IsLogined:      user.IsLogined,
+		FollowingCount: uint64(user.FollowingsCount),
+		FansCount:      uint64(user.FansCount),
+		LikedCount:     uint64(user.LikedCount),
+		NewFansCount:   uint64(user.NewFansCount),
+		Intro:          user.Intro,
+	}
+	if user.AvatarUrl != nil {
+		resp.Avatar = &AvatarResp{
+			Small:      user.AvatarUrl.Small,
+			Medium:     user.AvatarUrl.Medium,
+			Large:      user.AvatarUrl.Large,
+			NftAssetId: user.AvatarUrl.NftAssetId,
+		}
+	}
+	return resp
+}
+
+func BuildUserRestrictedResp(user *pb.UserInfo, followed bool) *UserRestrictedResp {
+	if user == nil {
+		return nil
+	}
+	resp := &UserRestrictedResp{
+		UID:            user.Uid,
+		Username:       user.Username,
+		Misesid:        user.Misesid,
+		Gender:         user.Gender,
 		IsFollowed:     followed,
 		IsAirdropped:   user.IsAirdropped,
 		AirdropStatus:  user.AirdropStatus,

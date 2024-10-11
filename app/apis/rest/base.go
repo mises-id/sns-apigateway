@@ -13,6 +13,7 @@ import (
 	airdropsvcgrpcclient "github.com/mises-id/mises-airdropsvc/svc/client/grpc"
 	miningsvcpb "github.com/mises-id/mises-miningsvc/proto"
 	miningsvcgrpcclient "github.com/mises-id/mises-miningsvc/svc/client/grpc"
+	newsflowpb "github.com/mises-id/mises-news-flow/pkg/proto/apiserver/v1"
 	swapvcpb "github.com/mises-id/mises-swapsvc/proto"
 	swapsvcgrpcclient "github.com/mises-id/mises-swapsvc/svc/client/grpc"
 	websitesvcpb "github.com/mises-id/mises-websitesvc/proto"
@@ -25,24 +26,26 @@ import (
 )
 
 var (
-	socialSvcPool  *grpcpool.Pool
-	storageSvcPool *grpcpool.Pool
-	websiteSvcPool *grpcpool.Pool
-	airdropSvcPool *grpcpool.Pool
-	swapSvcPool    *grpcpool.Pool
-	mingsvcSvcPool *grpcpool.Pool
-	store          sync.Map
+	socialSvcPool   *grpcpool.Pool
+	storageSvcPool  *grpcpool.Pool
+	websiteSvcPool  *grpcpool.Pool
+	airdropSvcPool  *grpcpool.Pool
+	swapSvcPool     *grpcpool.Pool
+	mingsvcSvcPool  *grpcpool.Pool
+	newsFlowSvcPool *grpcpool.Pool
+	store           sync.Map
 )
 
 type PoolCfg struct {
-	SocialSvcURI  string
-	StorageSvcURI string
-	WebsiteSvcURI string
-	AirdropSvcURI string
-	SwapSvcURI    string
-	MiningSvcURI  string
-	Capacity      int
-	IdleTimeout   time.Duration
+	SocialSvcURI   string
+	StorageSvcURI  string
+	WebsiteSvcURI  string
+	AirdropSvcURI  string
+	SwapSvcURI     string
+	MiningSvcURI   string
+	NewsFlowSvcURI string
+	Capacity       int
+	IdleTimeout    time.Duration
 }
 type PageQuickParams struct {
 	Limit  int64  `json:"limit" query:"limit"`
@@ -264,6 +267,21 @@ func GrpcAirdropService() (airdropsvcpb.AirdropsvcServer, context.Context, error
 	svcclient, err := airdropsvcgrpcclient.New(conn.ClientConn)
 	return svcclient, ctx, err
 }
+
+func GrpcNewsFlowService() (newsflowpb.ApiserverClient, context.Context, error) {
+	conn, err := newsFlowSvcPool.Get(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create news-flow grpcclient: %q", err)
+	}
+	defer conn.Close()
+
+	// Create a context with the header key and value
+	ctx := context.WithValue(context.Background(), "key", "value")
+
+	client := newsflowpb.NewApiserverClient(conn.ClientConn)
+	return client, ctx, nil
+}
+
 func InMemoryStore() *sync.Map {
 	return &store
 }
@@ -297,11 +315,26 @@ func ResetSvrPool(cfg PoolCfg) {
 		return grpc.DialContext(ctx, cfg.MiningSvcURI, grpc.WithInsecure())
 	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
 
+	newsFlowSvcPool, err = grpcpool.NewWithContext(ctx, func(ctx context.Context) (*grpc.ClientConn, error) {
+		return grpc.DialContext(ctx, cfg.NewsFlowSvcURI, grpc.WithInsecure())
+	}, 0, cfg.Capacity, cfg.IdleTimeout*time.Second)
+
 	if err != nil {
 		panic(err)
 	}
 }
 
 func init() {
-	ResetSvrPool(PoolCfg{":5040", ":6040", ":4040", ":3040", ":4540", ":3540", 1, 60})
+	ResetSvrPool(
+		PoolCfg{
+			SocialSvcURI:   ":5040",
+			StorageSvcURI:  ":6040",
+			WebsiteSvcURI:  ":4040",
+			AirdropSvcURI:  ":3040",
+			SwapSvcURI:     ":4540",
+			MiningSvcURI:   ":3540",
+			NewsFlowSvcURI: ":7000",
+			Capacity:       1,
+			IdleTimeout:    60,
+		})
 }
