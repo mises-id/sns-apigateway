@@ -1,8 +1,8 @@
 module github.com/mises-id/sns-apigateway
 
-go 1.21
+go 1.24.0
 
-toolchain go1.21.6
+toolchain go1.24.2
 
 require (
 	github.com/bluele/factory-go v0.0.1
@@ -171,12 +171,12 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/zondax/hid v0.9.1 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.43.0 // indirect
+	golang.org/x/net v0.46.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/term v0.36.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5 // indirect
@@ -200,4 +200,4 @@ replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.6
 
 replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.17.3
 
-// replace github.com/mises-id/mises-news-flow => /Users/tingzhenlin/project/mises/mises-news-flow
+replace github.com/mises-id/mises-news-flow => /Users/baoge/Documents/work/mises-news-flow

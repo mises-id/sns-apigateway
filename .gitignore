@@ -3,3 +3,4 @@ main.exe
 .env
 keystore
 .idea
+sns-apigateway-darwin

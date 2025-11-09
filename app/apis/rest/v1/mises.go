@@ -1,18 +1,12 @@
 package v1
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mises-id/sns-apigateway/app/apis/rest"
 	"github.com/mises-id/sns-apigateway/config/env"
-
-	cosmosrest "github.com/cosmos/cosmos-sdk/types/rest"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	types "github.com/tendermint/tendermint/rpc/jsonrpc/types"
 )
 
 type GasPricesResp struct {
@@ -56,30 +50,36 @@ func ChainInfo(c echo.Context) error {
 
 	}
 	if info == nil {
-		resp, err := cosmosrest.GetRequest(fmt.Sprintf("%s/block", "http://127.0.0.1:26657"))
-		if err != nil {
-			return err
-		}
-		rpcResponse := &types.RPCResponse{}
-		err = tmjson.Unmarshal(
-			resp,
-			rpcResponse,
-		)
-		if err != nil {
-			return err
-		}
-		resultBlock := &ctypes.ResultBlock{}
-		err = tmjson.Unmarshal(
-			rpcResponse.Result,
-			resultBlock,
-		)
-		if err != nil {
-			return err
-		}
+		// resp, err := cosmosrest.GetRequest(fmt.Sprintf("%s/block", "http://127.0.0.1:26657"))
+		// if err != nil {
+		// 	return err
+		// }
+		// rpcResponse := &types.RPCResponse{}
+		// err = tmjson.Unmarshal(
+		// 	resp,
+		// 	rpcResponse,
+		// )
+		// if err != nil {
+		// 	return err
+		// }
+		// resultBlock := &ctypes.ResultBlock{}
+		// err = tmjson.Unmarshal(
+		// 	rpcResponse.Result,
+		// 	resultBlock,
+		// )
+		// if err != nil {
+		// 	return err
+		// }
+		// info = &LastBlockInfo{
+		// 	hash:      resultBlock.BlockID.Hash.String(),
+		// 	height:    resultBlock.Block.Height,
+		// 	chainID:   resultBlock.Block.ChainID,
+		// 	blockTime: time.Now(),
+		// }
 		info = &LastBlockInfo{
-			hash:      resultBlock.BlockID.Hash.String(),
-			height:    resultBlock.Block.Height,
-			chainID:   resultBlock.Block.ChainID,
+			hash:      "",
+			height:    0,
+			chainID:   "",
 			blockTime: time.Now(),
 		}
 		store.Store("LastBlockInfo", info)

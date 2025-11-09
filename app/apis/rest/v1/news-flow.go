@@ -85,9 +85,10 @@ func NewGetNewsByIdRespFromPB(pbNews *pb.News) *News {
 }
 
 type NewsSource struct {
-	Title  string `json:"title"`
-	Domain string `json:"domain"`
-	Region string `json:"region"`
+	Title     string `json:"title"`
+	Domain    string `json:"domain"`
+	Region    string `json:"region"`
+	Thumbnail string `json:"thumbnail"`
 }
 
 type Currency struct {
@@ -160,9 +161,10 @@ func NewNewsFromPB(pbNews *pb.News) *News {
 		Id:            pbNews.Id,
 		CrawledSource: pbNews.CrawledSource,
 		Source: NewsSource{
-			Title:  pbNews.Source.Title,
-			Domain: pbNews.Source.Domain,
-			Region: pbNews.Source.Region,
+			Title:     pbNews.Source.Title,
+			Domain:    pbNews.Source.Domain,
+			Region:    pbNews.Source.Region,
+			Thumbnail: pbNews.Source.Thumbnail,
 		},
 		PublishedAt: pbNews.PublishedAt.AsTime(),
 		Title:       pbNews.Title,
@@ -251,5 +253,109 @@ func NewStrategyFromPB(pbStrategy *pb.Strategy) *Strategy {
 		Link:        pbStrategy.Link,
 		AuthorName:  pbStrategy.AuthorName,
 		AuthorId:    pbStrategy.AuthorId,
+	}
+}
+
+type XmodView struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func NewXmodViewFromPB(pbView *pb.XmodView) *XmodView {
+	if pbView == nil {
+		return nil
+	}
+
+	return &XmodView{
+		Id:   pbView.ViewId,
+		Name: pbView.ViewName,
+	}
+}
+
+type ListXmodViewsParams struct {
+}
+type ListXmodViewsResponse struct {
+	ViewArray []*XmodView `json:"view_array"`
+}
+
+func NewListXmodViewsResponseFromPB(pbResp *pb.FindAllXmodViewsResponse) *ListXmodViewsResponse {
+	viewArray := make([]*XmodView, 0)
+	for _, pbView := range pbResp.Views {
+		if view := NewXmodViewFromPB(pbView); view != nil {
+			viewArray = append(viewArray, view)
+		}
+	}
+	return &ListXmodViewsResponse{
+		ViewArray: viewArray,
+	}
+}
+
+func ListXmodViews(c echo.Context) error {
+	params := &ListXmodViewsParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcNewsFlowService()
+	if err != nil {
+		return err
+	}
+
+	resp, err := grpcsvc.FindAllXmodViews(
+		ctx,
+		&pb.FindAllXmodViewsRequest{},
+	)
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, NewListXmodViewsResponseFromPB(resp))
+}
+
+type ListXmodStreamParams struct {
+	BeforeNewsId *string `json:"before_news_id" query:"before_news_id"`
+}
+
+type ListXmodStreamResponse struct {
+	NewsArray []*News `json:"news_array"`
+	HaveMore  bool    `json:"have_more"`
+}
+
+func ListXmodStream(c echo.Context) error {
+	viewId := c.Param("id")
+	params := &ListXmodStreamParams{}
+	if err := c.Bind(params); err != nil {
+		return codes.ErrInvalidArgument.Newf("invalid query params")
+	}
+
+	grpcsvc, ctx, err := rest.GrpcNewsFlowService()
+	if err != nil {
+		return err
+	}
+
+	resp, err := grpcsvc.FindXmodStreamInPageBefore(
+		ctx,
+		&pb.FindXmodStreamInPageBeforeRequest{
+			ViewId: &viewId,
+			NewsId: params.BeforeNewsId,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return rest.BuildSuccessResp(c, NewListXmodStreamResponseFromPB(resp))
+}
+
+func NewListXmodStreamResponseFromPB(pbResp *pb.FindXmodStreamInPageBeforeResponse) *ListXmodStreamResponse {
+	newsArray := make([]*News, 0)
+	for _, pbNews := range pbResp.NewsArray {
+		if news := NewNewsFromPB(pbNews); news != nil {
+			newsArray = append(newsArray, news)
+		}
+	}
+	return &ListXmodStreamResponse{
+		NewsArray: newsArray,
+		HaveMore:  pbResp.HaveMore,
 	}
 }
