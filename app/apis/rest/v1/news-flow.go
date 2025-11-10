@@ -257,8 +257,10 @@ func NewStrategyFromPB(pbStrategy *pb.Strategy) *Strategy {
 }
 
 type XmodView struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Enabled bool   `json:"enabled"`
+	Type    string `json:"type"`
 }
 
 func NewXmodViewFromPB(pbView *pb.XmodView) *XmodView {
@@ -267,8 +269,10 @@ func NewXmodViewFromPB(pbView *pb.XmodView) *XmodView {
 	}
 
 	return &XmodView{
-		Id:   pbView.ViewId,
-		Name: pbView.ViewName,
+		Id:      pbView.ViewId,
+		Name:    pbView.ViewName,
+		Enabled: pbView.Enabled,
+		Type:    pbView.ViewType,
 	}
 }
 
