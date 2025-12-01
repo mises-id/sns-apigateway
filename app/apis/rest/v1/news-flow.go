@@ -261,6 +261,7 @@ type XmodView struct {
 	Name    string `json:"name"`
 	Enabled bool   `json:"enabled"`
 	Type    string `json:"type"`
+	URL     string `json:"url"`
 }
 
 func NewXmodViewFromPB(pbView *pb.XmodView) *XmodView {
@@ -273,6 +274,7 @@ func NewXmodViewFromPB(pbView *pb.XmodView) *XmodView {
 		Name:    pbView.ViewName,
 		Enabled: pbView.Enabled,
 		Type:    pbView.ViewType,
+		URL:     "https://xmod.cc/#/app?tab=" + pbView.ViewId,
 	}
 }
 
